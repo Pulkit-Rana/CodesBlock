@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-label="Career and interview guide illustration">
+  <rect width="960" height="540" rx="36" fill="#fff6dc"/>
+  <rect x="132" y="104" width="696" height="332" rx="34" fill="#ffffff" stroke="#dbe7f3" stroke-width="4"/>
+  <rect x="188" y="160" width="248" height="36" rx="14" fill="#101828"/>
+  <rect x="188" y="228" width="406" height="20" rx="10" fill="#dbe7f3"/>
+  <rect x="188" y="268" width="338" height="20" rx="10" fill="#dbe7f3"/>
+  <rect x="188" y="336" width="152" height="52" rx="18" fill="#13b981"/>
+  <circle cx="684" cy="249" r="82" fill="#18b6d8" opacity=".22"/>
+  <circle cx="684" cy="220" r="42" fill="#101828"/>
+  <path d="M596 360c18-52 55-78 88-78s70 26 88 78" fill="#f06f8f"/>
+</svg>

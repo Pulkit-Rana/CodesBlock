@@ -1,0 +1,30 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Node modules (if any build tools used)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build artifacts
+dist/
+*.min.css.map
+*.min.js.map
+
+# Sass cache
+.sass-cache/
+*.css.map
+
+# Logs
+*.log
+
+# Temp files
+*.tmp
+*.temp
