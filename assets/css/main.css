@@ -86,6 +86,54 @@ input {
 	z-index: 100;
 }
 
+.top-promo-bar {
+	background:
+		linear-gradient(90deg, #101828, #173a8a 48%, #087a59);
+	color: #fff;
+	font-size: .88rem;
+	position: relative;
+	z-index: 25;
+}
+
+.top-promo-inner {
+	align-items: center;
+	display: flex;
+	gap: 12px;
+	justify-content: center;
+	margin: 0 auto;
+	max-width: var(--container);
+	min-height: 38px;
+	padding: 7px 32px;
+	text-align: center;
+}
+
+.top-promo-inner p {
+	font-weight: 800;
+	margin: 0;
+}
+
+.promo-badge {
+	background: rgba(255,255,255,.16);
+	border: 1px solid rgba(255,255,255,.22);
+	border-radius: 999px;
+	font-size: .68rem;
+	font-weight: 900;
+	letter-spacing: .05em;
+	padding: 3px 8px;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+.top-promo-inner a {
+	background: #fff;
+	border-radius: 999px;
+	color: #101828;
+	font-size: .76rem;
+	font-weight: 900;
+	padding: 5px 10px;
+	white-space: nowrap;
+}
+
 .site-header {
 	background: rgba(247, 251, 255, .74);
 	border-bottom: 1px solid rgba(219, 231, 243, .74);
@@ -93,6 +141,27 @@ input {
 	top: 0;
 	z-index: 20;
 	backdrop-filter: blur(14px);
+	transition:
+		background .45s ease,
+		border-color .45s ease,
+		box-shadow .45s ease,
+		padding .45s ease;
+}
+
+/* ── Scrolled: liquid-glass pill nav ──────────────────── */
+.site-header.is-scrolled {
+	background: transparent;
+	border-bottom-color: transparent;
+	box-shadow: none;
+	padding: 10px 0;
+}
+
+/* The inner row stays full-width but items are laid out with flex */
+.header-inner-full {
+	padding: 0 32px;
+	width: 100%;
+	max-width: none;
+	position: relative; /* anchor for absolute brand/actions */
 }
 
 .header-inner {
@@ -101,6 +170,82 @@ input {
 	gap: 22px;
 	justify-content: space-between;
 	min-height: 70px;
+}
+
+/* When scrolled: brand & actions fade out but keep their width
+   so the nav stays exactly where it is without snapping */
+.site-header.is-scrolled .brand,
+.site-header.is-scrolled .header-actions {
+	opacity: 0;
+	pointer-events: none;
+	transform: translateY(-8px) scale(.98);
+	transition: opacity .3s ease, transform .3s ease, visibility 0s linear .3s;
+	visibility: hidden;
+}
+
+.site-header.is-scrolled .nav-toggle {
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity .3s ease, visibility 0s linear .3s;
+	visibility: hidden;
+}
+
+/* Restored state — elements fade back in */
+.site-header:not(.is-scrolled) .brand,
+.site-header:not(.is-scrolled) .header-actions {
+	opacity: 1;
+	transform: translateY(0) scale(1);
+	pointer-events: auto;
+	transition: opacity .35s ease .05s, transform .35s ease .05s;
+	visibility: visible;
+}
+
+.site-header:not(.is-scrolled) .nav-toggle {
+	opacity: 1;
+	pointer-events: auto;
+	transition: opacity .35s ease .05s;
+	visibility: visible;
+}
+
+/* The nav pill capsule */
+.site-header.is-scrolled .primary-nav {
+	background:
+		linear-gradient(135deg, rgba(255,255,255,.9), rgba(255,255,255,.55)),
+		radial-gradient(circle at 20% 10%, rgba(255,255,255,.95), transparent 36%);
+	border: 1px solid rgba(255,255,255,.86);
+	border-radius: 999px;
+	box-shadow:
+		0 8px 36px rgba(16,24,40,.13),
+		0 2px 8px rgba(16,24,40,.07),
+		inset 0 1px 0 rgba(255,255,255,.97),
+		inset 0 -1px 0 rgba(255,255,255,.55);
+	backdrop-filter: blur(32px) saturate(1.7);
+	-webkit-backdrop-filter: blur(32px) saturate(1.7);
+	padding: 6px 10px;
+}
+
+.site-header.is-scrolled .header-inner-full {
+	justify-content: center;
+}
+
+.site-header:not(.is-scrolled) .primary-nav {
+	background: transparent;
+	border: none;
+	border-radius: 0;
+	box-shadow: none;
+	padding: 0;
+	backdrop-filter: none;
+}
+
+/* Smoothly transition the nav pill appearance */
+.primary-nav {
+	transition:
+		background .4s ease,
+		border-color .4s ease,
+		box-shadow .4s ease,
+		border-radius .4s ease,
+		padding .4s ease,
+		backdrop-filter .4s ease;
 }
 
 .brand {
@@ -606,28 +751,61 @@ h3 {
 	border-bottom: 1px solid var(--line);
 }
 
+/* Replace old <article> strip styles — now using <a class="strip-item"> */
+.strip-item {
+	border-right: 1px solid var(--line);
+	cursor: pointer;
+	display: block;
+	padding: 14px 24px;
+	position: relative;
+	transition: background .18s ease, transform .18s ease;
+	text-decoration: none;
+	color: inherit;
+}
+
+.strip-item:first-child {
+	padding-left: 0;
+}
+
+.strip-item:last-child {
+	border-right: 0;
+	padding-right: 0;
+}
+
+.strip-item:hover,
+.strip-item:focus-within {
+	background: rgba(19, 185, 129, .05);
+	/* Liquid glass ripple follows cursor via JS-set custom properties */
+	background: radial-gradient(
+		circle 180px at var(--ripple-x, 50%) var(--ripple-y, 50%),
+		rgba(19, 185, 129, .12),
+		rgba(19, 185, 129, .04) 55%,
+		transparent 75%
+	);
+}
+
+.strip-item:hover .strip-arrow {
+	opacity: 1;
+	transform: translateX(0);
+}
+
+.strip-arrow {
+	color: var(--green-dark);
+	display: inline-block;
+	font-size: 1.1rem;
+	font-weight: 900;
+	margin-top: 6px;
+	opacity: 0;
+	transition: opacity .18s ease, transform .18s ease;
+	transform: translateX(-6px);
+}
+
 .strip-grid {
 	display: grid;
 	gap: 0;
 	grid-template-columns: repeat(3, 1fr);
-	
 }
 
-.strip-grid article {
-	border-right: 1px solid var(--line);
-	padding: 6px 24px;
-	position: relative;
-	
-}
-
-.strip-grid article:first-child {
-	padding-left: 0;
-}
-
-.strip-grid article:last-child {
-	border-right: 0;
-	padding-right: 0;
-}
 
 .strip-grid span {
 	color: var(--pink);
@@ -655,6 +833,55 @@ h3 {
 	max-width: 740px;
 }
 
+/* Courses section heading with side CTA button */
+.section-heading-split-cta {
+	align-items: flex-end;
+	display: flex;
+	justify-content: space-between;
+	max-width: none;
+	gap: 24px;
+	margin-bottom: 28px;
+}
+
+/* Courses section — compact title row + subhead pricing line */
+.section-heading-courses {
+	display: block;
+	margin-bottom: 20px;
+}
+
+.courses-title-row {
+	align-items: center;
+	display: flex;
+	gap: 16px;
+	justify-content: flex-start;
+	flex-wrap: wrap;
+	margin-bottom: 8px;
+	width: 100%;
+}
+
+.courses-h2 {
+	font-size: clamp(1.4rem, 2.2vw, 1.95rem);
+	margin-bottom: 0;
+}
+
+.courses-subhead {
+	color: var(--muted);
+	font-size: .92rem;
+	margin: 0 0 20px;
+	max-width: 760px;
+}
+
+.courses-subhead strong {
+	color: var(--ink);
+}
+
+.explore-courses-btn {
+	margin-left: auto;
+	flex-shrink: 0;
+	align-self: center;
+	white-space: nowrap;
+}
+
 .section-heading p:not(.eyebrow) {
 	color: var(--muted);
 	font-size: 1.06rem;
@@ -670,19 +897,28 @@ h3 {
 .courses-workspace {
 	align-items: start;
 	display: grid;
-	gap: 26px;
-	grid-template-columns: minmax(0, 1fr) 300px;
+	gap: 24px;
+	grid-template-columns: minmax(0, 1fr) 310px;
 }
 
 .course-sidebars {
 	display: grid;
-	gap: 16px;
+	gap: 14px;
 	position: sticky;
 	top: 92px;
 }
 
 .course-sidebars .side-card {
-	min-height: 168px;
+	background:
+		linear-gradient(145deg, rgba(255,255,255,.96), rgba(248,251,255,.86));
+	border: 1px solid rgba(219, 231, 243, .92);
+	border-radius: 8px;
+	box-shadow: 0 16px 40px rgba(17, 24, 39, .08);
+	display: grid;
+	gap: 12px;
+	min-height: 0;
+	overflow: hidden;
+	padding: 16px;
 	position: static;
 	transform: none;
 	width: auto;
@@ -696,6 +932,84 @@ h3 {
 	border-color: rgba(36, 87, 214, .2);
 }
 
+.side-card-heading {
+	align-items: center;
+	display: flex;
+	gap: 10px;
+	justify-content: space-between;
+}
+
+.side-card-heading span {
+	color: var(--ink);
+	font-size: .78rem;
+	font-weight: 900;
+	letter-spacing: .04em;
+	text-transform: uppercase;
+}
+
+.side-card-heading a {
+	color: var(--green-dark);
+	font-size: .74rem;
+	font-weight: 900;
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.side-card-heading small {
+	color: var(--muted);
+	font-size: .68rem;
+	font-weight: 900;
+	letter-spacing: .03em;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+.side-card-list {
+	display: grid;
+	gap: 9px;
+}
+
+.side-card-link {
+	background: #fff;
+	border: 1px solid rgba(219, 231, 243, .86);
+	border-radius: 8px;
+	color: var(--ink);
+	display: grid;
+	gap: 4px;
+	padding: 12px;
+	text-decoration: none;
+	transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+.side-card-link:hover {
+	border-color: rgba(19, 185, 129, .36);
+	box-shadow: 0 10px 22px rgba(17, 24, 39, .08);
+	transform: translateY(-2px);
+}
+
+.side-card-link small,
+.side-card-empty {
+	color: var(--muted);
+	font-size: .76rem;
+	font-weight: 800;
+	line-height: 1.35;
+}
+
+.side-card-link strong {
+	color: var(--ink);
+	font-family: "Sora", system-ui, sans-serif;
+	font-size: .95rem;
+	line-height: 1.22;
+}
+
+.side-card-empty {
+	background: rgba(19, 185, 129, .08);
+	border: 1px dashed rgba(19, 185, 129, .35);
+	border-radius: 8px;
+	margin: 0;
+	padding: 12px;
+}
+
 .course-desk {
 	background:
 		radial-gradient(circle at 78% 18%, rgba(248, 189, 59, .28), transparent 25%),
@@ -705,11 +1019,11 @@ h3 {
 	border-radius: 8px;
 	box-shadow: var(--shadow);
 	display: grid;
-	gap: 22px;
+	gap: 20px;
 	grid-template-columns: repeat(12, 1fr);
-	min-height: 520px;
+	min-height: 500px;
 	overflow: hidden;
-	padding: 34px;
+	padding: 28px;
 	position: relative;
 }
 
@@ -718,91 +1032,258 @@ h3 {
 	border: 1px solid #ead27d;
 	border-radius: 8px;
 	content: "";
-	height: 130px;
+	height: 116px;
 	position: absolute;
-	right: 38px;
-	top: 34px;
+	right: 34px;
+	top: 30px;
 	transform: rotate(5deg);
-	width: 190px;
+	width: 178px;
 }
 
 .course-desk::after {
 	color: #7c5a00;
 	content: "AI coach helps turn every lesson into examples, hints, and review notes.";
 	font-family: "Sora", system-ui, sans-serif;
-	font-size: 1.02rem;
+	font-size: .96rem;
 	font-weight: 700;
 	line-height: 1.18;
 	position: absolute;
-	right: 58px;
-	top: 56px;
+	right: 52px;
+	top: 50px;
 	transform: rotate(5deg);
-	width: 150px;
+	width: 140px;
 	z-index: 1;
 }
 
+/* ── Course card flip animation ─────────────────────── */
 .course-card {
-	background: #fff;
-	border: 2px solid var(--ink);
-	border-radius: 8px;
-	box-shadow: 8px 8px 0 rgba(17, 24, 39, .12);
-	display: grid;
-	gap: 16px;
-	grid-template-rows: auto 0fr;
-	min-height: 240px;
-	padding: 24px;
+	background: transparent;
+	border: none;
+	box-shadow: none;
+	display: block;
+	min-height: 232px;
+	padding: 0;
+	perspective: 900px;
 	position: relative;
 	transform: rotate(-1.5deg);
-	transition: transform .22s ease, box-shadow .22s ease, grid-template-rows .22s ease;
+	transition: transform .22s ease;
 	z-index: 1;
+}
+
+.course-card-inner {
+	/* Liquid glass front */
+	background:
+		linear-gradient(145deg, rgba(255,255,255,.96), rgba(247,251,255,.88)),
+		radial-gradient(circle at 20% 15%, rgba(255,255,255,.98), transparent 42%);
+	border: 1.5px solid rgba(219,231,243,.9);
+	border-radius: 12px;
+	box-shadow:
+		8px 8px 0 rgba(17,24,39,.09),
+		0 4px 22px rgba(16,24,40,.06),
+		inset 0 1px 0 rgba(255,255,255,.98);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	height: 100%;
+	min-height: 232px;
+	padding: 0;
+	position: relative;
+	transform-style: preserve-3d;
+	transition: transform .45s cubic-bezier(.4,0,.2,1), box-shadow .22s ease;
+	width: 100%;
+}
+
+/* Make the card-face a flex column so footer sticks to bottom */
+.course-card-face {
+	backface-visibility: hidden;
+	-webkit-backface-visibility: hidden;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	height: 100%;
+	left: 0;
+	padding: 20px;
+	position: absolute;
+	top: 0;
+	width: 100%;
+}
+
+.course-card-front {
+	border-radius: 10px;
+	height: 100%;
+}
+
+.course-card-back {
+	background:
+		linear-gradient(145deg, rgba(17,24,39,.97), rgba(36,87,214,.92)),
+		radial-gradient(circle at 80% 90%, rgba(19,185,129,.22), transparent 38%);
+	border-radius: 10px;
+	color: #fff;
+	transform: rotateY(180deg);
+}
+
+.back-title {
+	color: #8be3b7;
+	font-size: .72rem;
+	font-weight: 900;
+	letter-spacing: .06em;
+	margin: 0 0 10px;
+	text-transform: uppercase;
+}
+
+.back-bullets {
+	list-style: none;
+	margin: 0 0 14px;
+	padding: 0;
+	display: grid;
+	gap: 7px;
+}
+
+.back-bullets li {
+	align-items: flex-start;
+	color: #cbd5e1;
+	display: flex;
+	font-size: .84rem;
+	font-weight: 600;
+	gap: 7px;
+	line-height: 1.35;
+}
+
+.back-bullets li::before {
+	content: "\2022";
+	color: var(--green);
+	flex-shrink: 0;
+	font-size: 1rem;
+	margin-top: -1px;
+}
+
+.back-cta {
+	background: rgba(19,185,129,.2);
+	border: 1px solid rgba(19,185,129,.4);
+	border-radius: 999px;
+	color: #8be3b7 !important;
+	display: inline-block;
+	font-size: .82rem;
+	font-weight: 800;
+	padding: 6px 14px;
+	text-decoration: none;
+	transition: background .2s ease;
+}
+
+.back-cta:hover {
+	background: rgba(19,185,129,.35);
+}
+
+.course-card-back p {
+	color: #cbd5e1;
+}
+
+.course-card-back a {
+	color: var(--green);
+	font-weight: 800;
+	margin-top: 8px;
+	display: inline-block;
+}
+
+.course-card:hover .course-card-inner,
+.course-card:focus-within .course-card-inner {
+	box-shadow: 14px 16px 0 rgba(17, 24, 39, .13);
+	transform: rotateY(180deg);
+}
+
+.course-card:hover,
+.course-card:focus-within {
+	transform: translateY(-10px) rotate(0deg);
+	z-index: 3;
+}
+
+.course-card.featured .course-card-inner {
+	border-color: rgba(167,220,188,.7);
+	box-shadow:
+		8px 8px 0 #dff4e7,
+		0 4px 22px rgba(19,185,129,.1),
+		inset 0 1px 0 rgba(255,255,255,.99);
+}
+
+/* Card footer: enrolled count + price side by side */
+.card-footer-row {
+	align-items: center;
+	display: flex;
+	gap: 8px;
+	justify-content: space-between;
+	margin-top: auto;
+	padding-top: 8px;
+}
+
+.card-enrolled {
+	color: var(--muted);
+	font-size: .75rem;
+	font-weight: 700;
+}
+
+.card-price {
+	border-radius: 999px;
+	font-size: .78rem;
+	font-weight: 900;
+	padding: 3px 10px;
+	white-space: nowrap;
+	background: rgba(37,99,235,.1);
+	color: var(--blue-dark);
+}
+
+.card-price small {
+	font-size: .65rem;
+	opacity: .75;
+}
+
+.free-badge {
+	background: rgba(19,185,129,.12) !important;
+	color: var(--green-dark) !important;
+}
+
+.offer-badge {
+	background: rgba(248,189,59,.18) !important;
+	color: #7c5a00 !important;
+}
+
+.offer-badge s {
+	opacity: .5;
+	text-decoration-color: currentColor;
+}
+
+.card-desc {
+	color: var(--muted) !important;
+	font-size: .88rem;
+	line-height: 1.45;
+	margin-bottom: 0;
 }
 
 .course-card:nth-child(1) {
 	grid-column: 1 / span 5;
-	margin-top: 22px;
+	margin-top: 18px;
 }
 
 .course-card:nth-child(2) {
 	grid-column: 6 / span 4;
-	margin-top: 94px;
+	margin-top: 80px;
 	transform: rotate(2deg);
 }
 
 .course-card:nth-child(3) {
 	grid-column: 3 / span 5;
-	margin-top: -12px;
+	margin-top: -10px;
 	transform: rotate(1deg);
 }
 
-.course-card.featured {
-	border-color: #a7dcbc;
-	box-shadow: 8px 8px 0 #dff4e7;
+.course-card:nth-child(4) {
+	grid-column: 1 / span 4;
+	margin-top: 6px;
+	transform: rotate(-1deg);
 }
 
-.course-card:hover,
-.course-card:focus-within {
-	box-shadow: 14px 16px 0 rgba(17, 24, 39, .13);
-	grid-template-rows: auto 1fr;
-	transform: translateY(-12px) rotate(0deg);
-	z-index: 3;
-}
-
-.course-card-front {
-	display: grid;
-	gap: 8px;
-}
-
-.course-card p {
-	color: var(--muted);
-	margin-bottom: 0;
-}
-
-.course-card .tag {
-	margin-bottom: 6px;
-}
-
-.course-card h3 {
-	margin-bottom: 6px;
+.course-card:nth-child(5) {
+	grid-column: 5 / span 5;
+	margin-top: 42px;
+	transform: rotate(1.5deg);
 }
 
 .course-meta {
@@ -828,18 +1309,6 @@ h3 {
 	font-weight: 800;
 }
 
-.course-card-reveal {
-	border-top: 1px solid var(--line);
-	display: grid;
-	gap: 12px;
-	margin-top: 4px;
-	overflow: hidden;
-	padding-top: 14px;
-}
-
-.course-card-reveal p {
-	color: #334155;
-}
 
 .desk-note {
 	align-self: end;
@@ -848,8 +1317,8 @@ h3 {
 	box-shadow: 8px 8px 0 #d8e3f8;
 	color: #fff;
 	grid-column: 8 / span 5;
-	margin-bottom: 26px;
-	padding: 22px;
+	margin-bottom: 22px;
+	padding: 20px;
 	position: relative;
 	transform: rotate(-2deg);
 	z-index: 2;
@@ -867,39 +1336,248 @@ h3 {
 .desk-note strong {
 	display: block;
 	font-family: "Sora", system-ui, sans-serif;
-	font-size: 1.35rem;
+	font-size: 1.24rem;
 	line-height: 1.18;
 }
 
+/* ── Practice / Interview Guides bento ───────────────── */
 .practice {
 	background:
-		radial-gradient(circle at 10% 20%, rgba(37, 99, 235, .12), transparent 24%),
+		radial-gradient(circle at 10% 20%, rgba(37, 99, 235, .1), transparent 28%),
+		radial-gradient(circle at 90% 80%, rgba(19, 185, 129, .1), transparent 28%),
 		linear-gradient(135deg, #eef8ff, #f6fffb);
 	border-block: 1px solid var(--line);
 }
 
-.practice-grid {
-	align-items: center;
+.practice-header {
+	align-items: flex-end;
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 28px;
+	gap: 20px;
+	flex-wrap: wrap;
+}
+
+.practice-header h2 {
+	margin-bottom: 0;
+	font-size: clamp(1.6rem, 2.8vw, 2.4rem);
+}
+
+/* Bento grid — 4 columns, 2 rows */
+.practice-bento {
 	display: grid;
-	gap: 48px;
-	grid-template-columns: .85fr 1fr;
+	gap: 14px;
+	grid-template-columns: 1fr 1fr 1fr 1fr;
+	grid-template-rows: auto auto;
+	align-items: stretch;
 }
 
-.practice-grid p {
-	color: #435466;
-}
-
-.practice-board {
+.bento-cell {
 	background:
-		radial-gradient(circle at 90% 12%, rgba(19, 185, 129, .16), transparent 26%),
-		#fff;
-	border: 1px solid rgba(255, 255, 255, .86);
-	border-radius: 8px;
-	box-shadow: 10px 10px 0 #dff4e7;
-	display: grid;
-	gap: 12px;
-	padding: 22px;
+		linear-gradient(135deg, rgba(255,255,255,.9), rgba(255,255,255,.62));
+	border: 1px solid rgba(255,255,255,.84);
+	border-radius: 18px;
+	box-shadow:
+		0 4px 18px rgba(16,24,40,.07),
+		inset 0 1px 0 rgba(255,255,255,.96);
+	backdrop-filter: blur(16px) saturate(1.3);
+	-webkit-backdrop-filter: blur(16px) saturate(1.3);
+	padding: 20px;
+	transition: transform .2s ease, box-shadow .2s ease;
 }
+
+.bento-cell:hover {
+	box-shadow:
+		0 10px 36px rgba(16,24,40,.12),
+		inset 0 1px 0 rgba(255,255,255,.98);
+	transform: translateY(-3px);
+}
+
+.bento-label {
+	align-items: center;
+	color: var(--muted);
+	display: flex;
+	font-size: .72rem;
+	font-weight: 900;
+	gap: 6px;
+	letter-spacing: .04em;
+	margin: 0 0 10px;
+	text-transform: uppercase;
+}
+
+/* Roles bento cell — spans 2 cols */
+.bento-roles {
+	grid-column: 1 / span 2;
+}
+
+.role-pills {
+	display: flex;
+	gap: 8px;
+	margin-bottom: 12px;
+	flex-wrap: wrap;
+}
+
+.role-pill {
+	background: rgba(255,255,255,.6);
+	border: 1.5px solid rgba(219,231,243,.8);
+	border-radius: 999px;
+	color: var(--muted);
+	cursor: pointer;
+	font-size: .84rem;
+	font-weight: 800;
+	padding: 7px 14px;
+	transition: background .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+.role-pill.active,
+.role-pill:hover {
+	background:
+		linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,255,255,.6));
+	border-color: rgba(19,185,129,.5);
+	box-shadow: 0 4px 16px rgba(19,185,129,.18), inset 0 1px 0 rgba(255,255,255,.95);
+	color: var(--green-dark);
+}
+
+.role-desc {
+	color: var(--muted);
+	font-size: .9rem;
+	line-height: 1.5;
+	margin: 0;
+	transition: opacity .25s ease;
+}
+
+/* Image Showcase cell — spans 2 cols, 1 row or whatever height it needs */
+.bento-image-showcase {
+	grid-column: 1 / span 4; /* Let it span full width inside the grid to showcase the UI well */
+	padding: 0;
+	position: relative;
+	overflow: hidden;
+	min-height: 280px;
+	border-radius: 18px;
+}
+
+.bento-showcase-img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: top;
+	display: block;
+	transition: transform .6s cubic-bezier(.4,0,.2,1);
+}
+
+.bento-image-showcase:hover .bento-showcase-img {
+	transform: scale(1.03);
+}
+
+.bento-image-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(180deg, rgba(17,24,39,.7) 0%, transparent 40%, rgba(17,24,39,.8) 100%);
+	display: flex;
+	padding: 24px;
+	flex-direction: column;
+	justify-content: space-between;
+	pointer-events: none;
+}
+
+.bento-image-overlay .bento-label {
+	color: #fff;
+	text-shadow: 0 2px 8px rgba(0,0,0,.3);
+}
+
+/* Mock cell */
+.bento-mock {
+	grid-column: 3 / span 2;
+	background:
+		linear-gradient(135deg, rgba(17,24,39,.96), rgba(36,87,214,.88));
+	border-color: rgba(255,255,255,.1);
+	color: #fff;
+	position: relative;
+	overflow: hidden;
+}
+
+.bento-mock .bento-label {
+	color: #8be3b7;
+}
+
+.mock-pulse-ring {
+	animation: ring-pulse 2.2s ease-out infinite;
+	border: 2px solid rgba(19,185,129,.4);
+	border-radius: 50%;
+	height: 120px;
+	opacity: .3;
+	position: absolute;
+	right: -24px;
+	top: -24px;
+	width: 120px;
+}
+
+@keyframes ring-pulse {
+	0% { transform: scale(.6); opacity: .5; }
+	100% { transform: scale(2); opacity: 0; }
+}
+
+.mock-status {
+	display: block;
+	font-family: "Sora", system-ui, sans-serif;
+	font-size: 1.1rem;
+	line-height: 1.2;
+	margin-bottom: 6px;
+}
+
+.mock-hint {
+	color: #a8bcce;
+	font-size: .83rem;
+	margin: 0 0 14px;
+}
+
+.mock-cta {
+	background: rgba(19,185,129,.22);
+	border: 1px solid rgba(19,185,129,.4);
+	border-radius: 999px;
+	color: #8be3b7;
+	display: inline-block;
+	font-size: .84rem;
+	font-weight: 800;
+	padding: 7px 14px;
+	transition: background .2s ease;
+}
+
+.mock-cta:hover {
+	background: rgba(19,185,129,.36);
+}
+
+/* Feature pills row */
+.bento-features {
+	grid-column: 1 / -1;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	padding: 14px 20px;
+}
+
+.feat-pill {
+	background: rgba(255,255,255,.72);
+	border: 1px solid rgba(255,255,255,.9);
+	border-radius: 999px;
+	box-shadow: 0 2px 8px rgba(16,24,40,.06), inset 0 1px 0 rgba(255,255,255,.96);
+	backdrop-filter: blur(8px);
+	color: var(--ink);
+	font-size: .82rem;
+	font-weight: 800;
+	padding: 7px 13px;
+	transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.feat-pill:hover {
+	box-shadow: 0 6px 18px rgba(16,24,40,.1), inset 0 1px 0 rgba(255,255,255,.98);
+	transform: translateY(-2px);
+}
+
+
 
 .guide-card,
 .question-card {
@@ -1063,26 +1741,43 @@ h3 {
 
 .member-section {
 	background:
-		linear-gradient(135deg, rgba(216, 227, 248, .72), transparent 42%),
-		linear-gradient(45deg, rgba(223, 244, 231, .8), transparent 55%),
+		linear-gradient(90deg, rgba(216, 227, 248, .5), rgba(223, 244, 231, .56)),
 		#fff;
 	border-block: 1px solid var(--line);
+	padding: 18px 0;
 }
 
-.member-grid {
+.member-grid,
+.member-strip {
 	align-items: center;
 	display: grid;
-	gap: 22px;
+	gap: 16px;
 	grid-template-columns: 1.15fr auto;
 }
 
-.member-grid h2 {
-	font-size: clamp(1.9rem, 3.5vw, 3rem);
+.member-strip {
+	background: rgba(255,255,255,.62);
+	border: 1px solid rgba(255,255,255,.88);
+	border-radius: 8px;
+	box-shadow: 0 16px 36px rgba(17, 24, 39, .07);
+	grid-template-columns: minmax(220px, .8fr) minmax(0, 1.9fr);
+	padding: 10px 12px;
+}
+
+.member-grid h2,
+.member-strip h2 {
+	font-size: clamp(.98rem, 1.5vw, 1.16rem);
 	margin-bottom: 0;
+}
+
+.member-strip .eyebrow {
+	font-size: .66rem;
+	margin-bottom: 2px;
 }
 
 .member-actions,
 .social-links,
+.community-links,
 .footer-actions,
 .footer-socials {
 	display: flex;
@@ -1109,9 +1804,15 @@ h3 {
 }
 
 .button-secondary .action-icon,
-.coffee-button .action-icon {
+.coffee-button .action-icon,
+.community-links .action-icon {
 	background: rgba(17, 24, 39, .08);
 	border-color: rgba(17, 24, 39, .1);
+}
+
+.coffee-icon {
+	background: #fff7d8 !important;
+	color: #7c5a00;
 }
 
 .social-icon {
@@ -1145,6 +1846,7 @@ h3 {
 }
 
 .social-links a,
+.community-links a,
 .footer-actions a,
 .footer-socials a {
 	background: rgba(255, 255, 255, .62);
@@ -1155,6 +1857,43 @@ h3 {
 	font-weight: 800;
 	padding: 8px 12px;
 	backdrop-filter: blur(12px);
+}
+
+.community-links {
+	align-items: center;
+	flex-wrap: nowrap;
+	justify-content: flex-end;
+	overflow-x: auto;
+	padding-bottom: 2px;
+}
+
+.community-links a {
+	align-items: center;
+	box-shadow: none;
+	display: inline-grid;
+	flex: 0 0 auto;
+	gap: 0 8px;
+	grid-template-columns: 26px auto;
+	line-height: 1.1;
+	min-width: 104px;
+	padding: 6px 9px;
+	text-decoration: none;
+}
+
+.community-links span {
+	grid-row: span 2;
+	margin-right: 0;
+}
+
+.community-links strong {
+	color: var(--ink);
+	font-size: .78rem;
+}
+
+.community-links small {
+	color: var(--muted);
+	font-size: .64rem;
+	font-weight: 800;
 }
 
 .footer-socials {
@@ -1717,14 +2456,39 @@ h3 {
 	}
 
 	.hero-grid,
-	.practice-grid,
 	.cta-inner,
 	.footer-grid,
 	.member-grid,
+	.member-strip,
 	.courses-workspace,
 	.articles-hero-grid,
 	.articles-layout {
 		grid-template-columns: 1fr;
+	}
+
+	/* Bento collapses to 2 cols on tablet */
+	.practice-bento {
+		grid-template-columns: 1fr 1fr;
+	}
+
+	.bento-roles,
+	.bento-ai-chat,
+	.bento-progress,
+	.bento-mock {
+		grid-column: auto;
+	}
+
+	/* Liquid glass header: also show on mobile as centered pill */
+	.site-header.is-scrolled .primary-nav {
+		position: static;
+		display: block;
+	}
+
+	/* On mobile keep the is-scrolled nav toggle accessible */
+	.site-header.is-scrolled .nav-toggle {
+		opacity: 1;
+		pointer-events: auto;
+		transform: translateY(0);
 	}
 
 
@@ -1738,9 +2502,9 @@ h3 {
 		grid-template-columns: 1fr;
 	}
 
-	.strip-grid article,
-	.strip-grid article:first-child,
-	.strip-grid article:last-child {
+	.strip-item,
+	.strip-item:first-child,
+	.strip-item:last-child {
 		border-right: 0;
 		border-top: 1px solid var(--line);
 		padding: 18px 0 0;
@@ -1750,6 +2514,7 @@ h3 {
 		display: grid;
 		min-height: auto;
 		padding: 22px;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 
 	.course-desk::before {
@@ -1768,6 +2533,8 @@ h3 {
 	.course-card:nth-child(1),
 	.course-card:nth-child(2),
 	.course-card:nth-child(3),
+	.course-card:nth-child(4),
+	.course-card:nth-child(5),
 	.desk-note {
 		grid-column: auto;
 		margin: 0;
@@ -1775,7 +2542,17 @@ h3 {
 	}
 
 	.course-card {
-		grid-template-columns: 1fr;
+		min-height: auto;
+	}
+
+	.course-card-inner {
+		min-height: 220px;
+		position: relative;
+	}
+
+	.course-card:hover .course-card-inner,
+	.course-card:focus-within .course-card-inner {
+		transform: rotateY(180deg);
 	}
 
 	.course-card:hover,
@@ -1785,6 +2562,14 @@ h3 {
 
 	.member-actions {
 		justify-content: start;
+	}
+
+	.member-strip {
+		align-items: start;
+	}
+
+	.community-links {
+		justify-content: flex-start;
 	}
 
 	.articles-sidebar,
@@ -1799,6 +2584,51 @@ h3 {
 }
 
 @media (max-width: 620px) {
+	.top-promo-inner {
+		align-items: stretch;
+		flex-direction: column;
+		gap: 6px;
+		padding: 8px 20px;
+	}
+
+	.top-promo-inner a {
+		align-self: center;
+	}
+
+	.courses-title-row {
+		align-items: flex-start;
+		flex-direction: column;
+	}
+
+	.explore-courses-btn {
+		margin-left: 0;
+	}
+
+	.course-desk {
+		grid-template-columns: 1fr;
+	}
+
+	.course-card:nth-child(2) {
+		margin-top: 0;
+	}
+
+	/* Bento to 1 col on mobile */
+	.practice-bento {
+		grid-template-columns: 1fr;
+	}
+
+	.bento-roles,
+	.bento-ai-chat,
+	.bento-progress,
+	.bento-mock,
+	.bento-features {
+		grid-column: 1 / -1;
+	}
+
+	.practice-header {
+		flex-direction: column;
+		align-items: flex-start;
+	}
 	.container {
 		padding: 0 18px;
 	}

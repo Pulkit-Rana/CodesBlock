@@ -31,8 +31,8 @@ add_action( 'after_setup_theme', 'codesblock_setup' );
 
 function codesblock_assets() {
 	wp_enqueue_style( 'codesblock-fonts', 'https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap', array(), null );
-	wp_enqueue_style( 'codesblock-main', get_template_directory_uri() . '/assets/css/main.css', array(), '2.7.0' );
-	wp_enqueue_script( 'codesblock-main', get_template_directory_uri() . '/assets/js/main.js', array(), '1.0.0', true );
+	wp_enqueue_style( 'codesblock-main', get_template_directory_uri() . '/assets/css/main.css', array(), '2.9.0' );
+	wp_enqueue_script( 'codesblock-main', get_template_directory_uri() . '/assets/js/main.js', array(), '1.2.0', true );
 }
 add_action( 'wp_enqueue_scripts', 'codesblock_assets' );
 
@@ -105,6 +105,10 @@ function codesblock_save_recommended_meta( $post_id ) {
 }
 add_action( 'save_post', 'codesblock_save_recommended_meta' );
 
+function codesblock_sanitize_checkbox( $checked ) {
+	return ( isset( $checked ) && true === (bool) $checked );
+}
+
 function codesblock_customize_register( $wp_customize ) {
 	$wp_customize->add_section(
 		'codesblock_homepage',
@@ -138,6 +142,63 @@ function codesblock_customize_register( $wp_customize ) {
 			array(
 				'default'           => $field['default'],
 				'sanitize_callback' => 'textarea' === $field['type'] ? 'sanitize_textarea_field' : 'sanitize_text_field',
+			)
+		);
+
+		$wp_customize->add_control(
+			$setting_id,
+			array(
+				'label'   => $field['label'],
+				'section' => 'codesblock_homepage',
+				'type'    => $field['type'],
+			)
+		);
+	}
+
+	$wp_customize->add_setting(
+		'codesblock_promo_enabled',
+		array(
+			'default'           => true,
+			'sanitize_callback' => 'codesblock_sanitize_checkbox',
+		)
+	);
+
+	$wp_customize->add_control(
+		'codesblock_promo_enabled',
+		array(
+			'label'   => __( 'Show top promo bar', 'codesblock' ),
+			'section' => 'codesblock_homepage',
+			'type'    => 'checkbox',
+		)
+	);
+
+	$promo_fields = array(
+		'codesblock_promo_text'      => array(
+			'label'             => __( 'Promo text', 'codesblock' ),
+			'default'           => 'Flash sale: Get 60% off AI interview prep this week.',
+			'type'              => 'text',
+			'sanitize_callback' => 'sanitize_text_field',
+		),
+		'codesblock_promo_cta_text'  => array(
+			'label'             => __( 'Promo button text', 'codesblock' ),
+			'default'           => 'Claim offer',
+			'type'              => 'text',
+			'sanitize_callback' => 'sanitize_text_field',
+		),
+		'codesblock_promo_cta_url'   => array(
+			'label'             => __( 'Promo button URL', 'codesblock' ),
+			'default'           => '#courses',
+			'type'              => 'url',
+			'sanitize_callback' => 'esc_url_raw',
+		),
+	);
+
+	foreach ( $promo_fields as $setting_id => $field ) {
+		$wp_customize->add_setting(
+			$setting_id,
+			array(
+				'default'           => $field['default'],
+				'sanitize_callback' => $field['sanitize_callback'],
 			)
 		);
 

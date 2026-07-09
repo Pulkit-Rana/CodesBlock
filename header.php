@@ -15,8 +15,19 @@
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 <a class="skip-link" href="#main"><?php esc_html_e( 'Skip to content', 'codesblock' ); ?></a>
+<?php if ( get_theme_mod( 'codesblock_promo_enabled', true ) ) : ?>
+	<div class="top-promo-bar" role="region" aria-label="<?php esc_attr_e( 'Current promotion', 'codesblock' ); ?>">
+		<div class="top-promo-inner">
+			<span class="promo-badge"><?php esc_html_e( 'Limited time', 'codesblock' ); ?></span>
+			<p><?php echo esc_html( get_theme_mod( 'codesblock_promo_text', 'Flash sale: Get 60% off AI interview prep this week.' ) ); ?></p>
+			<a href="<?php echo esc_url( get_theme_mod( 'codesblock_promo_cta_url', '#courses' ) ); ?>">
+				<?php echo esc_html( get_theme_mod( 'codesblock_promo_cta_text', 'Claim offer' ) ); ?>
+			</a>
+		</div>
+	</div>
+<?php endif; ?>
 <header class="site-header" data-site-header>
-	<div class="container header-inner">
+	<div class="header-inner header-inner-full">
 		<a class="brand" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php bloginfo( 'name' ); ?>">
 			<?php if ( has_custom_logo() ) : ?>
 				<?php the_custom_logo(); ?>
