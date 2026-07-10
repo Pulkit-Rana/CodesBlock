@@ -57,6 +57,44 @@ $codesblock_recommended_courses = new WP_Query(
 		'order'               => 'DESC',
 	)
 );
+
+$codesblock_home_course_posts = array();
+$codesblock_featured_courses  = new WP_Query(
+	array(
+		'post_type'           => 'course',
+		'posts_per_page'      => 5,
+		'post_status'         => 'publish',
+		'ignore_sticky_posts' => true,
+		'meta_key'            => '_codesblock_recommended',
+		'meta_value'          => '1',
+		'orderby'             => 'date',
+		'order'               => 'DESC',
+	)
+);
+
+if ( $codesblock_featured_courses->have_posts() ) {
+	$codesblock_home_course_posts = $codesblock_featured_courses->posts;
+}
+
+if ( count( $codesblock_home_course_posts ) < 5 ) {
+	$codesblock_latest_courses = new WP_Query(
+		array(
+			'post_type'           => 'course',
+			'posts_per_page'      => 5 - count( $codesblock_home_course_posts ),
+			'post_status'         => 'publish',
+			'post__not_in'        => wp_list_pluck( $codesblock_home_course_posts, 'ID' ),
+			'ignore_sticky_posts' => true,
+			'orderby'             => 'date',
+			'order'               => 'DESC',
+		)
+	);
+
+	if ( $codesblock_latest_courses->have_posts() ) {
+		$codesblock_home_course_posts = array_merge( $codesblock_home_course_posts, $codesblock_latest_courses->posts );
+	}
+}
+
+wp_reset_postdata();
 ?>
 
 <main id="main">
@@ -87,28 +125,27 @@ $codesblock_recommended_courses = new WP_Query(
 			
 			</div>
 			<div class="hero-sketch" aria-label="CodesBlock learning preview">
-				<div class="sketch-label">Today&apos;s study board</div>
+				<div class="sketch-label">CodesBlock Paths</div>
 				<div class="sketch-card lesson-card">
-					<p>AI lesson plan</p>
-					<h2>AI Study Coach</h2>
+					<p>Step-by-step Guides</p>
+					<h2>Master System Design</h2>
 					<div class="lesson-line long"></div>
 					<div class="lesson-line"></div>
 					<div class="lesson-line short"></div>
 				</div>
 				<div class="sketch-card quiz-card">
-					<span>AI feedback</span>
-					<strong>Explain your approach before coding.</strong>
-					<div class="choice active">Great constraint check</div>
-					<div class="choice">Try a clearer edge case</div>
+					<span>Interactive Practice</span>
+					<strong>Solve real-world engineering problems.</strong>
+					<div class="choice active">Optimized Database Queries</div>
+					<div class="choice">Scalable Architecture</div>
 				</div>
-				<div class="sketch-card code-card">
-					<code>ai.coach("mock interview");<br>ai.explain(withExamples);</code>
+				<div class="sketch-card code-card" style="transform: rotate(-1deg); padding-bottom: 24px;">
+					<code>import { useCourse } from 'codesblock';<br><br>const course = useCourse('React Advanced');<br>course.startPractice();</code>
 				</div>
-				<div class="sketch-card extra-card">
-					<span>AI feedback</span>
-					<strong>Explain your approach before coding.</strong>
-					<div class="choice active">Great constraint check</div>
-					<div class="choice">Try a clearer edge case</div>
+				<div class="sketch-card extra-card" style="transform: rotate(1.5deg);">
+					<span>Success Rate</span>
+					<strong>+45% Offer Rate</strong>
+					<p style="font-size: 0.8rem; color: #a8bcce; margin-top: 6px;">After completing 3 paths.</p>
 				</div>
 			</div>
 		</div>
@@ -151,127 +188,147 @@ $codesblock_recommended_courses = new WP_Query(
 			</div>
 			<div class="courses-workspace">
 				<div class="course-desk">
-					<article class="course-card featured">
-						<div class="course-card-inner">
+					<?php if ( $codesblock_home_course_posts ) : ?>
+						<?php
+						foreach ( $codesblock_home_course_posts as $codesblock_course_index => $post ) :
+							setup_postdata( $post );
+
+							$codesblock_course_id       = get_the_ID();
+							$codesblock_course_price    = get_post_meta( $codesblock_course_id, '_course_price', true );
+							$codesblock_course_original = get_post_meta( $codesblock_course_id, '_course_original_price', true );
+							$codesblock_course_level    = get_post_meta( $codesblock_course_id, '_course_level', true );
+							$codesblock_course_duration = get_post_meta( $codesblock_course_id, '_course_duration', true );
+							$codesblock_course_badge    = get_post_meta( $codesblock_course_id, '_course_badge', true );
+							$codesblock_is_free_course  = ( 'free' === strtolower( (string) $codesblock_course_price ) || '' === trim( (string) $codesblock_course_price ) );
+							$codesblock_course_tag      = $codesblock_course_badge ? $codesblock_course_badge : ( $codesblock_is_free_course ? __( 'Free course', 'codesblock' ) : __( 'Paid course', 'codesblock' ) );
+							$codesblock_course_summary  = get_the_excerpt() ? get_the_excerpt() : wp_strip_all_tags( get_the_content() );
+							$codesblock_course_meta     = array_filter( array( $codesblock_course_duration, $codesblock_course_level ) );
+							?>
+							<a class="course-card course-card-link <?php echo 0 === $codesblock_course_index ? 'featured' : ''; ?>" href="<?php the_permalink(); ?>">
+								<div class="course-card-inner static">
+									<div class="course-card-face course-card-front">
+										<p class="tag"><?php echo esc_html( $codesblock_course_tag ); ?></p>
+										<h3><?php the_title(); ?></h3>
+										<p class="card-desc"><?php echo esc_html( wp_trim_words( $codesblock_course_summary, 18 ) ); ?></p>
+										<?php if ( $codesblock_course_meta ) : ?>
+											<div class="course-meta">
+												<?php foreach ( $codesblock_course_meta as $codesblock_course_meta_item ) : ?>
+													<span><?php echo esc_html( $codesblock_course_meta_item ); ?></span>
+												<?php endforeach; ?>
+											</div>
+										<?php endif; ?>
+										<div class="card-footer-row" style="margin-top:12px;">
+											<span class="card-enrolled"><?php esc_html_e( 'Updated from WP admin', 'codesblock' ); ?></span>
+											<?php if ( $codesblock_is_free_course ) : ?>
+												<span class="card-price free-badge"><?php esc_html_e( 'Free', 'codesblock' ); ?></span>
+											<?php elseif ( $codesblock_course_price ) : ?>
+												<span class="card-price">
+													<?php echo esc_html( $codesblock_course_price ); ?>
+													<?php if ( $codesblock_course_original ) : ?>
+														<small><s><?php echo esc_html( $codesblock_course_original ); ?></s></small>
+													<?php endif; ?>
+												</span>
+											<?php endif; ?>
+										</div>
+										<span class="course-card-cta"><?php esc_html_e( 'Open course', 'codesblock' ); ?></span>
+									</div>
+								</div>
+							</a>
+						<?php endforeach; ?>
+						<?php wp_reset_postdata(); ?>
+					<?php else : ?>
+						<article class="empty-post-card">
+							<p class="tag"><?php esc_html_e( 'No courses yet', 'codesblock' ); ?></p>
+							<h3><?php esc_html_e( 'Create your first course', 'codesblock' ); ?></h3>
+							<p><?php esc_html_e( 'Courses you publish from WordPress admin will appear here automatically.', 'codesblock' ); ?></p>
+						</article>
+					<?php endif; ?>
+					<?php if ( false ) : ?>
+					<a class="course-card course-card-link featured" href="<?php echo esc_url( $codesblock_home_course_links['dsa'] ); ?>">
+						<div class="course-card-inner static">
 							<div class="course-card-face course-card-front">
 								<p class="tag">Paid · AI assistant</p>
 								<h3>DSA Interview Sprint</h3>
-								<p class="card-desc">Pattern-first prep with AI hints &amp; mock interview feedback.</p>
-								<div class="course-meta"><span>42 lessons</span><span>AI coach</span><span>Mock plan</span></div>
-								<div class="card-footer-row">
+								<p class="card-desc">Pattern-first prep with AI hints. Master Arrays, Trees, DP & mock rounds.</p>
+								<div class="course-meta"><span>42 lessons</span><span>AI coach</span></div>
+								<div class="card-footer-row" style="margin-top:12px;">
 									<span class="card-enrolled">&#128100; 1,240 enrolled</span>
 									<span class="card-price">From $9<small>/mo</small></span>
 								</div>
-							</div>
-							<div class="course-card-face course-card-back">
-								<p class="back-title">What you&rsquo;ll master</p>
-								<ul class="back-bullets">
-									<li>Arrays, strings &amp; recursion patterns</li>
-									<li>Trees, graphs &amp; dynamic programming</li>
-									<li>AI-reviewed solutions &amp; mock rounds</li>
-								</ul>
-								<a class="back-cta" href="#practice">Preview practice &rarr;</a>
+								<span class="course-card-cta">Open course</span>
 							</div>
 						</div>
-					</article>
-					<article class="course-card">
-						<div class="course-card-inner">
+					</a>
+					<a class="course-card course-card-link" href="<?php echo esc_url( $codesblock_home_course_links['backend'] ); ?>">
+						<div class="course-card-inner static">
 							<div class="course-card-face course-card-front">
 								<p class="tag">Free course</p>
 								<h3>Backend Foundations</h3>
-								<p class="card-desc">APIs, databases, auth, caching &amp; deployment basics.</p>
+								<p class="card-desc">APIs, databases, auth, caching & deployment basics. Learn REST & HTTP.</p>
 								<div class="course-meta"><span>24 lessons</span><span>Projects</span></div>
-								<div class="card-footer-row">
+								<div class="card-footer-row" style="margin-top:12px;">
 									<span class="card-enrolled">&#128100; 870 reading</span>
 									<span class="card-price free-badge">Free</span>
 								</div>
-							</div>
-							<div class="course-card-face course-card-back">
-								<p class="back-title">What you&rsquo;ll learn</p>
-								<ul class="back-bullets">
-									<li>HTTP, request flow &amp; REST design</li>
-									<li>Database modeling &amp; migrations</li>
-									<li>Auth, caching &amp; small service patterns</li>
-								</ul>
-								<a class="back-cta" href="#articles">Read related articles &rarr;</a>
+								<span class="course-card-cta">Open course</span>
 							</div>
 						</div>
-					</article>
-					<article class="course-card">
-						<div class="course-card-inner">
+					</a>
+					<a class="course-card course-card-link" href="<?php echo esc_url( $codesblock_home_course_links['system'] ); ?>">
+						<div class="course-card-inner static">
 							<div class="course-card-face course-card-front">
 								<p class="tag">Article series</p>
 								<h3>System Design Basics</h3>
-								<p class="card-desc">Capacity thinking, queues, storage choices &amp; tradeoffs.</p>
+								<p class="card-desc">Capacity thinking, queues, storage choices & scaling tradeoffs.</p>
 								<div class="course-meta"><span>18 lessons</span><span>Diagrams</span></div>
-								<div class="card-footer-row">
+								<div class="card-footer-row" style="margin-top:12px;">
 									<span class="card-enrolled">&#128100; 540 reading</span>
 									<span class="card-price free-badge">Free</span>
 								</div>
-							</div>
-							<div class="course-card-face course-card-back">
-								<p class="back-title">What you&rsquo;ll cover</p>
-								<ul class="back-bullets">
-									<li>Constraints, bottlenecks &amp; scaling</li>
-									<li>Queue &amp; storage tradeoffs</li>
-									<li>Failure modes &amp; calm reasoning</li>
-								</ul>
-								<a class="back-cta" href="#contact">Get notified &rarr;</a>
+								<span class="course-card-cta">Open course</span>
 							</div>
 						</div>
-					</article>
-					<article class="course-card">
-						<div class="course-card-inner">
+					</a>
+					<a class="course-card course-card-link" href="<?php echo esc_url( $codesblock_home_course_links['performance'] ); ?>">
+						<div class="course-card-inner static">
 							<div class="course-card-face course-card-front">
-								<p class="tag">Paid &middot; 50% off launch</p>
+								<p class="tag">Paid &middot; 50% off</p>
 								<h3>Frontend Performance</h3>
-								<p class="card-desc">Core Web Vitals, rendering &amp; real-world bundle trimming.</p>
+								<p class="card-desc">Core Web Vitals, lazy-loading, code-splitting & real-world bundles.</p>
 								<div class="course-meta"><span>30 lessons</span><span>AI hints</span></div>
-								<div class="card-footer-row">
+								<div class="card-footer-row" style="margin-top:12px;">
 									<span class="card-enrolled">&#128100; 390 enrolled</span>
 									<span class="card-price offer-badge">$4.50 <s>$9</s></span>
 								</div>
-							</div>
-							<div class="course-card-face course-card-back">
-								<p class="back-title">What you&rsquo;ll optimise</p>
-								<ul class="back-bullets">
-									<li>LCP, CLS &amp; INP deep-dives</li>
-									<li>Lazy-loading &amp; code-splitting</li>
-									<li>DevTools &amp; Lighthouse profiling</li>
-								</ul>
-								<a class="back-cta" href="#contact">Get early access &rarr;</a>
+								<span class="course-card-cta">Open course</span>
 							</div>
 						</div>
-					</article>
-					<article class="course-card">
-						<div class="course-card-inner">
+					</a>
+					<a class="course-card course-card-link" href="<?php echo esc_url( $codesblock_home_course_links['react'] ); ?>">
+						<div class="course-card-inner static">
 							<div class="course-card-face course-card-front">
 								<p class="tag">Free course</p>
 								<h3>React Patterns</h3>
-								<p class="card-desc">Hooks, context, composition &amp; state patterns for scale.</p>
+								<p class="card-desc">Hooks, context, reducers & composition patterns for large-scale apps.</p>
 								<div class="course-meta"><span>20 lessons</span><span>Exercises</span></div>
-								<div class="card-footer-row">
+								<div class="card-footer-row" style="margin-top:12px;">
 									<span class="card-enrolled">&#128100; 680 reading</span>
 									<span class="card-price free-badge">Free</span>
 								</div>
-							</div>
-							<div class="course-card-face course-card-back">
-								<p class="back-title">What you&rsquo;ll practice</p>
-								<ul class="back-bullets">
-									<li>Custom hooks &amp; reducer patterns</li>
-									<li>Context, memoisation &amp; composition</li>
-									<li>Reusable hook libraries</li>
-								</ul>
-								<a class="back-cta" href="#contact">Start learning &rarr;</a>
+								<span class="course-card-cta">Open course</span>
 							</div>
 						</div>
-					</article>
+					</a>
+					<?php endif; ?>
 					<div class="desk-note">
 						<span>AI assistant included</span>
 						<strong>Paid courses pair lessons with hints, examples, mock questions, and answer reviews.</strong>
 					</div>
 				</div>
 				<aside class="course-sidebars" aria-label="Course recommendations">
+					<?php if ( is_active_sidebar( 'home-sidebar-ad' ) ) : ?>
+						<?php dynamic_sidebar( 'home-sidebar-ad' ); ?>
+					<?php endif; ?>
 					<div class="side-card recommendation-card">
 						<div class="side-card-heading">
 							<span>Recommended articles</span>
@@ -334,49 +391,40 @@ $codesblock_recommended_courses = new WP_Query(
 			<div class="practice-header">
 				<div>
 					<p class="eyebrow">Interview Guides</p>
-					<h2>Role-specific prep with AI-guided feedback.</h2>
+					<h2>Role-specific prep with guided feedback.</h2>
 				</div>
-				<a class="button button-primary" href="#contact">Explore guides</a>
+				<p class="practice-lede">Compact tracks for senior, AI, and leadership interviews with checkpoints you can use before every round.</p>
 			</div>
-			<div class="practice-bento">
 
-				<!-- Role selector -->
-				<div class="bento-cell bento-roles">
-					<p class="bento-label">Choose your track</p>
-					<div class="role-pills">
-						<button class="role-pill active" data-role="senior">Sr. Engineer</button>
-						<button class="role-pill" data-role="ai">AI Roles</button>
-						<button class="role-pill" data-role="manager">Manager</button>
+			<div class="practice-board">
+				<div class="practice-track-grid" aria-label="Interview guide tracks">
+					<a class="practice-track-card" href="#contact">
+						<span>01</span>
+						<h3>Sr. Engineer Track</h3>
+						<p>Architecture, tradeoffs, ownership, debugging judgment, and system-level thinking.</p>
+						<strong>Explore Track</strong>
+					</a>
+					<a class="practice-track-card is-featured" href="#contact">
+						<span>02</span>
+						<h3>AI Roles Track</h3>
+						<p>Prompting, ML basics, agents, evaluation, and data pipeline tradeoffs.</p>
+						<strong>Explore Track</strong>
+					</a>
+					<a class="practice-track-card" href="#contact">
+						<span>03</span>
+						<h3>Manager Track</h3>
+						<p>Team building, conflict resolution, delivery stories, and technical leadership.</p>
+						<strong>Explore Track</strong>
+					</a>
+				</div>
+
+				<div class="practice-dashboard">
+					<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/interview-coach.jpg' ); ?>" alt="Interview Prep Dashboard">
+					<div class="practice-dashboard-overlay">
+						<span>Live feedback</span>
+						<strong>Round-ready review in one view</strong>
 					</div>
-					<p class="role-desc" id="role-desc">Architecture, tradeoffs, ownership, debugging judgment, and system-level thinking.</p>
 				</div>
-
-				<!-- Visual feature showcase -->
-				<div class="bento-cell bento-image-showcase">
-					<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/interview-coach.jpg' ); ?>" alt="AI Interview Coach Dashboard Preview" class="bento-showcase-img">
-					<div class="bento-image-overlay">
-						<p class="bento-label"><span class="ai-dot"></span> AI Coach Dashboard</p>
-					</div>
-				</div>
-
-				<!-- Mock practice stat -->
-				<div class="bento-cell bento-mock">
-					<div class="mock-pulse-ring"></div>
-					<p class="bento-label">Mock interview</p>
-					<strong class="mock-status">Live feedback mode</strong>
-					<p class="mock-hint">Answer &rarr; AI scores &rarr; you improve</p>
-					<a href="#contact" class="mock-cta">Start a round &rarr;</a>
-				</div>
-
-				<!-- Feature pills row -->
-				<div class="bento-cell bento-features">
-					<span class="feat-pill">&#129302; AI hints</span>
-					<span class="feat-pill">&#128221; Answer reviews</span>
-					<span class="feat-pill">&#127919; Mock rounds</span>
-					<span class="feat-pill">&#128200; Progress tracking</span>
-					<span class="feat-pill">&#128172; Follow-up questions</span>
-				</div>
-
 			</div>
 		</div>
 	</section>

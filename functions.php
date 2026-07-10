@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 require_once get_template_directory() . '/inc.php';
+require_once get_template_directory() . '/inc-course-meta.php';
 
 function codesblock_setup() {
 	add_theme_support( 'title-tag' );
@@ -30,11 +31,60 @@ function codesblock_setup() {
 add_action( 'after_setup_theme', 'codesblock_setup' );
 
 function codesblock_assets() {
-	wp_enqueue_style( 'codesblock-fonts', 'https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap', array(), null );
-	wp_enqueue_style( 'codesblock-main', get_template_directory_uri() . '/assets/css/main.css', array(), '2.9.0' );
+	wp_enqueue_style( 'codesblock-fonts', 'https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&family=Sora:wght@500;600;700;800&display=swap', array(), null );
+	wp_enqueue_style( 'codesblock-main', get_template_directory_uri() . '/assets/css/main.css', array(), '3.0.0' );
 	wp_enqueue_script( 'codesblock-main', get_template_directory_uri() . '/assets/js/main.js', array(), '1.2.0', true );
 }
 add_action( 'wp_enqueue_scripts', 'codesblock_assets' );
+
+/**
+ * Course portal assets — loaded only on course archive & single course pages.
+ */
+function codesblock_course_portal_assets() {
+	if ( ! is_singular( 'course' ) && ! is_post_type_archive( 'course' ) ) {
+		return;
+	}
+
+	wp_enqueue_style(
+		'codesblock-course-portal',
+		get_template_directory_uri() . '/assets/css/course-portal.css',
+		array( 'codesblock-main' ),
+		'1.0.0'
+	);
+
+	wp_enqueue_script(
+		'codesblock-course-portal',
+		get_template_directory_uri() . '/assets/js/course-portal.js',
+		array( 'codesblock-main' ),
+		'1.0.0',
+		true
+	);
+
+	/* Pass course-specific data to JS (used by the AI Tutor) */
+	if ( is_singular( 'course' ) ) {
+		$post_id  = get_the_ID();
+		$ai_faqs_raw = get_post_meta( $post_id, '_course_ai_faqs', true );
+		$ai_faqs     = $ai_faqs_raw ? json_decode( $ai_faqs_raw, true ) : array();
+
+		wp_localize_script(
+			'codesblock-course-portal',
+			'cbPortalData',
+			array(
+				'title'   => get_the_title( $post_id ),
+				'summary' => get_post_meta( $post_id, '_course_ai_summary', true ) ?: get_the_excerpt(),
+				'faqs'    => is_array( $ai_faqs ) ? $ai_faqs : array(),
+			)
+		);
+	}
+}
+add_action( 'wp_enqueue_scripts', 'codesblock_course_portal_assets' );
+
+function codesblock_add_adsense() {
+	?>
+	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5837563798509200" crossorigin="anonymous"></script>
+	<?php
+}
+add_action( 'wp_head', 'codesblock_add_adsense' );
 
 function codesblock_register_course_type() {
 	register_post_type(
@@ -236,6 +286,17 @@ function codesblock_widgets_init() {
 			'after_widget'  => '</div>',
 			'before_title'  => '<h2 class="widget-title">',
 			'after_title'   => '</h2>',
+		)
+	);
+	register_sidebar(
+		array(
+			'name'          => __( 'Home Sidebar Ad', 'codesblock' ),
+			'id'            => 'home-sidebar-ad',
+			'description'   => __( 'Optional ad area on the home page course sidebar.', 'codesblock' ),
+			'before_widget' => '<div id="%1$s" class="side-card widget %2$s">',
+			'after_widget'  => '</div>',
+			'before_title'  => '<div class="side-card-heading"><span>',
+			'after_title'   => '</span></div>',
 		)
 	);
 }
