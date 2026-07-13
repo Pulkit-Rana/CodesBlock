@@ -2,12 +2,13 @@
 	'use strict';
 
 	/* ─────────────────────────────────────────────────────────
-	   AI TUTOR PANEL — dummy responses, fixed slide-in panel
+	   INTERACTIVE COURSE GUIDE — fixed slide-in panel
 	   ───────────────────────────────────────────────────────── */
 
 	var tutor = {
 		panel:       document.getElementById('ai-tutor-panel'),
 		toggleBtn:   document.getElementById('ai-tutor-toggle'),
+		inlineBtn:   document.getElementById('open-ai-tutor-inline'),
 		closeBtn:    document.getElementById('ai-tutor-close'),
 		tabs:        document.querySelectorAll('.ai-tutor-tab'),
 		tabContents: document.querySelectorAll('.ai-tutor-tab-content'),
@@ -27,28 +28,24 @@
 			.replace(/'/g, '&#039;');
 	}
 
-	/* --- Dummy knowledge base (generated from page data) --- */
+	/* --- Course guide knowledge base (generated from page data) --- */
 	var courseData = window.cbPortalData || {};
-	var summary    = courseData.summary  || 'This is a comprehensive, hands-on course designed to help you build real skills step by step, with an AI tutor available throughout your learning journey.';
+	var summary    = courseData.summary  || 'This course is designed to help you build practical skills step by step. Review the syllabus and learning outcomes on this page for the full outline.';
 	var faqs       = courseData.faqs     || [];
 	var courseTitle = courseData.title   || 'this course';
 
-	/* Keyword-based dummy responses */
+	/* Keyword-based page guidance. */
 	var knowledgeBase = [
 		{ keys: ['price', 'cost', 'how much', 'free', 'enroll', 'subscribe', 'buy'],
-		  reply: 'Click the <strong>Enroll Now</strong> button on the right to see all plans. We have a Free tier, a Pro plan at $9/month (unlimited courses + AI Tutor), and a one-time Lifetime deal at $199.' },
+		  reply: 'Use the <strong>Enroll</strong> button on this page to review the currently available membership choices and final checkout price.' },
 		{ keys: ['syllabus', 'curriculum', 'module', 'chapter', 'lesson'],
 		  reply: 'Scroll down to the <strong>Course Syllabus</strong> section on this page to see the full breakdown of modules and lessons — just click a module header to expand it.' },
-		{ keys: ['certificate', 'certification', 'badge'],
-		  reply: '✅ Yes! You get a <strong>Certificate of Completion</strong> after finishing all modules and the final assessment. You can download it as a PDF and share it directly on LinkedIn.' },
-		{ keys: ['refund', 'money back', 'guarantee'],
-		  reply: 'We offer a <strong>30-day money-back guarantee</strong>, no questions asked. If you are not satisfied, just contact us within 30 days for a full refund.' },
 		{ keys: ['prerequisite', 'need to know', 'level', 'beginner', 'experience', 'requirement'],
 		  reply: 'Check the <strong>Level</strong> badge in the course header. Beginner courses start from scratch, Intermediate assumes some experience, and Advanced targets senior engineers.' },
 		{ keys: ['duration', 'how long', 'hours', 'weeks', 'time'],
-		  reply: 'Course duration is listed in the course header. You have <strong>lifetime access</strong>, so you can go at your own pace — binge it in a week or spread it over months.' },
-		{ keys: ['ai tutor', 'ai assistant', 'how does the tutor'],
-		  reply: 'I am the AI Tutor 🤖 — I am baked into every course on CodesBlock. You can ask me anything about this course: concepts, doubts, prerequisites, or "explain it simply". On Pro and Lifetime plans I can also review your code.' },
+		  reply: 'The estimated course duration is listed in the course header. Your account keeps saved progress so you can continue later.' },
+		{ keys: ['guide', 'help', 'how does this work'],
+		  reply: 'This interactive guide uses the published course summary, syllabus, and instructor-provided FAQ answers to help you navigate the page.' },
 		{ keys: ['language', 'python', 'javascript', 'java', 'typescript'],
 		  reply: 'The course examples use languages relevant to the topic. All conceptual patterns are language-agnostic — you can apply them in Python, JavaScript, Java, or whatever your interviewer expects.' },
 		{ keys: ['summary', 'overview', 'about', 'what is'],
@@ -67,7 +64,7 @@
 
 	var fallbacks = [
 		'Great question! I&rsquo;d suggest checking the <strong>Syllabus</strong> and <strong>What You\'ll Learn</strong> sections below. Is there a specific topic you want me to explain?',
-		'I\'m here to help! Could you rephrase your question or ask something more specific about ' + escHtml(courseTitle) + '? I know the course content, pricing, prerequisites, and more.',
+		'I\'m here to help you navigate ' + escHtml(courseTitle) + '. Try asking about the course outline, pricing, prerequisites, or duration.',
 		'That\'s something I\'ll need more context to answer. Try asking: <em>"What will I learn?"</em>, <em>"How long is this course?"</em>, or <em>"What\'s included?"</em>',
 	];
 
@@ -111,6 +108,10 @@
 				openPanel();
 			}
 		});
+	}
+
+	if (tutor.inlineBtn) {
+		tutor.inlineBtn.addEventListener('click', openPanel);
 	}
 
 	if (tutor.closeBtn) { tutor.closeBtn.addEventListener('click', closePanel); }
@@ -299,33 +300,6 @@
 					card.style.display = level === filter ? '' : 'none';
 				}
 			});
-		});
-	});
-
-	/* ─────────────────────────────────────────────────────────
-	   NEWSLETTER FORM — simple feedback (no real submit)
-	   ───────────────────────────────────────────────────────── */
-
-	var nlForms = document.querySelectorAll('.newsletter-form-js');
-
-	nlForms.forEach(function (form) {
-		form.addEventListener('submit', function (e) {
-			/* Only intercept if no real action is set */
-			var action = form.getAttribute('action') || '';
-			if (action && action !== '#') return; /* let real plugins handle it */
-
-			e.preventDefault();
-			var emailInput = form.querySelector('input[type="email"]');
-			var btn        = form.querySelector('button[type="submit"]');
-
-			if (emailInput && emailInput.value) {
-				if (btn) { btn.textContent = '🎉 You\'re in!'; btn.disabled = true; }
-				emailInput.value = '';
-
-				setTimeout(function () {
-					if (btn) { btn.textContent = 'Subscribe'; btn.disabled = false; }
-				}, 4000);
-			}
 		});
 	});
 

@@ -31,17 +31,88 @@ function codesblock_setup() {
 add_action( 'after_setup_theme', 'codesblock_setup' );
 
 function codesblock_assets() {
+	$member_css_path = get_template_directory() . '/assets/css/member.css';
+	$member_js_path  = get_template_directory() . '/assets/js/member.js';
 	wp_enqueue_style( 'codesblock-fonts', 'https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&family=Sora:wght@500;600;700;800&display=swap', array(), null );
-	wp_enqueue_style( 'codesblock-main', get_template_directory_uri() . '/assets/css/main.css', array(), '3.0.0' );
+	wp_enqueue_style( 'codesblock-main', get_template_directory_uri() . '/assets/css/main.css', array(), '3.1.0' );
+	wp_enqueue_style( 'codesblock-member', get_template_directory_uri() . '/assets/css/member.css', array( 'codesblock-main' ), file_exists( $member_css_path ) ? (string) filemtime( $member_css_path ) : '1.1.0' );
 	wp_enqueue_script( 'codesblock-main', get_template_directory_uri() . '/assets/js/main.js', array(), '1.2.0', true );
+	wp_enqueue_script( 'codesblock-member', get_template_directory_uri() . '/assets/js/member.js', array( 'codesblock-main' ), file_exists( $member_js_path ) ? (string) filemtime( $member_js_path ) : '1.1.0', true );
+	wp_localize_script(
+		'codesblock-member',
+		'cbMemberData',
+		array(
+			'ajaxUrl' => admin_url( 'admin-ajax.php', 'relative' ),
+			'nonce'   => wp_create_nonce( 'cbcommerce_member' ),
+		)
+	);
 }
 add_action( 'wp_enqueue_scripts', 'codesblock_assets' );
+
+/**
+ * Keep paid content protected across templates, feeds, embeds, and REST output.
+ */
+function codesblock_is_protected_content( $post_id ) {
+	$post_type = get_post_type( $post_id );
+	if ( 'course' === $post_type ) {
+		$price = trim( (string) get_post_meta( $post_id, '_course_price', true ) );
+		return '' !== $price && 'free' !== strtolower( $price );
+	}
+
+	return 'post' === $post_type && (bool) get_post_meta( $post_id, '_codesblock_premium', true );
+}
+
+function codesblock_user_can_view_protected_content( $post_id ) {
+	if ( ! codesblock_is_protected_content( $post_id ) || current_user_can( 'edit_post', $post_id ) ) {
+		return true;
+	}
+
+	return function_exists( 'cbcommerce_user_has_paid_access' ) && cbcommerce_user_has_paid_access();
+}
+
+function codesblock_protected_preview( $post_id ) {
+	$excerpt = get_post_field( 'post_excerpt', $post_id );
+	if ( ! $excerpt ) {
+		$excerpt = wp_trim_words( wp_strip_all_tags( get_post_field( 'post_content', $post_id ) ), 55 );
+	}
+
+	return wpautop( esc_html( $excerpt ) );
+}
+
+function codesblock_filter_protected_content( $content ) {
+	$post_id = get_the_ID();
+	if ( $post_id && codesblock_is_protected_content( $post_id ) && ! codesblock_user_can_view_protected_content( $post_id ) ) {
+		return codesblock_protected_preview( $post_id );
+	}
+
+	return $content;
+}
+add_filter( 'the_content', 'codesblock_filter_protected_content', 99 );
+add_filter( 'the_content_feed', 'codesblock_filter_protected_content', 99 );
+
+function codesblock_protect_rest_content( $response, $post ) {
+	if ( $post instanceof WP_Post && codesblock_is_protected_content( $post->ID ) && ! codesblock_user_can_view_protected_content( $post->ID ) ) {
+		$data = $response->get_data();
+		if ( isset( $data['content'] ) && is_array( $data['content'] ) ) {
+			$data['content']['rendered']  = codesblock_protected_preview( $post->ID );
+			$data['content']['protected'] = true;
+		}
+		$response->set_data( $data );
+	}
+
+	return $response;
+}
+add_filter( 'rest_prepare_post', 'codesblock_protect_rest_content', 10, 2 );
+add_filter( 'rest_prepare_course', 'codesblock_protect_rest_content', 10, 2 );
 
 /**
  * Course portal assets — loaded only on course archive & single course pages.
  */
 function codesblock_course_portal_assets() {
-	if ( ! is_singular( 'course' ) && ! is_post_type_archive( 'course' ) ) {
+	$is_course = is_singular( 'course' ) || is_post_type_archive( 'course' );
+	$is_premium_post = is_singular( 'post' ) && (bool) get_post_meta( get_the_ID(), '_codesblock_premium', true );
+
+	if ( ! $is_course && ! $is_premium_post ) {
 		return;
 	}
 
@@ -60,19 +131,21 @@ function codesblock_course_portal_assets() {
 		true
 	);
 
-	/* Pass course-specific data to JS (used by the AI Tutor) */
+	/* Pass course-specific data only when the current visitor may view the course. */
 	if ( is_singular( 'course' ) ) {
-		$post_id  = get_the_ID();
-		$ai_faqs_raw = get_post_meta( $post_id, '_course_ai_faqs', true );
-		$ai_faqs     = $ai_faqs_raw ? json_decode( $ai_faqs_raw, true ) : array();
+		$post_id         = get_the_ID();
+		$user_can_access = ! function_exists( 'codesblock_user_can_view_protected_content' ) || codesblock_user_can_view_protected_content( $post_id );
+		$ai_faqs_raw     = $user_can_access ? get_post_meta( $post_id, '_course_ai_faqs', true ) : '';
+		$ai_faqs         = $ai_faqs_raw ? json_decode( $ai_faqs_raw, true ) : array();
 
 		wp_localize_script(
 			'codesblock-course-portal',
 			'cbPortalData',
 			array(
-				'title'   => get_the_title( $post_id ),
-				'summary' => get_post_meta( $post_id, '_course_ai_summary', true ) ?: get_the_excerpt(),
-				'faqs'    => is_array( $ai_faqs ) ? $ai_faqs : array(),
+				'title'       => get_the_title( $post_id ),
+				'summary'     => $user_can_access ? ( get_post_meta( $post_id, '_course_ai_summary', true ) ?: get_the_excerpt() ) : '',
+				'faqs'        => is_array( $ai_faqs ) ? $ai_faqs : array(),
+				'canUseGuide' => $user_can_access,
 			)
 		);
 	}
@@ -130,6 +203,20 @@ function codesblock_render_recommended_meta_box( $post ) {
 		<?php esc_html_e( 'Prioritize as recommended', 'codesblock' ); ?>
 	</label>
 	<p><?php esc_html_e( 'Recommended posts appear before regular latest posts. Recommended courses appear in the Articles sidebar.', 'codesblock' ); ?></p>
+
+	<?php if ( 'post' === $post->post_type ) : ?>
+		<hr style="margin: 16px 0;">
+
+		<?php
+		wp_nonce_field( 'codesblock_save_premium', 'codesblock_premium_nonce' );
+		$is_premium = (bool) get_post_meta( $post->ID, '_codesblock_premium', true );
+		?>
+		<label>
+			<input type="checkbox" name="codesblock_premium" value="1" <?php checked( $is_premium ); ?>>
+			<?php esc_html_e( 'Premium Article (Members Only)', 'codesblock' ); ?>
+		</label>
+		<p><?php esc_html_e( 'If checked, non-members see only the article preview.', 'codesblock' ); ?></p>
+	<?php endif; ?>
 	<?php
 }
 
@@ -148,10 +235,19 @@ function codesblock_save_recommended_meta( $post_id ) {
 
 	if ( isset( $_POST['codesblock_recommended'] ) ) {
 		update_post_meta( $post_id, '_codesblock_recommended', '1' );
+	} else {
+		delete_post_meta( $post_id, '_codesblock_recommended' );
+	}
+
+	if ( 'post' !== get_post_type( $post_id ) || ! isset( $_POST['codesblock_premium_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['codesblock_premium_nonce'] ) ), 'codesblock_save_premium' ) ) {
 		return;
 	}
 
-	delete_post_meta( $post_id, '_codesblock_recommended' );
+	if ( isset( $_POST['codesblock_premium'] ) ) {
+		update_post_meta( $post_id, '_codesblock_premium', '1' );
+	} else {
+		delete_post_meta( $post_id, '_codesblock_premium' );
+	}
 }
 add_action( 'save_post', 'codesblock_save_recommended_meta' );
 
@@ -225,7 +321,7 @@ function codesblock_customize_register( $wp_customize ) {
 	$promo_fields = array(
 		'codesblock_promo_text'      => array(
 			'label'             => __( 'Promo text', 'codesblock' ),
-			'default'           => 'Flash sale: Get 60% off AI interview prep this week.',
+			'default'           => 'Practical courses and interview prep for working developers.',
 			'type'              => 'text',
 			'sanitize_callback' => 'sanitize_text_field',
 		),

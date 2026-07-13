@@ -1,7 +1,7 @@
 <?php
 /**
  * Single Course page.
- * Includes: course hero, detailed info, AI Tutor fixed panel, paywall modal, newsletter.
+ * Includes: course hero, detailed info, interactive course guide, and newsletter.
  *
  * @package CodesBlock
  */
@@ -26,26 +26,25 @@ $course_preview = get_the_excerpt() ? get_the_excerpt() : wp_trim_words( wp_stri
    If Paid Memberships Pro is active, check membership.
    Otherwise treat all visitors as "guests".
    ─────────────────────────────────────────────────────────────── */
-$user_has_access = false;
-if ( is_user_logged_in() ) {
-	if ( function_exists( 'pmpro_hasMembershipLevel' ) ) {
-		/* Check any paid level — adjust level IDs to match your PMPro setup */
-		$user_has_access = pmpro_hasMembershipLevel() || $is_free;
-	} else {
-		/* No paywall plugin installed — logged-in users see all content */
-		$user_has_access = $is_free || current_user_can( 'edit_post', $post_id );
-	}
-} elseif ( $is_free ) {
-	$user_has_access = true;
-}
+$user_has_access = function_exists( 'codesblock_user_can_view_protected_content' )
+	? codesblock_user_can_view_protected_content( $post_id )
+	: $is_free;
+$codesblock_is_admin_session = function_exists( 'cbcommerce_user_can_access_admin' )
+	? cbcommerce_user_can_access_admin()
+	: current_user_can( 'manage_options' );
+$codesblock_is_frontend_member = function_exists( 'cbcommerce_is_frontend_member' )
+	? cbcommerce_is_frontend_member()
+	: ( is_user_logged_in() && ! $codesblock_is_admin_session );
+$codesblock_can_track_progress = $codesblock_is_frontend_member && $user_has_access && function_exists( 'cbcommerce_user_can_track_course' ) && cbcommerce_user_can_track_course( $post_id );
+$codesblock_course_progress    = $codesblock_can_track_progress && function_exists( 'cbcommerce_get_course_progress' ) ? cbcommerce_get_course_progress( $post_id ) : 0;
 
-/* ── AI Tutor suggestion chips (shown in panel) ─────────────── */
+/* ── Course guide suggestion chips (shown in panel) ─────────── */
 $ai_suggestions = array(
 	__( 'What will I learn?', 'codesblock' ),
 	__( 'How long does it take?', 'codesblock' ),
-	__( 'Do I get a certificate?', 'codesblock' ),
+	__( 'What level is this course?', 'codesblock' ),
 	__( 'What\'s the price?', 'codesblock' ),
-	__( 'Is there a refund policy?', 'codesblock' ),
+	__( 'What are the prerequisites?', 'codesblock' ),
 );
 ?>
 
@@ -82,7 +81,7 @@ $ai_suggestions = array(
 						<?php endif; ?>
 						<span>
 							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-							<strong><?php esc_html_e( 'AI Tutor included', 'codesblock' ); ?></strong>
+							<strong><?php esc_html_e( 'Interactive course guide', 'codesblock' ); ?></strong>
 						</span>
 					</div>
 				</div>
@@ -113,29 +112,42 @@ $ai_suggestions = array(
 							</div>
 
 							<!-- Enroll CTA -->
-							<button
-								class="btn-enroll js-open-paywall"
-								id="btn-enroll-main"
-								aria-haspopup="dialog"
-								aria-controls="paywall-overlay"
-							>
-								<?php esc_html_e( 'Enroll Now', 'codesblock' ); ?> &rarr;
-							</button>
+							<?php if ( $codesblock_can_track_progress ) : ?>
+								<a class="btn-enroll" id="btn-enroll-main" href="#course-progress"><?php esc_html_e( 'Continue learning', 'codesblock' ); ?> &rarr;</a>
+							<?php elseif ( $codesblock_is_frontend_member ) : ?>
+								<a class="btn-enroll" id="btn-enroll-main" href="<?php echo esc_url( function_exists( 'cbcommerce_checkout_url' ) ? cbcommerce_checkout_url( 'pro' ) : home_url( '/#member' ) ); ?>"><?php esc_html_e( 'Upgrade to unlock', 'codesblock' ); ?> &rarr;</a>
+							<?php elseif ( $codesblock_is_admin_session ) : ?>
+								<a class="btn-enroll" id="btn-enroll-main" href="<?php echo esc_url( get_edit_post_link( $post_id ) ); ?>"><?php esc_html_e( 'Edit course in WP Admin', 'codesblock' ); ?> &rarr;</a>
+							<?php else : ?>
+								<button
+									class="btn-enroll js-open-paywall"
+									id="btn-enroll-main"
+									aria-haspopup="dialog"
+									aria-controls="paywall-overlay"
+								>
+									<?php esc_html_e( 'Enroll Now', 'codesblock' ); ?> &rarr;
+								</button>
+							<?php endif; ?>
 
 							<p class="enroll-guarantee">
 								<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-								<?php esc_html_e( '30-Day Money-Back Guarantee', 'codesblock' ); ?>
+								<?php echo esc_html( $is_free ? __( 'No payment required', 'codesblock' ) : __( 'Clear pricing before checkout', 'codesblock' ) ); ?>
 							</p>
 
 							<!-- Includes list -->
 							<?php if ( $features ) : ?>
 								<ul class="course-includes-list">
 									<?php
+									$codesblock_legacy_feature_labels = array(
+										'AI Tutor included'          => __( 'Interactive course guide', 'codesblock' ),
+										'Certificate of completion' => __( 'Saved learning progress', 'codesblock' ),
+									);
 									foreach ( array_filter( array_map( 'trim', explode( "\n", $features ) ) ) as $feat ) :
+										$feature_label = isset( $codesblock_legacy_feature_labels[ $feat ] ) ? $codesblock_legacy_feature_labels[ $feat ] : $feat;
 									?>
 										<li>
 											<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-											<?php echo esc_html( $feat ); ?>
+											<?php echo esc_html( $feature_label ); ?>
 										</li>
 									<?php endforeach; ?>
 								</ul>
@@ -155,6 +167,31 @@ $ai_suggestions = array(
 
 			<!-- ── Left: course details ─────────────────────── -->
 			<div class="course-details-area">
+				<?php if ( $codesblock_can_track_progress ) : ?>
+					<section class="course-section cb-course-progress" id="course-progress" aria-labelledby="course-progress-heading">
+						<div class="cb-course-progress-heading">
+							<div>
+								<p class="eyebrow"><?php esc_html_e( 'My learning', 'codesblock' ); ?></p>
+								<h2 id="course-progress-heading"><?php esc_html_e( 'Track this course', 'codesblock' ); ?></h2>
+							</div>
+							<strong data-course-progress-value><?php echo esc_html( $codesblock_course_progress ); ?>%</strong>
+						</div>
+						<div class="cb-course-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?php echo esc_attr( $codesblock_course_progress ); ?>">
+							<span data-course-progress-fill style="width: <?php echo esc_attr( $codesblock_course_progress ); ?>%"></span>
+						</div>
+						<form class="cb-course-progress-form" data-course-progress-form>
+							<input type="hidden" name="course_id" value="<?php echo esc_attr( $post_id ); ?>">
+							<label for="cb-course-progress-select"><?php esc_html_e( 'Current progress', 'codesblock' ); ?></label>
+							<select id="cb-course-progress-select" name="progress">
+								<?php foreach ( array( 0, 25, 50, 75, 100 ) as $codesblock_progress_step ) : ?>
+									<option value="<?php echo esc_attr( $codesblock_progress_step ); ?>" <?php selected( $codesblock_course_progress, $codesblock_progress_step ); ?>><?php echo esc_html( $codesblock_progress_step ); ?>%</option>
+								<?php endforeach; ?>
+							</select>
+							<button class="button button-primary" type="submit"><?php esc_html_e( 'Save progress', 'codesblock' ); ?></button>
+							<p class="cb-form-feedback" role="status" aria-live="polite"></p>
+						</form>
+					</section>
+				<?php endif; ?>
 
 				<!-- What You'll Learn -->
 				<?php if ( $what_you_learn ) : ?>
@@ -179,14 +216,14 @@ $ai_suggestions = array(
 					<?php if ( $user_has_access ) : ?>
 						<div class="entry-content"><?php the_content(); ?></div>
 					<?php else : ?>
-						<!-- Paywall gate: show blurred preview -->
+						<!-- Paywall gate: only the server-generated preview reaches the browser. -->
 						<div class="content-gate-wrapper">
 							<div class="content-gate-blur entry-content">
 								<p><?php echo esc_html( $course_preview ); ?></p>
 							</div>
 							<div class="content-gate-overlay">
 								<h3><?php esc_html_e( 'Enroll to read the full course overview', 'codesblock' ); ?></h3>
-								<p><?php esc_html_e( 'Connect a membership or checkout plugin before selling paid course access.', 'codesblock' ); ?></p>
+								<p><?php esc_html_e( 'Join Pro or Lifetime to unlock the complete course and member learning tools.', 'codesblock' ); ?></p>
 								<button class="button button-primary js-open-paywall" aria-haspopup="dialog" aria-controls="paywall-overlay">
 									<?php esc_html_e( 'Unlock Access', 'codesblock' ); ?>
 								</button>
@@ -235,21 +272,21 @@ $ai_suggestions = array(
 					</section>
 				<?php endif; ?>
 
-				<!-- AI Tutor CTA (inline) — open the fixed panel -->
+				<?php if ( $user_has_access ) : ?>
+				<!-- Course Guide CTA (inline) — open the fixed panel -->
 				<section class="course-section" style="background:linear-gradient(135deg,#f0f5ff,#e8f5ee);border-color:#d4e0ff;">
 					<div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
 						<div style="flex:1;min-width:200px;">
-							<p class="eyebrow" style="color:var(--blue);"><?php esc_html_e( 'AI Tutor', 'codesblock' ); ?></p>
-							<h2 style="font-size:1.3rem;margin-bottom:6px;"><?php esc_html_e( 'Have questions? Ask the AI Tutor.', 'codesblock' ); ?></h2>
-							<p style="color:var(--muted);margin:0;font-size:.9rem;"><?php esc_html_e( 'Get course summaries, prerequisite advice, or ask anything — the AI Tutor knows this course inside out.', 'codesblock' ); ?></p>
+							<p class="eyebrow" style="color:var(--blue);"><?php esc_html_e( 'Course Guide', 'codesblock' ); ?></p>
+							<h2 style="font-size:1.3rem;margin-bottom:6px;"><?php esc_html_e( 'Find your way through the course.', 'codesblock' ); ?></h2>
+							<p style="color:var(--muted);margin:0;font-size:.9rem;"><?php esc_html_e( 'Use the interactive guide for the course summary, prerequisites, pricing, and curriculum details.', 'codesblock' ); ?></p>
 						</div>
 						<button
 							class="button button-primary"
 							id="open-ai-tutor-inline"
-							onclick="document.getElementById('ai-tutor-toggle').click()"
 							style="white-space:nowrap;"
 						>
-							🤖 <?php esc_html_e( 'Open AI Tutor', 'codesblock' ); ?>
+							<?php esc_html_e( 'Open Course Guide', 'codesblock' ); ?>
 						</button>
 					</div>
 
@@ -260,6 +297,7 @@ $ai_suggestions = array(
 						<?php endforeach; ?>
 					</div>
 				</section>
+				<?php endif; ?>
 
 			</div>
 
@@ -275,13 +313,14 @@ $ai_suggestions = array(
 					/* If Newsletter plugin active: echo do_shortcode('[newsletter]'); */
 					/* If Mailchimp for WP active: echo do_shortcode('[mc4wp_form id="YOUR_FORM_ID"]'); */
 					?>
-					<form class="newsletter-form-js" style="display:flex;flex-direction:column;gap:8px;" action="#" method="post">
-						<?php wp_nonce_field( 'cbcm_newsletter', 'cbcm_nl_nonce' ); ?>
+					<form class="cb-newsletter-form" style="display:flex;flex-direction:column;gap:8px;" action="#" method="post" novalidate>
 						<label class="screen-reader-text" for="nl-email-sidebar"><?php esc_html_e( 'Email address', 'codesblock' ); ?></label>
 						<input
 							id="nl-email-sidebar"
 							type="email"
 							name="email"
+							autocomplete="email"
+							inputmode="email"
 							placeholder="<?php esc_attr_e( 'you@example.com', 'codesblock' ); ?>"
 							style="border:1px solid var(--line);border-radius:8px;padding:9px 12px;font:inherit;width:100%;outline:none;"
 							required
@@ -293,6 +332,8 @@ $ai_suggestions = array(
 						>
 							<?php esc_html_e( 'Notify Me', 'codesblock' ); ?>
 						</button>
+						<input class="cb-honeypot" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
+						<p class="cb-form-feedback" role="status" aria-live="polite"></p>
 					</form>
 				</div>
 
@@ -323,9 +364,8 @@ $ai_suggestions = array(
 
 </main>
 
-<!-- ══════════════════════════════════════════════════
-     AI TUTOR FIXED PANEL (always rendered, toggled by JS)
-══════════════════════════════════════════════════ -->
+<?php if ( $user_has_access ) : ?>
+<!-- Interactive course guide panel. -->
 
 <!-- Toggle button anchored to right edge -->
 <button
@@ -333,11 +373,11 @@ $ai_suggestions = array(
 	id="ai-tutor-toggle"
 	aria-expanded="false"
 	aria-controls="ai-tutor-panel"
-	aria-label="<?php esc_attr_e( 'Open AI Tutor', 'codesblock' ); ?>"
+	aria-label="<?php esc_attr_e( 'Open Course Guide', 'codesblock' ); ?>"
 >
 	<div class="ai-tutor-toggle-inner">
 		<div class="ai-tutor-pulse" aria-hidden="true"></div>
-		<span style="writing-mode:vertical-rl;text-orientation:mixed;letter-spacing:.05em;">AI</span>
+		<span style="writing-mode:vertical-rl;text-orientation:mixed;letter-spacing:.05em;">Guide</span>
 	</div>
 </button>
 
@@ -347,26 +387,26 @@ $ai_suggestions = array(
 	class="ai-tutor-panel"
 	role="dialog"
 	aria-modal="false"
-	aria-label="<?php esc_attr_e( 'AI Tutor', 'codesblock' ); ?>"
+	aria-label="<?php esc_attr_e( 'Course Guide', 'codesblock' ); ?>"
 >
 	<!-- Header -->
 	<div class="ai-tutor-panel-header">
-		<div class="ai-tutor-avatar" aria-hidden="true">🤖</div>
+		<div class="ai-tutor-avatar" aria-hidden="true">?</div>
 		<div class="ai-tutor-panel-header-info">
-			<strong><?php esc_html_e( 'AI Tutor', 'codesblock' ); ?></strong>
+			<strong><?php esc_html_e( 'Course Guide', 'codesblock' ); ?></strong>
 			<small><?php echo esc_html( get_the_title() ); ?></small>
 		</div>
 		<button
 			class="ai-tutor-close"
 			id="ai-tutor-close"
-			aria-label="<?php esc_attr_e( 'Close AI Tutor', 'codesblock' ); ?>"
+			aria-label="<?php esc_attr_e( 'Close Course Guide', 'codesblock' ); ?>"
 		>&#x2715;</button>
 	</div>
 
 	<!-- Tabs -->
 	<div class="ai-tutor-tabs" role="tablist">
 		<button class="ai-tutor-tab is-active" data-tab="summary" role="tab" aria-selected="true"><?php esc_html_e( 'Summary', 'codesblock' ); ?></button>
-		<button class="ai-tutor-tab" data-tab="chat" role="tab" aria-selected="false"><?php esc_html_e( 'Ask AI', 'codesblock' ); ?></button>
+		<button class="ai-tutor-tab" data-tab="chat" role="tab" aria-selected="false"><?php esc_html_e( 'Ask Guide', 'codesblock' ); ?></button>
 	</div>
 
 	<!-- Summary tab -->
@@ -416,7 +456,7 @@ $ai_suggestions = array(
 					<?php
 					printf(
 						/* translators: %s course title */
-						esc_html__( "Hi! I'm your AI Tutor for %s. Ask me anything — prerequisites, what you'll learn, pricing, or any topic in the course!", 'codesblock' ),
+						esc_html__( "Welcome to the course guide for %s. Ask about prerequisites, what you'll learn, pricing, or the course outline.", 'codesblock' ),
 						esc_html( get_the_title() )
 					);
 					?>
@@ -441,8 +481,8 @@ $ai_suggestions = array(
 				id="ai-chat-input"
 				class="ai-chat-input"
 				rows="2"
-				placeholder="<?php esc_attr_e( 'Ask me anything about this course…', 'codesblock' ); ?>"
-				aria-label="<?php esc_attr_e( 'Ask the AI Tutor', 'codesblock' ); ?>"
+				placeholder="<?php esc_attr_e( 'Ask about this course…', 'codesblock' ); ?>"
+				aria-label="<?php esc_attr_e( 'Ask the Course Guide', 'codesblock' ); ?>"
 			></textarea>
 			<button
 				id="ai-chat-send"
@@ -454,156 +494,6 @@ $ai_suggestions = array(
 		</div>
 	</div>
 </div>
-
-<!-- ══════════════════════════════════════════════════
-     PAYWALL / SUBSCRIPTION MODAL
-══════════════════════════════════════════════════ -->
-<div
-	id="paywall-overlay"
-	class="paywall-overlay"
-	role="dialog"
-	aria-modal="true"
-	aria-labelledby="paywall-title"
->
-	<div class="paywall-modal">
-		<!-- Header -->
-		<div class="paywall-modal-header">
-			<button
-				class="paywall-modal-close"
-				id="paywall-close"
-				aria-label="<?php esc_attr_e( 'Close', 'codesblock' ); ?>"
-			>&#x2715;</button>
-			<p class="eyebrow" style="color:rgba(255,255,255,.6);margin-bottom:6px;"><?php esc_html_e( 'Get Access', 'codesblock' ); ?></p>
-			<h2 id="paywall-title"><?php esc_html_e( 'Choose your plan', 'codesblock' ); ?></h2>
-			<p>
-				<?php
-				printf(
-					/* translators: %s course title */
-					esc_html__( 'Enroll in %s and start learning today.', 'codesblock' ),
-					esc_html( get_the_title() )
-				);
-				?>
-			</p>
-		</div>
-
-		<!-- Social login (requires Nextend Social Login plugin) -->
-		<?php if ( ! is_user_logged_in() ) : ?>
-			<div class="social-login-divider"><?php esc_html_e( 'Sign in to get started', 'codesblock' ); ?></div>
-			<div class="social-login-buttons">
-				<?php
-				/* If Nextend Social Login is active, replace buttons with its shortcode.
-				   Example: echo do_shortcode('[nextend_social_login]');
-				   Otherwise, link to the login page with a redirect.
-				*/
-				$login_redirect = urlencode( get_permalink() );
-				?>
-				<a href="<?php echo esc_url( wp_login_url( get_permalink() ) ); ?>" class="btn-social">
-					<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8z" fill="var(--muted)"/><path d="M12 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm0 6c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="var(--muted)"/></svg>
-					<?php esc_html_e( 'Login / Register', 'codesblock' ); ?>
-				</a>
-			</div>
-			<div class="social-login-divider"><?php esc_html_e( 'or choose a plan below', 'codesblock' ); ?></div>
-		<?php endif; ?>
-
-		<!-- Plans grid -->
-		<div class="paywall-plans">
-
-			<!-- Starter (Free) -->
-			<div class="plan-card">
-				<div class="plan-name"><?php esc_html_e( 'Starter', 'codesblock' ); ?></div>
-				<div class="plan-price"><?php esc_html_e( '$0', 'codesblock' ); ?></div>
-				<div class="plan-period"><?php esc_html_e( 'forever', 'codesblock' ); ?></div>
-				<div class="plan-desc"><?php esc_html_e( 'Access free courses and the community forum.', 'codesblock' ); ?></div>
-				<ul class="plan-features" role="list">
-					<?php
-					$starter_features = array(
-						__( 'All free courses', 'codesblock' ),
-						__( 'Community Discord', 'codesblock' ),
-						__( 'Weekly newsletter', 'codesblock' ),
-						__( 'Progress tracking', 'codesblock' ),
-					);
-					foreach ( $starter_features as $feat ) :
-					?>
-						<li>
-							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-							<?php echo esc_html( $feat ); ?>
-						</li>
-					<?php endforeach; ?>
-				</ul>
-				<a href="<?php echo esc_url( wp_registration_url() ); ?>" class="btn-plan" style="text-align:center;display:block;text-decoration:none;">
-					<?php esc_html_e( 'Start Free', 'codesblock' ); ?>
-				</a>
-			</div>
-
-			<!-- Pro (Popular) -->
-			<div class="plan-card is-popular">
-				<div class="plan-popular-badge"><?php esc_html_e( 'Most Popular', 'codesblock' ); ?></div>
-				<div class="plan-name"><?php esc_html_e( 'Pro', 'codesblock' ); ?></div>
-				<div class="plan-price">$9</div>
-				<div class="plan-period"><?php esc_html_e( 'per month', 'codesblock' ); ?></div>
-				<div class="plan-desc"><?php esc_html_e( 'Unlimited access to all courses + AI Tutor.', 'codesblock' ); ?></div>
-				<ul class="plan-features" role="list">
-					<?php
-					$pro_features = array(
-						__( 'Everything in Starter', 'codesblock' ),
-						__( 'All paid courses — unlimited', 'codesblock' ),
-						__( 'AI Tutor on every course', 'codesblock' ),
-						__( 'Mock interview simulator', 'codesblock' ),
-						__( 'Certificate of completion', 'codesblock' ),
-						__( 'Priority support', 'codesblock' ),
-					);
-					foreach ( $pro_features as $feat ) :
-					?>
-						<li>
-							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-							<?php echo esc_html( $feat ); ?>
-						</li>
-					<?php endforeach; ?>
-				</ul>
-				<?php
-				/* Replace href with Paid Memberships Pro checkout URL when plugin is active.
-				   e.g. href="<?php echo esc_url( pmpro_url( 'checkout', '?level=1' ) ); ?>" */
-				?>
-				<a href="<?php echo esc_url( wp_login_url( get_permalink() ) ); ?>" class="btn-plan" style="text-align:center;display:block;text-decoration:none;">
-					<?php esc_html_e( 'Start Pro — $9/mo', 'codesblock' ); ?>
-				</a>
-			</div>
-
-			<!-- Lifetime -->
-			<div class="plan-card">
-				<div class="plan-name"><?php esc_html_e( 'Lifetime', 'codesblock' ); ?></div>
-				<div class="plan-price">$199</div>
-				<div class="plan-period"><?php esc_html_e( 'one-time', 'codesblock' ); ?></div>
-				<div class="plan-desc"><?php esc_html_e( 'Pay once, learn forever. Includes all future courses.', 'codesblock' ); ?></div>
-				<ul class="plan-features" role="list">
-					<?php
-					$lifetime_features = array(
-						__( 'Everything in Pro', 'codesblock' ),
-						__( 'All future courses included', 'codesblock' ),
-						__( 'Private 1:1 AMA sessions', 'codesblock' ),
-						__( 'Early access to new courses', 'codesblock' ),
-						__( 'Team seat available (add-on)', 'codesblock' ),
-					);
-					foreach ( $lifetime_features as $feat ) :
-					?>
-						<li>
-							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-							<?php echo esc_html( $feat ); ?>
-						</li>
-					<?php endforeach; ?>
-				</ul>
-				<a href="<?php echo esc_url( wp_login_url( get_permalink() ) ); ?>" class="btn-plan" style="text-align:center;display:block;text-decoration:none;">
-					<?php esc_html_e( 'Get Lifetime Access', 'codesblock' ); ?>
-				</a>
-			</div>
-
-		</div>
-
-		<p class="paywall-modal-footer">
-			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-			<?php esc_html_e( '30-day money-back guarantee · No lock-in · Cancel anytime', 'codesblock' ); ?>
-		</p>
-	</div>
-</div>
+<?php endif; ?>
 
 <?php get_footer(); ?>
