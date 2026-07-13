@@ -91,11 +91,11 @@ get_header();
 								</div>
 
 								<h2><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>
-								<p class="card-excerpt"><?php echo wp_trim_words( get_the_excerpt(), 16 ); ?></p>
+								<p class="card-excerpt"><?php echo esc_html( wp_trim_words( get_the_excerpt(), 16 ) ); ?></p>
 
 								<!-- Footer -->
 								<div class="card-footer">
-									<div class="price-tag <?php echo $is_free ? 'price-free' : ''; ?>">
+									<div class="price-tag <?php echo esc_attr( $is_free ? 'price-free' : '' ); ?>">
 										<?php if ( $is_free ) : ?>
 											<?php esc_html_e( 'Free', 'codesblock' ); ?>
 										<?php elseif ( $price ) : ?>
@@ -144,11 +144,12 @@ get_header();
 				   Example: echo do_shortcode('[mc4wp_form id="YOUR_ID"]');
 				*/
 				?>
-				<form class="newsletter-form newsletter-form-js" action="#" method="post">
-					<?php wp_nonce_field( 'cbcm_newsletter', 'cbcm_nl_nonce' ); ?>
+				<form class="newsletter-form cb-newsletter-form" action="#" method="post" novalidate>
 					<label class="screen-reader-text" for="nl-email-archive"><?php esc_html_e( 'Email address', 'codesblock' ); ?></label>
-					<input id="nl-email-archive" type="email" name="email" placeholder="<?php esc_attr_e( 'you@example.com', 'codesblock' ); ?>" required>
+					<input id="nl-email-archive" type="email" name="email" autocomplete="email" inputmode="email" placeholder="<?php esc_attr_e( 'you@example.com', 'codesblock' ); ?>" required>
+					<input class="cb-honeypot" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
 					<button type="submit"><?php esc_html_e( 'Subscribe Free', 'codesblock' ); ?></button>
+					<p class="cb-form-feedback" role="status" aria-live="polite"></p>
 				</form>
 				<p class="newsletter-trust-row">
 					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
