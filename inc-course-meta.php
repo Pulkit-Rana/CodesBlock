@@ -57,7 +57,7 @@ function codesblock_render_course_meta_box( $post ) {
 		<div>
 			<label for="course_features"><strong><?php esc_html_e( 'Course Features (Sidebar List - one per line)', 'codesblock' ); ?></strong></label><br>
 			<textarea id="course_features" name="course_features" rows="4" style="width: 100%;"><?php echo esc_textarea( $features ); ?></textarea>
-			<p class="description">e.g.<br>Lifetime Access<br>100+ Lessons<br>Certificate of completion</p>
+			<p class="description">e.g.<br>Saved progress<br>Hands-on lessons<br>Downloadable resources</p>
 		</div>
 		<div>
 			<label for="course_what_you_learn"><strong><?php esc_html_e( 'What You Will Learn (Checklist - one per line)', 'codesblock' ); ?></strong></label><br>
@@ -69,13 +69,13 @@ function codesblock_render_course_meta_box( $post ) {
 			<textarea id="course_syllabus" name="course_syllabus" rows="10" style="width: 100%; font-family: monospace;"><?php echo esc_textarea( $syllabus ); ?></textarea>
 		</div>
 		<div>
-			<label for="course_ai_summary"><strong><?php esc_html_e( 'AI Tutor Summary (shown in the AI panel)', 'codesblock' ); ?></strong></label><br>
-			<p class="description"><?php esc_html_e( 'A 2-3 sentence summary the AI Tutor reads when users ask "what is this course about?". If left blank, the post excerpt is used.', 'codesblock' ); ?></p>
+			<label for="course_ai_summary"><strong><?php esc_html_e( 'Course Guide Summary', 'codesblock' ); ?></strong></label><br>
+			<p class="description"><?php esc_html_e( 'A 2-3 sentence summary shown by the interactive course guide. If left blank, the post excerpt is used.', 'codesblock' ); ?></p>
 			<textarea id="course_ai_summary" name="course_ai_summary" rows="4" style="width: 100%;"><?php echo esc_textarea( get_post_meta( $post->ID, '_course_ai_summary', true ) ); ?></textarea>
 		</div>
 		<div>
-			<label for="course_ai_faqs"><strong><?php esc_html_e( 'AI Tutor FAQs (JSON, for smart answers)', 'codesblock' ); ?></strong></label><br>
-			<p class="description"><?php esc_html_e( 'Optional. Enter as JSON array: [{"q":"Your question","a":"Your answer"}, ...]. The AI uses these to answer relevant user questions.', 'codesblock' ); ?></p>
+			<label for="course_ai_faqs"><strong><?php esc_html_e( 'Course Guide FAQs (JSON)', 'codesblock' ); ?></strong></label><br>
+			<p class="description"><?php esc_html_e( 'Optional. Enter as a JSON array: [{"q":"Your question","a":"Your answer"}, ...]. The guide matches these answers to relevant questions.', 'codesblock' ); ?></p>
 			<textarea id="course_ai_faqs" name="course_ai_faqs" rows="6" style="width: 100%; font-family: monospace;"><?php echo esc_textarea( get_post_meta( $post->ID, '_course_ai_faqs', true ) ); ?></textarea>
 		</div>
 	</div>

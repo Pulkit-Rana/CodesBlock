@@ -63,6 +63,13 @@ function codesblock_prepare_article_content( $content ) {
 
 		$prepared = codesblock_prepare_article_content( apply_filters( 'the_content', get_the_content() ) );
 
+		$is_premium = (bool) get_post_meta( get_the_ID(), '_codesblock_premium', true );
+		$user_has_full_access = function_exists( 'codesblock_user_can_view_protected_content' )
+			? codesblock_user_can_view_protected_content( get_the_ID() )
+			: ! $is_premium;
+
+		$show_gate = $is_premium && ! $user_has_full_access;
+
 		$recommended_posts = new WP_Query(
 			array(
 				'posts_per_page'      => 5,
@@ -127,9 +134,25 @@ function codesblock_prepare_article_content( $content ) {
 						</div>
 					<?php endif; ?>
 
-					<div class="article-content">
-						<?php echo $prepared['content']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-					</div>
+					<?php if ( $show_gate ) : ?>
+						<div class="article-premium-gate-wrapper">
+							<div class="article-content article-content-faded">
+								<?php echo $prepared['content']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+							</div>
+							<div class="article-premium-gate-overlay">
+								<div class="article-premium-gate-card">
+									<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom:12px; color:var(--blue);"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+									<h3 style="font-size:1.4rem; margin-bottom:8px;">Read the full story</h3>
+									<p style="color:var(--muted); font-size:1rem; margin-bottom:20px;">Join Pro to read this article and unlock the complete paid course library.</p>
+									<button class="button button-primary js-open-paywall" aria-haspopup="dialog" aria-controls="paywall-overlay">Unlock Access</button>
+								</div>
+							</div>
+						</div>
+					<?php else : ?>
+						<div class="article-content">
+							<?php echo $prepared['content']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						</div>
+					<?php endif; ?>
 				</div>
 
 				<aside class="article-recommend-panel" aria-label="Recommended reading">
@@ -149,7 +172,7 @@ function codesblock_prepare_article_content( $content ) {
 								?>
 								<a href="<?php echo esc_url( home_url( '/articles/' ) ); ?>">AI interview practice guide</a>
 								<a href="<?php echo esc_url( home_url( '/articles/' ) ); ?>">System design notes</a>
-								<a href="<?php echo esc_url( home_url( '/#courses' ) ); ?>">DSA course with AI assistant</a>
+								<a href="<?php echo esc_url( home_url( '/#courses' ) ); ?>">Explore practical developer courses</a>
 							<?php endif; ?>
 						</div>
 					</div>
