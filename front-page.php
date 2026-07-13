@@ -95,9 +95,124 @@ if ( count( $codesblock_home_course_posts ) < 5 ) {
 }
 
 wp_reset_postdata();
+
+$codesblock_is_admin_session = function_exists( 'cbcommerce_user_can_access_admin' )
+	? cbcommerce_user_can_access_admin()
+	: current_user_can( 'manage_options' );
+$codesblock_is_frontend_member = function_exists( 'cbcommerce_is_frontend_member' )
+	? cbcommerce_is_frontend_member()
+	: ( is_user_logged_in() && ! $codesblock_is_admin_session );
+$codesblock_member_user          = null;
+$codesblock_member_courses       = array();
+$codesblock_member_progress      = array();
+$codesblock_member_average       = 0;
+$codesblock_member_completed     = 0;
+$codesblock_member_level_name    = __( 'Starter', 'codesblock' );
+$codesblock_member_profile_url   = function_exists( 'cbcommerce_member_profile_url' ) ? cbcommerce_member_profile_url() : home_url( '/#my-learning' );
+$codesblock_member_account_url   = function_exists( 'cbcommerce_member_account_url' ) ? cbcommerce_member_account_url() : home_url( '/#my-learning' );
+
+if ( $codesblock_is_frontend_member ) {
+	$codesblock_member_user = wp_get_current_user();
+	if ( function_exists( 'pmpro_getMembershipLevelForUser' ) ) {
+		$codesblock_member_level = pmpro_getMembershipLevelForUser( $codesblock_member_user->ID );
+		if ( $codesblock_member_level && ! empty( $codesblock_member_level->name ) ) {
+			$codesblock_member_level_name = $codesblock_member_level->name;
+		}
+	}
+
+	if ( function_exists( 'cbcommerce_get_user_course_progress' ) ) {
+		$codesblock_member_progress = cbcommerce_get_user_course_progress( $codesblock_member_user->ID );
+	}
+
+	if ( $codesblock_member_progress ) {
+		$codesblock_progress_query = new WP_Query(
+			array(
+				'post_type'      => 'course',
+				'post_status'    => 'publish',
+				'posts_per_page' => 6,
+				'post__in'       => array_keys( $codesblock_member_progress ),
+				'orderby'        => 'post__in',
+			)
+		);
+		$codesblock_member_courses = $codesblock_progress_query->posts;
+		wp_reset_postdata();
+
+		$codesblock_progress_total = 0;
+		foreach ( $codesblock_member_courses as $codesblock_member_course ) {
+			$codesblock_course_percent = absint( $codesblock_member_progress[ $codesblock_member_course->ID ]['percent'] );
+			$codesblock_progress_total += $codesblock_course_percent;
+			if ( 100 === $codesblock_course_percent ) {
+				$codesblock_member_completed++;
+			}
+		}
+		if ( $codesblock_member_courses ) {
+			$codesblock_member_average = (int) round( $codesblock_progress_total / count( $codesblock_member_courses ) );
+		}
+	}
+}
 ?>
 
 <main id="main">
+	<?php if ( $codesblock_is_frontend_member && $codesblock_member_user ) : ?>
+		<section class="cb-learning-hub" id="my-learning" aria-labelledby="cb-learning-title">
+			<div class="container">
+				<div class="cb-learning-heading">
+					<div>
+						<p class="eyebrow"><?php esc_html_e( 'Your learning space', 'codesblock' ); ?></p>
+						<h2 id="cb-learning-title"><?php printf( esc_html__( 'Welcome back, %s', 'codesblock' ), esc_html( $codesblock_member_user->display_name ) ); ?></h2>
+						<p><?php esc_html_e( 'Continue where you left off and keep your CodesBlock profile in one place.', 'codesblock' ); ?></p>
+					</div>
+					<a class="button button-secondary" href="<?php echo esc_url( get_post_type_archive_link( 'course' ) ); ?>"><?php esc_html_e( 'Browse courses', 'codesblock' ); ?></a>
+				</div>
+
+				<div class="cb-learning-grid">
+					<aside class="cb-profile-card" aria-label="<?php esc_attr_e( 'Member profile', 'codesblock' ); ?>">
+						<div class="cb-profile-person">
+							<?php echo get_avatar( $codesblock_member_user->ID, 72, '', '', array( 'class' => 'cb-profile-avatar' ) ); ?>
+							<div>
+								<strong><?php echo esc_html( $codesblock_member_user->display_name ); ?></strong>
+								<span><?php echo esc_html( $codesblock_member_user->user_email ); ?></span>
+							</div>
+						</div>
+						<span class="cb-member-level"><?php echo esc_html( $codesblock_member_level_name ); ?> <?php esc_html_e( 'member', 'codesblock' ); ?></span>
+						<div class="cb-profile-actions">
+							<a href="<?php echo esc_url( $codesblock_member_profile_url ); ?>"><?php esc_html_e( 'Edit profile', 'codesblock' ); ?></a>
+							<a href="<?php echo esc_url( $codesblock_member_account_url ); ?>"><?php esc_html_e( 'Membership & billing', 'codesblock' ); ?></a>
+							<a href="<?php echo esc_url( wp_logout_url( home_url( '/' ) ) ); ?>"><?php esc_html_e( 'Sign out', 'codesblock' ); ?></a>
+						</div>
+					</aside>
+
+					<div class="cb-progress-card">
+						<div class="cb-progress-summary">
+							<div>
+								<span><?php esc_html_e( 'Average progress', 'codesblock' ); ?></span>
+								<strong><?php echo esc_html( $codesblock_member_average ); ?>%</strong>
+							</div>
+							<p><?php printf( esc_html__( '%1$d active course(s) · %2$d completed', 'codesblock' ), count( $codesblock_member_courses ), $codesblock_member_completed ); ?></p>
+						</div>
+
+						<?php if ( $codesblock_member_courses ) : ?>
+							<div class="cb-learning-list">
+								<?php foreach ( $codesblock_member_courses as $codesblock_member_course ) : ?>
+									<?php $codesblock_course_percent = absint( $codesblock_member_progress[ $codesblock_member_course->ID ]['percent'] ); ?>
+									<a class="cb-learning-row" href="<?php echo esc_url( get_permalink( $codesblock_member_course ) ); ?>">
+										<span class="cb-learning-row-copy"><strong><?php echo esc_html( get_the_title( $codesblock_member_course ) ); ?></strong><small><?php echo 100 === $codesblock_course_percent ? esc_html__( 'Completed', 'codesblock' ) : esc_html__( 'Continue learning', 'codesblock' ); ?></small></span>
+										<span class="cb-learning-row-progress"><span><i style="width: <?php echo esc_attr( $codesblock_course_percent ); ?>%"></i></span><b><?php echo esc_html( $codesblock_course_percent ); ?>%</b></span>
+									</a>
+								<?php endforeach; ?>
+							</div>
+						<?php else : ?>
+							<div class="cb-learning-empty">
+								<strong><?php esc_html_e( 'Your first course is waiting.', 'codesblock' ); ?></strong>
+								<p><?php esc_html_e( 'Open a course and save your progress to build your learning list here.', 'codesblock' ); ?></p>
+								<a href="<?php echo esc_url( get_post_type_archive_link( 'course' ) ); ?>"><?php esc_html_e( 'Explore courses', 'codesblock' ); ?> &rarr;</a>
+							</div>
+						<?php endif; ?>
+					</div>
+				</div>
+			</div>
+		</section>
+	<?php endif; ?>
 	<section class="hero">
 		<div class="container hero-grid">
 			<div class="hero-copy">
@@ -184,7 +299,7 @@ wp_reset_postdata();
 					</div>
 					<a class="button button-secondary explore-courses-btn" href="<?php echo esc_url( home_url( '/courses/' ) ); ?>" id="explore-all-courses">Explore All &rarr;</a>
 				</div>
-				<p class="courses-subhead">Focused tracks for free &amp; paid AI-assisted learning &mdash; <strong>prices start at free</strong>, paid plans from <strong>$9/mo</strong>. Get <strong>50% off</strong> your first course.</p>
+			<p class="courses-subhead">Focused tracks for practical developer learning &mdash; <strong>start with free courses</strong>, then upgrade only when a paid course fits your goals.</p>
 			</div>
 			<div class="courses-workspace">
 				<div class="course-desk">
@@ -243,86 +358,9 @@ wp_reset_postdata();
 							<p><?php esc_html_e( 'Courses you publish from WordPress admin will appear here automatically.', 'codesblock' ); ?></p>
 						</article>
 					<?php endif; ?>
-					<?php if ( false ) : ?>
-					<a class="course-card course-card-link featured" href="<?php echo esc_url( $codesblock_home_course_links['dsa'] ); ?>">
-						<div class="course-card-inner static">
-							<div class="course-card-face course-card-front">
-								<p class="tag">Paid · AI assistant</p>
-								<h3>DSA Interview Sprint</h3>
-								<p class="card-desc">Pattern-first prep with AI hints. Master Arrays, Trees, DP & mock rounds.</p>
-								<div class="course-meta"><span>42 lessons</span><span>AI coach</span></div>
-								<div class="card-footer-row" style="margin-top:12px;">
-									<span class="card-enrolled">&#128100; 1,240 enrolled</span>
-									<span class="card-price">From $9<small>/mo</small></span>
-								</div>
-								<span class="course-card-cta">Open course</span>
-							</div>
-						</div>
-					</a>
-					<a class="course-card course-card-link" href="<?php echo esc_url( $codesblock_home_course_links['backend'] ); ?>">
-						<div class="course-card-inner static">
-							<div class="course-card-face course-card-front">
-								<p class="tag">Free course</p>
-								<h3>Backend Foundations</h3>
-								<p class="card-desc">APIs, databases, auth, caching & deployment basics. Learn REST & HTTP.</p>
-								<div class="course-meta"><span>24 lessons</span><span>Projects</span></div>
-								<div class="card-footer-row" style="margin-top:12px;">
-									<span class="card-enrolled">&#128100; 870 reading</span>
-									<span class="card-price free-badge">Free</span>
-								</div>
-								<span class="course-card-cta">Open course</span>
-							</div>
-						</div>
-					</a>
-					<a class="course-card course-card-link" href="<?php echo esc_url( $codesblock_home_course_links['system'] ); ?>">
-						<div class="course-card-inner static">
-							<div class="course-card-face course-card-front">
-								<p class="tag">Article series</p>
-								<h3>System Design Basics</h3>
-								<p class="card-desc">Capacity thinking, queues, storage choices & scaling tradeoffs.</p>
-								<div class="course-meta"><span>18 lessons</span><span>Diagrams</span></div>
-								<div class="card-footer-row" style="margin-top:12px;">
-									<span class="card-enrolled">&#128100; 540 reading</span>
-									<span class="card-price free-badge">Free</span>
-								</div>
-								<span class="course-card-cta">Open course</span>
-							</div>
-						</div>
-					</a>
-					<a class="course-card course-card-link" href="<?php echo esc_url( $codesblock_home_course_links['performance'] ); ?>">
-						<div class="course-card-inner static">
-							<div class="course-card-face course-card-front">
-								<p class="tag">Paid &middot; 50% off</p>
-								<h3>Frontend Performance</h3>
-								<p class="card-desc">Core Web Vitals, lazy-loading, code-splitting & real-world bundles.</p>
-								<div class="course-meta"><span>30 lessons</span><span>AI hints</span></div>
-								<div class="card-footer-row" style="margin-top:12px;">
-									<span class="card-enrolled">&#128100; 390 enrolled</span>
-									<span class="card-price offer-badge">$4.50 <s>$9</s></span>
-								</div>
-								<span class="course-card-cta">Open course</span>
-							</div>
-						</div>
-					</a>
-					<a class="course-card course-card-link" href="<?php echo esc_url( $codesblock_home_course_links['react'] ); ?>">
-						<div class="course-card-inner static">
-							<div class="course-card-face course-card-front">
-								<p class="tag">Free course</p>
-								<h3>React Patterns</h3>
-								<p class="card-desc">Hooks, context, reducers & composition patterns for large-scale apps.</p>
-								<div class="course-meta"><span>20 lessons</span><span>Exercises</span></div>
-								<div class="card-footer-row" style="margin-top:12px;">
-									<span class="card-enrolled">&#128100; 680 reading</span>
-									<span class="card-price free-badge">Free</span>
-								</div>
-								<span class="course-card-cta">Open course</span>
-							</div>
-						</div>
-					</a>
-					<?php endif; ?>
 					<div class="desk-note">
-						<span>AI assistant included</span>
-						<strong>Paid courses pair lessons with hints, examples, mock questions, and answer reviews.</strong>
+						<span>Built for steady progress</span>
+						<strong>Structured course outlines, member-only lessons, and saved progress keep learning focused.</strong>
 					</div>
 				</div>
 				<aside class="course-sidebars" aria-label="Course recommendations">
@@ -436,8 +474,15 @@ wp_reset_postdata();
 				<h2>Follow, support, and keep learning.</h2>
 			</div>
 			<nav class="community-links" aria-label="Community links">
-				<a href="#contact"><span class="action-icon">M</span><strong>Member</strong><small>early access</small></a>
-				<a href="<?php echo esc_url( wp_login_url() ); ?>"><span class="action-icon">L</span><strong>Login</strong><small>paid users</small></a>
+				<?php if ( $codesblock_is_frontend_member ) : ?>
+					<a href="#my-learning"><span class="action-icon">M</span><strong>My learning</strong><small>progress</small></a>
+					<a href="<?php echo esc_url( $codesblock_member_profile_url ); ?>"><span class="action-icon">P</span><strong>Profile</strong><small>account</small></a>
+				<?php elseif ( $codesblock_is_admin_session ) : ?>
+					<a href="<?php echo esc_url( admin_url() ); ?>"><span class="action-icon">A</span><strong>WP Admin</strong><small>dashboard</small></a>
+				<?php else : ?>
+					<a class="js-open-paywall" href="#paywall-overlay" aria-haspopup="dialog" aria-controls="paywall-overlay"><span class="action-icon">M</span><strong>Member</strong><small>join free</small></a>
+					<a class="js-open-member" data-member-view="signin" href="#paywall-overlay" aria-haspopup="dialog" aria-controls="paywall-overlay"><span class="action-icon">L</span><strong>Sign in</strong><small>members</small></a>
+				<?php endif; ?>
 				<a href="https://www.buymeacoffee.com/codesblock" target="_blank" rel="noreferrer"><span class="action-icon coffee-icon">C</span><strong>Coffee</strong><small>support</small></a>
 				<a href="https://www.youtube.com/@codesblock" target="_blank" rel="noreferrer"><span class="social-icon youtube-icon">YT</span><strong>YouTube</strong><small>videos</small></a>
 				<a href="https://www.instagram.com/codesblock" target="_blank" rel="noreferrer"><span class="social-icon instagram-icon">IG</span><strong>Instagram</strong><small>updates</small></a>
@@ -516,13 +561,10 @@ wp_reset_postdata();
 					echo do_shortcode( '[contact-form-7 id="' . absint( $codesblock_forms[0]->ID ) . '"]' );
 				} else {
 					?>
-					<form class="signup-form" action="mailto:hello@codesblock.com" method="post" enctype="text/plain">
-						<label class="screen-reader-text" for="contact-name">Name</label>
-						<input id="contact-name" name="name" type="text" placeholder="Your name">
-						<label class="screen-reader-text" for="contact-email">Email</label>
-						<input id="contact-email" name="email" type="email" placeholder="you@example.com">
-						<button type="submit">Send message</button>
-					</form>
+					<div class="contact-fallback">
+						<p><?php esc_html_e( 'The contact form is being configured. You can still reach CodesBlock directly by email.', 'codesblock' ); ?></p>
+						<a class="button button-primary" href="mailto:hello@codesblock.com"><?php esc_html_e( 'Email CodesBlock', 'codesblock' ); ?></a>
+					</div>
 					<?php
 				}
 				?>

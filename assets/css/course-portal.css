@@ -370,6 +370,7 @@
 	font-weight: 800;
 	padding: 14px;
 	text-align: center;
+	text-decoration: none;
 	transition: transform .18s, box-shadow .18s;
 	width: 100%;
 }
@@ -1767,9 +1768,9 @@
 		border-left: 0;
 		border-radius: 0;
 		border-right: 0;
-		margin-left: calc(var(--container-gutter, 20px) * -1);
-		margin-right: calc(var(--container-gutter, 20px) * -1);
-		padding: 18px 20px;
+		margin-left: -14px;
+		margin-right: -14px;
+		padding: 18px 14px;
 	}
 
 	.paywall-modal-header {

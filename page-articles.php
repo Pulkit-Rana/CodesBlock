@@ -96,7 +96,7 @@ $course_query = new WP_Query(
 			<nav class="dashboard-category-bar" aria-label="Article categories">
 				<a class="<?php echo empty( $current_category ) ? 'is-active' : ''; ?>" href="<?php echo esc_url( home_url( '/articles/' ) ); ?>">All</a>
 				<?php foreach ( $categories as $category ) : ?>
-						<a class="<?php echo $current_category === $category->slug ? 'is-active' : ''; ?>" href="<?php echo esc_url( add_query_arg( array_filter( array( 'article_category' => $category->slug, 'article_search' => $search_query ) ), home_url( '/articles/' ) ) ); ?>">
+						<a class="<?php echo esc_attr( $current_category === $category->slug ? 'is-active' : '' ); ?>" href="<?php echo esc_url( add_query_arg( array_filter( array( 'article_category' => $category->slug, 'article_search' => $search_query ) ), home_url( '/articles/' ) ) ); ?>">
 						<?php echo esc_html( $category->name ); ?>
 					</a>
 				<?php endforeach; ?>
@@ -214,7 +214,7 @@ $course_query = new WP_Query(
 						<?php else : ?>
 							<a class="recommended-post" href="<?php echo esc_url( home_url( '/#courses' ) ); ?>">
 								<span>Course</span>
-								<strong>DSA Interview Sprint with AI assistant</strong>
+								<strong>Explore practical developer courses</strong>
 							</a>
 						<?php endif; ?>
 					</div>
