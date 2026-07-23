@@ -61,14 +61,34 @@ function codesblock_prepare_article_content( $content ) {
 	while ( have_posts() ) :
 		the_post();
 
-		$prepared = codesblock_prepare_article_content( apply_filters( 'the_content', get_the_content() ) );
-
-		$is_premium = (bool) get_post_meta( get_the_ID(), '_codesblock_premium', true );
+		$raw_content = get_the_content();
+		$is_premium  = (bool) get_post_meta( get_the_ID(), '_codesblock_premium', true );
 		$user_has_full_access = function_exists( 'codesblock_user_can_view_protected_content' )
 			? codesblock_user_can_view_protected_content( get_the_ID() )
 			: ! $is_premium;
 
-		$show_gate = $is_premium && ! $user_has_full_access;
+		$show_gate    = $is_premium && ! $user_has_full_access;
+		$reading_time = max( 1, (int) ceil( str_word_count( wp_strip_all_tags( $raw_content ) ) / 220 ) );
+		$article_meta = array( get_the_date() );
+		$author_name  = trim( (string) get_the_author() );
+		if ( '' !== $author_name ) {
+			$article_meta[] = $author_name;
+		}
+		$article_meta[] = sprintf(
+			/* translators: %d estimated reading time in minutes. */
+			_n( '%d min read', '%d min read', $reading_time, 'codesblock' ),
+			$reading_time
+		);
+
+		if ( $show_gate ) {
+			$preview_text = wp_trim_words( wp_strip_all_tags( strip_shortcodes( $raw_content ) ), 78, '&hellip;' );
+			$prepared     = array(
+				'content' => wpautop( esc_html( $preview_text ) ),
+				'toc'     => array(),
+			);
+		} else {
+			$prepared = codesblock_prepare_article_content( apply_filters( 'the_content', $raw_content ) );
+		}
 
 		$recommended_posts = new WP_Query(
 			array(
@@ -99,7 +119,7 @@ function codesblock_prepare_article_content( $content ) {
 				<div class="container article-title-wrap">
 					<a class="text-link" href="<?php echo esc_url( home_url( '/articles/' ) ); ?>">Back to articles</a>
 					<h1><?php the_title(); ?></h1>
-					<p class="article-meta"><?php echo esc_html( get_the_date() ); ?> &middot; <?php echo esc_html( get_the_author() ); ?></p>
+					<p class="article-meta"><?php echo esc_html( implode( ' · ', $article_meta ) ); ?></p>
 				</div>
 			</header>
 
@@ -143,8 +163,8 @@ function codesblock_prepare_article_content( $content ) {
 								<div class="article-premium-gate-card">
 									<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom:12px; color:var(--blue);"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
 									<h3 style="font-size:1.4rem; margin-bottom:8px;">Read the full story</h3>
-									<p style="color:var(--muted); font-size:1rem; margin-bottom:20px;">Join Pro to read this article and unlock the complete paid course library.</p>
-									<button class="button button-primary js-open-paywall" aria-haspopup="dialog" aria-controls="paywall-overlay">Unlock Access</button>
+									<p style="color:var(--muted); font-size:1rem; margin-bottom:20px;">You have reached the end of the public preview. Join Pro to read the complete article and unlock the paid course library.</p>
+									<button class="button button-primary js-open-paywall" type="button" aria-haspopup="dialog" aria-controls="paywall-overlay">Unlock Access</button>
 								</div>
 							</div>
 						</div>
