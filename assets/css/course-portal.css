@@ -125,7 +125,7 @@
 	align-items: center;
 	color: rgba(255,255,255,.35);
 	display: flex;
-	font-family: "Sora", system-ui, sans-serif;
+	font-family: var(--font-heading);
 	font-size: 1.1rem;
 	font-weight: 700;
 	height: 100%;
@@ -205,7 +205,7 @@
 }
 
 .price-tag {
-	font-family: "Sora", system-ui, sans-serif;
+	font-family: var(--font-heading);
 	font-size: 1.25rem;
 	font-weight: 800;
 }
@@ -346,7 +346,7 @@
 }
 
 .sticky-price {
-	font-family: "Sora", system-ui, sans-serif;
+	font-family: var(--font-heading);
 	font-size: 2.2rem;
 	font-weight: 800;
 }
@@ -1004,14 +1004,14 @@
 }
 
 .plan-name {
-	font-family: "Sora", system-ui, sans-serif;
+	font-family: var(--font-heading);
 	font-size: 1rem;
 	font-weight: 700;
 	margin-bottom: 4px;
 }
 
 .plan-price {
-	font-family: "Sora", system-ui, sans-serif;
+	font-family: var(--font-heading);
 	font-size: 2rem;
 	font-weight: 800;
 	line-height: 1;
@@ -1782,4 +1782,132 @@
 		padding-left: 16px;
 		padding-right: 16px;
 	}
+}
+
+/* Course library proof and pricing */
+.course-archive-proof {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	justify-content: center;
+	margin: -10px auto 24px;
+}
+
+.course-archive-proof span {
+	background: rgba(255, 255, 255, .76);
+	border: 1px solid rgba(190, 208, 225, .82);
+	border-radius: 999px;
+	color: #526174;
+	font-size: .78rem;
+	padding: 7px 12px;
+}
+
+.course-archive-proof strong { color: var(--ink); }
+
+.course-pricing-section {
+	background: #f7fbff;
+	border-block: 1px solid var(--line);
+	padding: 72px 0;
+}
+
+.course-pricing-heading {
+	align-items: end;
+	display: grid;
+	gap: 24px;
+	grid-template-columns: minmax(0, 1.35fr) minmax(260px, .65fr);
+	margin-bottom: 28px;
+}
+
+.course-pricing-heading h2 {
+	font-size: clamp(2rem, 4vw, 3.25rem);
+	line-height: 1.05;
+	margin: 6px 0 0;
+}
+
+.course-pricing-heading > p {
+	color: var(--muted);
+	line-height: 1.65;
+	margin: 0;
+}
+
+.course-pricing-grid {
+	display: grid;
+	gap: 14px;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.course-plan-card {
+	background: #fff;
+	border: 1px solid var(--line);
+	border-radius: 14px;
+	display: flex;
+	flex-direction: column;
+	min-height: 284px;
+	padding: 24px;
+}
+
+.course-plan-card.is-featured {
+	border: 2px solid var(--blue);
+	box-shadow: 0 18px 44px rgba(49, 87, 213, .12);
+	transform: translateY(-6px);
+}
+
+.course-plan-card > span {
+	color: var(--blue);
+	font-size: .72rem;
+	font-weight: 900;
+	letter-spacing: .08em;
+	text-transform: uppercase;
+}
+
+.course-plan-card h3 {
+	font-size: 1.75rem;
+	line-height: 1.1;
+	margin: 10px 0;
+}
+
+.course-plan-card h3 small {
+	color: var(--muted);
+	font-family: var(--font-body);
+	font-size: .72rem;
+	font-weight: 700;
+}
+
+.course-plan-card p {
+	color: var(--muted);
+	font-size: .9rem;
+	line-height: 1.58;
+	margin: 0 0 22px;
+}
+
+.course-plan-card .button {
+	justify-content: center;
+	margin-top: auto;
+	text-align: center;
+}
+
+.course-coupon-callout {
+	background: #fff8dd;
+	border: 1px solid #f3d98a;
+	border-radius: 10px;
+	color: #72521a;
+	font-size: .84rem;
+	margin: 18px 0 0;
+	padding: 12px 14px;
+	text-align: center;
+}
+
+@media (max-width: 1080px) {
+	.course-pricing-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	.course-plan-card.is-featured { transform: none; }
+}
+
+@media (max-width: 680px) {
+	.course-archive-hero { padding: 54px 0 40px; }
+	.course-archive-proof { align-items: stretch; flex-direction: column; }
+	.course-archive-proof span { text-align: center; }
+	.course-pricing-section { padding: 52px 0; }
+	.course-pricing-heading { align-items: start; grid-template-columns: 1fr; }
+	.course-pricing-grid { grid-template-columns: 1fr; }
+	.course-plan-card { min-height: 0; }
 }

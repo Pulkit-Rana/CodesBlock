@@ -79,7 +79,7 @@ $course_query = new WP_Query(
 				<div class="dashboard-intro">
 					<p class="eyebrow">Articles Dashboard</p>
 					<h1>Read what matters next.</h1>
-					<p>AI, coding, tech reviews, career notes, and interview guides arranged in a clean Bento board for fast exploring.</p>
+					<p>Production AI, system design, and interview lessons arranged for quick scanning and comfortable deep reading.</p>
 				</div>
 
 				<form class="dashboard-search" action="<?php echo esc_url( home_url( '/articles/' ) ); ?>" method="get">
@@ -119,6 +119,7 @@ $course_query = new WP_Query(
 							}
 
 							$is_recommended = (bool) get_post_meta( get_the_ID(), '_codesblock_recommended', true );
+							$is_premium     = (bool) get_post_meta( get_the_ID(), '_codesblock_premium', true );
 							$primary_cat    = get_the_category();
 							$cat_slug       = ! empty( $primary_cat ) ? $primary_cat[0]->slug : 'general';
 							$sample_image   = 'article-code.svg';
@@ -142,6 +143,9 @@ $course_query = new WP_Query(
 										<div class="bento-meta">
 											<?php if ( $is_recommended ) : ?>
 												<span class="bento-pill">Recommended</span>
+											<?php endif; ?>
+											<?php if ( $is_premium ) : ?>
+												<span class="bento-pill bento-pill-premium">Pro</span>
 											<?php endif; ?>
 											<?php if ( ! empty( $primary_cat ) ) : ?>
 												<span><?php echo esc_html( $primary_cat[0]->name ); ?></span>
@@ -172,7 +176,7 @@ $course_query = new WP_Query(
 					<div class="recommendations-card">
 						<div class="recommendations-heading">
 							<p class="eyebrow">Recommendations</p>
-							<h2>Chosen by you</h2>
+							<h2>Editor picks</h2>
 						</div>
 
 						<?php if ( $recommended_posts->have_posts() ) : ?>

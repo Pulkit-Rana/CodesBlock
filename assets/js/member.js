@@ -33,6 +33,7 @@
 		if (!overlay || !modal) return;
 		lastFocused = document.activeElement;
 		overlay.hidden = false;
+		overlay.setAttribute('aria-hidden', 'false');
 		document.body.classList.add('cb-modal-open');
 		setView(view || 'register', false);
 		modal.scrollTop = 0;
@@ -44,6 +45,7 @@
 	function closeMember() {
 		if (!overlay) return;
 		overlay.hidden = true;
+		overlay.setAttribute('aria-hidden', 'true');
 		document.body.classList.remove('cb-modal-open');
 		if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
 	}
@@ -103,6 +105,18 @@
 		});
 	});
 
+	function redirectSameOrigin(url) {
+		if (!url) return;
+		try {
+			var target = new URL(url, window.location.origin);
+			if (target.origin === window.location.origin) {
+				window.location.assign(target.href);
+			}
+		} catch (error) {
+			// Ignore malformed redirect values and leave the success message visible.
+		}
+	}
+
 	function submitForm(form, action) {
 		var feedback = form.querySelector('.cb-form-feedback');
 		var submit = form.querySelector('button[type="submit"]');
@@ -147,7 +161,7 @@
 					feedback.classList.add('is-success');
 				}
 				if (action === 'cbcommerce_newsletter') form.reset();
-				if (payload.redirect) window.setTimeout(function () { window.location.assign(payload.redirect); }, 550);
+				if (payload.redirect) window.setTimeout(function () { redirectSameOrigin(payload.redirect); }, 550);
 			})
 			.catch(function () {
 				if (feedback) feedback.textContent = 'We could not reach the server. Please try again.';

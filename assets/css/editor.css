@@ -1,9 +1,21 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap");
+
 body {
-	color: #162033;
-	font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-	line-height: 1.6;
+	color: #101828;
+	font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	font-size: 17px;
+	line-height: 1.75;
+}
+
+h1,
+h2,
+h3,
+h4 {
+	font-family: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+	letter-spacing: -.035em;
+	line-height: 1.2;
 }
 
 a {
-	color: #0f6f46;
+	color: #087a59;
 }
