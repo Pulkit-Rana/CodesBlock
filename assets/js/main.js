@@ -1,5 +1,54 @@
 (function () {
 
+	/* Top announcement: campaign-aware dismissal and privacy-safe events. */
+	var promoBar = document.querySelector('[data-promo-campaign]');
+	if (promoBar) {
+		var promoCampaign = promoBar.getAttribute('data-promo-campaign') || 'announcement';
+		var promoStorageKey = 'codesblock_promo_' + promoCampaign;
+		var promoDismissedUntil = 0;
+
+		try {
+			promoDismissedUntil = parseInt(window.localStorage.getItem(promoStorageKey), 10) || 0;
+		} catch (storageError) {
+			promoDismissedUntil = 0;
+		}
+
+		function trackPromo(eventName) {
+			var eventData = {
+				event: 'codesblock_promo_' + eventName,
+				campaign: promoCampaign
+			};
+			window.dispatchEvent(new CustomEvent('codesblock:promo', { detail: eventData }));
+			if (Array.isArray(window.dataLayer)) window.dataLayer.push(eventData);
+			if (typeof window.clarity === 'function') window.clarity('event', 'promo_' + eventName + '_' + promoCampaign);
+		}
+
+		if (promoDismissedUntil > Date.now()) {
+			promoBar.hidden = true;
+		} else {
+			trackPromo('impression');
+		}
+
+		var promoCta = promoBar.querySelector('[data-promo-action="click"]');
+		if (promoCta) {
+			promoCta.addEventListener('click', function () { trackPromo('click'); });
+		}
+
+		var promoDismiss = promoBar.querySelector('[data-promo-dismiss]');
+		if (promoDismiss) {
+			promoDismiss.addEventListener('click', function () {
+				var sevenDays = 7 * 24 * 60 * 60 * 1000;
+				try {
+					window.localStorage.setItem(promoStorageKey, String(Date.now() + sevenDays));
+				} catch (storageError) {
+					// The bar still dismisses for this page when storage is unavailable.
+				}
+				promoBar.hidden = true;
+				trackPromo('dismiss');
+			});
+		}
+	}
+
 	/* ── Mobile nav toggle ── */
 	var toggle = document.querySelector('[data-nav-toggle]');
 	var nav    = document.querySelector('[data-primary-nav]');
@@ -56,31 +105,6 @@
 		item.addEventListener('mouseleave', function () {
 			item.style.removeProperty('--ripple-x');
 			item.style.removeProperty('--ripple-y');
-		});
-	});
-
-	/* ── Role pills in Interview Guides ── */
-	var roleDescriptions = {
-		senior:  'Architecture, tradeoffs, ownership, debugging judgment, and system-level thinking.',
-		ai:      'Prompting, agents, LLM evaluation, product thinking, and coding confidently with AI tools.',
-		manager: 'People leadership, delivery stories, conflict resolution, and decision-making quality.'
-	};
-
-	var rolePills = document.querySelectorAll('.role-pill');
-	var roleDesc  = document.getElementById('role-desc');
-
-	rolePills.forEach(function (pill) {
-		pill.addEventListener('click', function () {
-			rolePills.forEach(function (p) { p.classList.remove('active'); });
-			pill.classList.add('active');
-
-			if (roleDesc) {
-				roleDesc.style.opacity = '0';
-				setTimeout(function () {
-					roleDesc.textContent = roleDescriptions[pill.dataset.role] || '';
-					roleDesc.style.opacity = '1';
-				}, 180);
-			}
 		});
 	});
 
