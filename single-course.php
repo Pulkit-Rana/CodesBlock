@@ -94,7 +94,10 @@ $ai_suggestions = array(
 							<?php if ( has_post_thumbnail() ) : ?>
 								<?php the_post_thumbnail( 'large' ); ?>
 							<?php else : ?>
-								<div style="height:100%;background:linear-gradient(135deg,#101828,#173a8a);"></div>
+								<div class="sticky-card-placeholder" aria-hidden="true">
+									<span>CB</span>
+									<strong><?php esc_html_e( 'Build with confidence', 'codesblock' ); ?></strong>
+								</div>
 							<?php endif; ?>
 						</div>
 
@@ -224,7 +227,7 @@ $ai_suggestions = array(
 							<div class="content-gate-overlay">
 								<h3><?php esc_html_e( 'Enroll to read the full course overview', 'codesblock' ); ?></h3>
 								<p><?php esc_html_e( 'Join Pro or Lifetime to unlock the complete course and member learning tools.', 'codesblock' ); ?></p>
-								<button class="button button-primary js-open-paywall" aria-haspopup="dialog" aria-controls="paywall-overlay">
+								<button class="button button-primary js-open-paywall" type="button" aria-haspopup="dialog" aria-controls="paywall-overlay">
 									<?php esc_html_e( 'Unlock Access', 'codesblock' ); ?>
 								</button>
 							</div>
@@ -240,6 +243,7 @@ $ai_suggestions = array(
 						/* Parse ## Section and - Lesson format into accordion */
 						$lines      = explode( "\n", $syllabus );
 						$in_module  = false;
+						$module_index = 0;
 						ob_start();
 
 						foreach ( $lines as $raw ) {
@@ -249,14 +253,18 @@ $ai_suggestions = array(
 							if ( strpos( $line, '##' ) === 0 ) {
 								/* Close previous module */
 								if ( $in_module ) echo '</ul></div>';
-								$title = esc_html( trim( substr( $line, 2 ) ) );
-								echo '<div class="syllabus-module">';
-								echo '<button class="syllabus-module-header" type="button" aria-expanded="false">';
+								$title       = esc_html( trim( substr( $line, 2 ) ) );
+								$is_first    = 0 === $module_index;
+								$module_id   = 'syllabus-module-' . $module_index;
+								$module_class = $is_first ? 'syllabus-module is-open' : 'syllabus-module';
+								echo '<div class="' . esc_attr( $module_class ) . '">';
+								echo '<button class="syllabus-module-header" type="button" aria-expanded="' . ( $is_first ? 'true' : 'false' ) . '" aria-controls="' . esc_attr( $module_id ) . '">';
 								echo '<span>' . $title . '</span>';
 								echo '<svg class="syllabus-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>';
 								echo '</button>';
-								echo '<ul class="syllabus-module-lessons" role="list">';
+								echo '<ul class="syllabus-module-lessons" id="' . esc_attr( $module_id ) . '" role="list">';
 								$in_module = true;
+								$module_index++;
 							} elseif ( strpos( $line, '-' ) === 0 ) {
 								if ( ! $in_module ) {
 									echo '<div class="syllabus-module"><ul class="syllabus-module-lessons" role="list">';
@@ -284,6 +292,7 @@ $ai_suggestions = array(
 						<button
 							class="button button-primary"
 							id="open-ai-tutor-inline"
+							type="button"
 							style="white-space:nowrap;"
 						>
 							<?php esc_html_e( 'Open Course Guide', 'codesblock' ); ?>
@@ -344,14 +353,14 @@ $ai_suggestions = array(
 						<a
 							href="https://twitter.com/intent/tweet?text=<?php echo rawurlencode( get_the_title() . ' — ' . get_permalink() ); ?>"
 							target="_blank"
-							rel="noreferrer"
+							rel="noopener noreferrer"
 							class="btn-view-course"
 							style="flex:1;text-align:center;"
 						>Twitter / X</a>
 						<a
 							href="https://www.linkedin.com/sharing/share-offsite/?url=<?php echo rawurlencode( get_permalink() ); ?>"
 							target="_blank"
-							rel="noreferrer"
+							rel="noopener noreferrer"
 							class="btn-view-course"
 							style="flex:1;text-align:center;background:#0a66c2;"
 						>LinkedIn</a>
@@ -371,14 +380,15 @@ $ai_suggestions = array(
 <button
 	class="ai-tutor-toggle"
 	id="ai-tutor-toggle"
+	type="button"
 	aria-expanded="false"
 	aria-controls="ai-tutor-panel"
 	aria-label="<?php esc_attr_e( 'Open Course Guide', 'codesblock' ); ?>"
 >
-	<div class="ai-tutor-toggle-inner">
-		<div class="ai-tutor-pulse" aria-hidden="true"></div>
+	<span class="ai-tutor-toggle-inner">
+		<span class="ai-tutor-pulse" aria-hidden="true"></span>
 		<span style="writing-mode:vertical-rl;text-orientation:mixed;letter-spacing:.05em;">Guide</span>
-	</div>
+	</span>
 </button>
 
 <!-- Slide-in panel -->
@@ -388,6 +398,9 @@ $ai_suggestions = array(
 	role="dialog"
 	aria-modal="false"
 	aria-label="<?php esc_attr_e( 'Course Guide', 'codesblock' ); ?>"
+	aria-hidden="true"
+	inert
+	hidden
 >
 	<!-- Header -->
 	<div class="ai-tutor-panel-header">
@@ -399,18 +412,19 @@ $ai_suggestions = array(
 		<button
 			class="ai-tutor-close"
 			id="ai-tutor-close"
+			type="button"
 			aria-label="<?php esc_attr_e( 'Close Course Guide', 'codesblock' ); ?>"
 		>&#x2715;</button>
 	</div>
 
 	<!-- Tabs -->
-	<div class="ai-tutor-tabs" role="tablist">
-		<button class="ai-tutor-tab is-active" data-tab="summary" role="tab" aria-selected="true"><?php esc_html_e( 'Summary', 'codesblock' ); ?></button>
-		<button class="ai-tutor-tab" data-tab="chat" role="tab" aria-selected="false"><?php esc_html_e( 'Ask Guide', 'codesblock' ); ?></button>
+	<div class="ai-tutor-tabs" role="tablist" aria-label="<?php esc_attr_e( 'Course Guide views', 'codesblock' ); ?>">
+		<button class="ai-tutor-tab is-active" id="ai-tab-summary-control" type="button" data-tab="summary" role="tab" aria-selected="true" aria-controls="ai-tab-summary" tabindex="0"><?php esc_html_e( 'Summary', 'codesblock' ); ?></button>
+		<button class="ai-tutor-tab" id="ai-tab-chat-control" type="button" data-tab="chat" role="tab" aria-selected="false" aria-controls="ai-tab-chat" tabindex="-1"><?php esc_html_e( 'Ask Guide', 'codesblock' ); ?></button>
 	</div>
 
 	<!-- Summary tab -->
-	<div class="ai-tutor-tab-content is-active" id="ai-tab-summary" role="tabpanel">
+	<div class="ai-tutor-tab-content is-active" id="ai-tab-summary" role="tabpanel" aria-labelledby="ai-tab-summary-control">
 		<div class="ai-tutor-summary">
 			<p class="ai-tutor-summary-title">
 				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -447,7 +461,7 @@ $ai_suggestions = array(
 	</div>
 
 	<!-- Chat tab -->
-	<div class="ai-tutor-tab-content" id="ai-tab-chat" role="tabpanel">
+	<div class="ai-tutor-tab-content" id="ai-tab-chat" role="tabpanel" aria-labelledby="ai-tab-chat-control" hidden>
 		<div class="ai-chat-messages" id="ai-chat-messages" aria-live="polite" aria-label="<?php esc_attr_e( 'Chat messages', 'codesblock' ); ?>">
 			<!-- Greeting message -->
 			<div class="chat-msg chat-msg-ai">
@@ -487,6 +501,7 @@ $ai_suggestions = array(
 			<button
 				id="ai-chat-send"
 				class="ai-chat-send"
+				type="button"
 				aria-label="<?php esc_attr_e( 'Send message', 'codesblock' ); ?>"
 			>
 				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>

@@ -5,6 +5,43 @@
  * @package CodesBlock
  */
 
+$course_count        = (int) wp_count_posts( 'course' )->publish;
+$free_course_query   = new WP_Query(
+	array(
+		'post_type'      => 'course',
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+		'fields'         => 'ids',
+		'meta_query'     => array(
+			'relation' => 'OR',
+			array(
+				'key'     => '_course_price',
+				'value'   => 'Free',
+				'compare' => '=',
+			),
+			array(
+				'key'     => '_course_price',
+				'compare' => 'NOT EXISTS',
+			),
+		),
+	)
+);
+$free_course_count   = (int) $free_course_query->found_posts;
+$payments_ready      = function_exists( 'cbcommerce_payments_ready' ) && cbcommerce_payments_ready();
+$pro_checkout_url    = function_exists( 'cbcommerce_checkout_url' ) ? cbcommerce_checkout_url( 'pro' ) : wp_registration_url();
+$annual_checkout_url = function_exists( 'cbcommerce_checkout_url' ) ? cbcommerce_checkout_url( 'pro_annual' ) : wp_registration_url();
+$lifetime_url        = function_exists( 'cbcommerce_checkout_url' ) ? cbcommerce_checkout_url( 'lifetime' ) : wp_registration_url();
+$pro_level           = function_exists( 'cbcommerce_level_id' ) && class_exists( 'PMPro_Membership_Level' ) ? new PMPro_Membership_Level( cbcommerce_level_id( 'pro' ) ) : false;
+$annual_level        = function_exists( 'cbcommerce_level_id' ) && class_exists( 'PMPro_Membership_Level' ) ? new PMPro_Membership_Level( cbcommerce_level_id( 'pro_annual' ) ) : false;
+$lifetime_level      = function_exists( 'cbcommerce_level_id' ) && class_exists( 'PMPro_Membership_Level' ) ? new PMPro_Membership_Level( cbcommerce_level_id( 'lifetime' ) ) : false;
+$pro_amount          = $pro_level ? (float) $pro_level->initial_payment : 999;
+$annual_amount       = $annual_level ? (float) $annual_level->initial_payment : 8499;
+$lifetime_amount     = $lifetime_level ? (float) $lifetime_level->initial_payment : 19999;
+$pro_price           = $pro_level && function_exists( 'pmpro_formatPrice' ) ? pmpro_formatPrice( $pro_amount ) : '₹999';
+$annual_price        = $annual_level && function_exists( 'pmpro_formatPrice' ) ? pmpro_formatPrice( $annual_amount ) : '₹8,499';
+$lifetime_price      = $lifetime_level && function_exists( 'pmpro_formatPrice' ) ? pmpro_formatPrice( $lifetime_amount ) : '₹19,999';
+$annual_saving       = $pro_amount > 0 ? max( 0, (int) round( ( 1 - ( $annual_amount / ( $pro_amount * 12 ) ) ) * 100 ) ) : 0;
+
 get_header();
 ?>
 <main id="main" class="archive-main">
@@ -12,18 +49,25 @@ get_header();
 	<!-- ── Hero ──────────────────────────────────────────────── -->
 	<section class="course-archive-hero">
 		<div class="container">
-			<p class="eyebrow"><?php esc_html_e( 'Level Up Your Career', 'codesblock' ); ?></p>
-			<h1><?php esc_html_e( 'Master Software Engineering', 'codesblock' ); ?></h1>
-			<p><?php esc_html_e( 'Hands-on courses with AI-powered guidance — from foundations to senior-level mastery.', 'codesblock' ); ?></p>
+			<p class="eyebrow"><?php esc_html_e( 'Learn by building', 'codesblock' ); ?></p>
+			<h1><?php esc_html_e( 'Production AI, system design, and interview practice', 'codesblock' ); ?></h1>
+			<p><?php esc_html_e( 'Focused paths with implementation labs, review checklists, and practical artifacts you can reuse at work or in interviews.', 'codesblock' ); ?></p>
+
+			<div class="course-archive-proof" aria-label="<?php esc_attr_e( 'Course library summary', 'codesblock' ); ?>">
+				<span><strong><?php echo esc_html( $course_count ); ?></strong> <?php esc_html_e( 'guided paths', 'codesblock' ); ?></span>
+				<span><strong><?php echo esc_html( $free_course_count ); ?></strong> <?php esc_html_e( 'free starter', 'codesblock' ); ?></span>
+				<span><strong><?php esc_html_e( 'Self-paced', 'codesblock' ); ?></strong> <?php esc_html_e( 'with saved progress', 'codesblock' ); ?></span>
+			</div>
 
 			<!-- Filter pills -->
 			<div class="course-filter-pills" role="group" aria-label="<?php esc_attr_e( 'Filter courses by level', 'codesblock' ); ?>">
-				<button class="filter-pill is-active" data-filter="all"><?php esc_html_e( 'All Courses', 'codesblock' ); ?></button>
-				<button class="filter-pill" data-filter="beginner"><?php esc_html_e( 'Beginner', 'codesblock' ); ?></button>
-				<button class="filter-pill" data-filter="intermediate"><?php esc_html_e( 'Intermediate', 'codesblock' ); ?></button>
-				<button class="filter-pill" data-filter="advanced"><?php esc_html_e( 'Advanced', 'codesblock' ); ?></button>
-				<button class="filter-pill" data-filter="free"><?php esc_html_e( 'Free', 'codesblock' ); ?></button>
+				<button class="filter-pill is-active" type="button" data-filter="all" aria-pressed="true"><?php esc_html_e( 'All Courses', 'codesblock' ); ?></button>
+				<button class="filter-pill" type="button" data-filter="beginner" aria-pressed="false"><?php esc_html_e( 'Beginner', 'codesblock' ); ?></button>
+				<button class="filter-pill" type="button" data-filter="intermediate" aria-pressed="false"><?php esc_html_e( 'Intermediate', 'codesblock' ); ?></button>
+				<button class="filter-pill" type="button" data-filter="advanced" aria-pressed="false"><?php esc_html_e( 'Advanced', 'codesblock' ); ?></button>
+				<button class="filter-pill" type="button" data-filter="free" aria-pressed="false"><?php esc_html_e( 'Free', 'codesblock' ); ?></button>
 			</div>
+			<p class="screen-reader-text" id="course-filter-status" aria-live="polite"></p>
 		</div>
 	</section>
 
@@ -132,6 +176,52 @@ get_header();
 	</section>
 
 	<!-- ── Newsletter strip ──────────────────────────────────── -->
+	<section class="course-pricing-section" id="plans" aria-labelledby="course-pricing-title">
+		<div class="container">
+			<div class="course-pricing-heading">
+				<div>
+					<p class="eyebrow"><?php esc_html_e( 'Simple pricing', 'codesblock' ); ?></p>
+					<h2 id="course-pricing-title"><?php esc_html_e( 'Start free. Choose a pass when you need more.', 'codesblock' ); ?></h2>
+				</div>
+				<p><?php esc_html_e( 'Every paid option is an upfront INR payment. Nothing renews automatically; extend access only when you decide.', 'codesblock' ); ?></p>
+			</div>
+
+			<div class="course-pricing-grid">
+				<article class="course-plan-card">
+					<span><?php esc_html_e( 'Starter', 'codesblock' ); ?></span>
+					<h3><?php esc_html_e( 'Free', 'codesblock' ); ?></h3>
+					<p><?php esc_html_e( 'Public articles, the free starter course, saved progress, and weekly learning notes.', 'codesblock' ); ?></p>
+					<a class="button button-secondary js-open-paywall" href="#paywall-overlay"><?php esc_html_e( 'Create free account', 'codesblock' ); ?></a>
+				</article>
+				<article class="course-plan-card">
+					<span><?php esc_html_e( '30-day pass', 'codesblock' ); ?></span>
+					<h3><?php echo wp_kses_post( $pro_price ); ?> <small><?php esc_html_e( 'once', 'codesblock' ); ?></small></h3>
+					<p><?php esc_html_e( 'Every paid course, implementation resources, certificates, and saved progress for 30 days.', 'codesblock' ); ?></p>
+					<a class="button button-secondary" href="<?php echo esc_url( $pro_checkout_url ); ?>"><?php echo esc_html( $payments_ready ? __( 'Choose 30 days', 'codesblock' ) : __( 'Get launch update', 'codesblock' ) ); ?></a>
+				</article>
+				<article class="course-plan-card is-featured">
+					<span><?php echo esc_html( $annual_saving ? sprintf( __( 'Save %d%%', 'codesblock' ), $annual_saving ) : __( 'Best value', 'codesblock' ) ); ?></span>
+					<h3><?php echo wp_kses_post( $annual_price ); ?> <small><?php esc_html_e( 'once', 'codesblock' ); ?></small></h3>
+					<p><?php esc_html_e( 'A full year of courses, implementation resources, certificates, and saved progress.', 'codesblock' ); ?></p>
+					<a class="button button-primary" href="<?php echo esc_url( $annual_checkout_url ); ?>"><?php echo esc_html( $payments_ready ? __( 'Choose 1 year', 'codesblock' ) : __( 'Get launch update', 'codesblock' ) ); ?></a>
+				</article>
+				<article class="course-plan-card">
+					<span><?php esc_html_e( 'Founding Lifetime', 'codesblock' ); ?></span>
+					<h3><?php echo wp_kses_post( $lifetime_price ); ?> <small><?php esc_html_e( 'once', 'codesblock' ); ?></small></h3>
+					<p><?php esc_html_e( 'Permanent access to current and future CodesBlock courses for early supporters.', 'codesblock' ); ?></p>
+					<a class="button button-secondary" href="<?php echo esc_url( $lifetime_url ); ?>"><?php echo esc_html( $payments_ready ? __( 'Choose lifetime', 'codesblock' ) : __( 'Get launch update', 'codesblock' ) ); ?></a>
+				</article>
+			</div>
+			<p class="course-coupon-callout">
+				<?php if ( $payments_ready ) : ?>
+					<strong><?php esc_html_e( 'Launch coupon:', 'codesblock' ); ?></strong> <?php esc_html_e( 'Use WELCOME25 to save 25% on the 30-day pass. Limited to 100 redemptions.', 'codesblock' ); ?>
+				<?php else : ?>
+					<strong><?php esc_html_e( 'Paid enrollment opens after gateway testing.', 'codesblock' ); ?></strong> <?php esc_html_e( 'Free membership is available now. Paid pass buttons will activate only after checkout and webhook verification.', 'codesblock' ); ?>
+				<?php endif; ?>
+			</p>
+		</div>
+	</section>
+
 	<section class="section">
 		<div class="container">
 			<div class="newsletter-strip">

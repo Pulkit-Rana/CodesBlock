@@ -31,7 +31,9 @@ if ( 'page' === get_option( 'show_on_front' ) && have_posts() ) {
 
 $hero_eyebrow = get_theme_mod( 'codesblock_hero_eyebrow', 'Stay Relevant. Stay Curious.' );
 $hero_title   = get_theme_mod( 'codesblock_hero_title', 'CodesBlock' );
-$hero_lede    = get_theme_mod( 'codesblock_hero_lede', 'AI-assisted courses, practical articles, and guided learning paths for developers preparing for interviews, senior roles, and smarter day-to-day engineering.' );
+$hero_lede    = get_theme_mod( 'codesblock_hero_lede', 'Production AI engineering, system design, and interview practice for developers who want practical proof - not another passive tutorial catalog.' );
+$codesblock_published_course_count = (int) wp_count_posts( 'course' )->publish;
+$codesblock_published_post_count   = (int) wp_count_posts( 'post' )->publish;
 
 $codesblock_recommended_articles = new WP_Query(
 	array(
@@ -62,7 +64,7 @@ $codesblock_home_course_posts = array();
 $codesblock_featured_courses  = new WP_Query(
 	array(
 		'post_type'           => 'course',
-		'posts_per_page'      => 5,
+		'posts_per_page'      => 6,
 		'post_status'         => 'publish',
 		'ignore_sticky_posts' => true,
 		'meta_key'            => '_codesblock_recommended',
@@ -76,11 +78,11 @@ if ( $codesblock_featured_courses->have_posts() ) {
 	$codesblock_home_course_posts = $codesblock_featured_courses->posts;
 }
 
-if ( count( $codesblock_home_course_posts ) < 5 ) {
+if ( count( $codesblock_home_course_posts ) < 6 ) {
 	$codesblock_latest_courses = new WP_Query(
 		array(
 			'post_type'           => 'course',
-			'posts_per_page'      => 5 - count( $codesblock_home_course_posts ),
+			'posts_per_page'      => 6 - count( $codesblock_home_course_posts ),
 			'post_status'         => 'publish',
 			'post__not_in'        => wp_list_pluck( $codesblock_home_course_posts, 'ID' ),
 			'ignore_sticky_posts' => true,
@@ -220,8 +222,8 @@ if ( $codesblock_is_frontend_member ) {
 				<h1><?php echo esc_html( $hero_title ); ?></h1>
 				<p class="hero-lede"><?php echo esc_html( $hero_lede ); ?></p>
 				<div class="hero-actions">
-					<a class="button button-primary" href="#courses">Explore paths</a>
-					<a class="button button-secondary" href="#articles">Read free lessons</a>
+					<a class="button button-primary" href="<?php echo esc_url( get_theme_mod( 'codesblock_hero_primary_url', get_post_type_archive_link( 'course' ) ?: home_url( '/courses/' ) ) ); ?>"><?php echo esc_html( get_theme_mod( 'codesblock_hero_primary_label', 'Explore paths' ) ); ?></a>
+					<a class="button button-secondary" href="<?php echo esc_url( get_theme_mod( 'codesblock_hero_secondary_url', home_url( '/articles/' ) ) ); ?>"><?php echo esc_html( get_theme_mod( 'codesblock_hero_secondary_label', 'Read free lessons' ) ); ?></a>
 				</div>
 				<div class="learning-search" aria-label="Search learning topics">
 					<form class="hero-search-form" action="<?php echo esc_url( home_url( '/' ) ); ?>" method="get">
@@ -255,12 +257,12 @@ if ( $codesblock_is_frontend_member ) {
 					<div class="choice">Scalable Architecture</div>
 				</div>
 				<div class="sketch-card code-card" style="transform: rotate(-1deg); padding-bottom: 24px;">
-					<code>import { useCourse } from 'codesblock';<br><br>const course = useCourse('React Advanced');<br>course.startPractice();</code>
+					<code>const score = evaluate(agent, cases);<br><br>if (score &lt; launchGate) {<br>&nbsp;&nbsp;rollback();<br>}</code>
 				</div>
 				<div class="sketch-card extra-card" style="transform: rotate(1.5deg);">
-					<span>Success Rate</span>
-					<strong>+45% Offer Rate</strong>
-					<p style="font-size: 0.8rem; color: #a8bcce; margin-top: 6px;">After completing 3 paths.</p>
+					<span>Starter Library</span>
+					<strong><?php echo esc_html( $codesblock_published_course_count ); ?> courses &middot; <?php echo esc_html( $codesblock_published_post_count ); ?> articles</strong>
+					<p style="font-size: 0.8rem; color: #66788a; margin-top: 6px;"><?php esc_html_e( 'Self-paced paths with saved progress.', 'codesblock' ); ?></p>
 				</div>
 			</div>
 		</div>
@@ -268,7 +270,7 @@ if ( $codesblock_is_frontend_member ) {
 
 	<section class="learning-strip" id="start">
 		<div class="container strip-grid">
-			<a class="strip-item" href="<?php echo esc_url( get_permalink( get_option( 'page_for_posts' ) ) ?: home_url( '/articles/' ) ); ?>" aria-label="Go to Articles">
+			<a class="strip-item" href="<?php echo esc_url( codesblock_articles_url() ); ?>" aria-label="Go to Articles">
 				<span>01</span>
 				<h2>Articles</h2>
 				<p>Sharp explainers, patterns, and career notes you can read between focused work sessions.</p>
@@ -297,7 +299,7 @@ if ( $codesblock_is_frontend_member ) {
 						<p class="eyebrow">Courses</p>
 						<h2 class="courses-h2">Pick a path and keep moving.</h2>
 					</div>
-					<a class="button button-secondary explore-courses-btn" href="<?php echo esc_url( home_url( '/courses/' ) ); ?>" id="explore-all-courses">Explore All &rarr;</a>
+					<a class="button button-secondary explore-courses-btn" href="<?php echo esc_url( get_post_type_archive_link( 'course' ) ?: home_url( '/courses/' ) ); ?>" id="explore-all-courses">Explore All &rarr;</a>
 				</div>
 			<p class="courses-subhead">Focused tracks for practical developer learning &mdash; <strong>start with free courses</strong>, then upgrade only when a paid course fits your goals.</p>
 			</div>
@@ -332,8 +334,8 @@ if ( $codesblock_is_frontend_member ) {
 												<?php endforeach; ?>
 											</div>
 										<?php endif; ?>
-										<div class="card-footer-row" style="margin-top:12px;">
-											<span class="card-enrolled"><?php esc_html_e( 'Updated from WP admin', 'codesblock' ); ?></span>
+										<div class="card-footer-row">
+											<span class="card-enrolled"><?php esc_html_e( 'Self-paced course', 'codesblock' ); ?></span>
 											<?php if ( $codesblock_is_free_course ) : ?>
 												<span class="card-price free-badge"><?php esc_html_e( 'Free', 'codesblock' ); ?></span>
 											<?php elseif ( $codesblock_course_price ) : ?>
@@ -351,6 +353,51 @@ if ( $codesblock_is_frontend_member ) {
 							</a>
 						<?php endforeach; ?>
 						<?php wp_reset_postdata(); ?>
+
+						<?php
+						$existing_count = count( $codesblock_home_course_posts );
+						if ( $existing_count < 6 ) :
+							$fallback_cards = array(
+								array(
+									'tag'      => 'New course',
+									'title'    => 'Production RAG & Knowledge Systems',
+									'desc'     => 'Architect vector search, hybrid retrieval, and real-time evaluation pipelines for high-throughput enterprise search.',
+									'meta'     => array( '4 weeks', 'Intermediate' ),
+									'price'    => 'Free',
+									'is_free'  => true,
+									'link'     => get_post_type_archive_link( 'course' ) ?: home_url( '/courses/' ),
+								),
+							);
+
+							$needed = min( 6 - $existing_count, count( $fallback_cards ) );
+							for ( $i = 0; $i < $needed; $i++ ) :
+								$fb = $fallback_cards[ $i ];
+								?>
+								<a class="course-card course-card-link" href="<?php echo esc_url( $fb['link'] ); ?>">
+									<div class="course-card-inner static">
+										<div class="course-card-face course-card-front">
+											<p class="tag"><?php echo esc_html( $fb['tag'] ); ?></p>
+											<h3><?php echo esc_html( $fb['title'] ); ?></h3>
+											<p class="card-desc"><?php echo esc_html( $fb['desc'] ); ?></p>
+											<div class="course-meta">
+												<?php foreach ( $fb['meta'] as $meta_item ) : ?>
+													<span><?php echo esc_html( $meta_item ); ?></span>
+												<?php endforeach; ?>
+											</div>
+											<div class="card-footer-row">
+												<span class="card-enrolled"><?php esc_html_e( 'Self-paced course', 'codesblock' ); ?></span>
+												<?php if ( $fb['is_free'] ) : ?>
+													<span class="card-price free-badge"><?php esc_html_e( 'Free', 'codesblock' ); ?></span>
+												<?php else : ?>
+													<span class="card-price"><?php echo esc_html( $fb['price'] ); ?></span>
+												<?php endif; ?>
+											</div>
+											<span class="course-card-cta"><?php esc_html_e( 'Open course', 'codesblock' ); ?></span>
+										</div>
+									</div>
+								</a>
+							<?php endfor; ?>
+						<?php endif; ?>
 					<?php else : ?>
 						<article class="empty-post-card">
 							<p class="tag"><?php esc_html_e( 'No courses yet', 'codesblock' ); ?></p>
@@ -428,41 +475,54 @@ if ( $codesblock_is_frontend_member ) {
 		<div class="container">
 			<div class="practice-header">
 				<div>
-					<p class="eyebrow">Interview Guides</p>
-					<h2>Role-specific prep with guided feedback.</h2>
+					<p class="eyebrow">Interview Practice</p>
+					<h2>Practice the decisions interviewers actually score.</h2>
 				</div>
-				<p class="practice-lede">Compact tracks for senior, AI, and leadership interviews with checkpoints you can use before every round.</p>
+				<p class="practice-lede">Work through a realistic prompt, make your reasoning visible, and use focused review notes to improve the next attempt.</p>
 			</div>
 
 			<div class="practice-board">
-				<div class="practice-track-grid" aria-label="Interview guide tracks">
-					<a class="practice-track-card" href="#contact">
-						<span>01</span>
-						<h3>Sr. Engineer Track</h3>
-						<p>Architecture, tradeoffs, ownership, debugging judgment, and system-level thinking.</p>
-						<strong>Explore Track</strong>
-					</a>
-					<a class="practice-track-card is-featured" href="#contact">
-						<span>02</span>
-						<h3>AI Roles Track</h3>
-						<p>Prompting, ML basics, agents, evaluation, and data pipeline tradeoffs.</p>
-						<strong>Explore Track</strong>
-					</a>
-					<a class="practice-track-card" href="#contact">
-						<span>03</span>
-						<h3>Manager Track</h3>
-						<p>Team building, conflict resolution, delivery stories, and technical leadership.</p>
-						<strong>Explore Track</strong>
-					</a>
-				</div>
-
-				<div class="practice-dashboard">
-					<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/interview-coach.jpg' ); ?>" alt="Interview Prep Dashboard">
-					<div class="practice-dashboard-overlay">
-						<span>Live feedback</span>
-						<strong>Round-ready review in one view</strong>
+				<div class="practice-workspace" aria-label="Example system design interview workspace">
+					<div class="practice-window-bar">
+						<span><i></i><i></i><i></i> Mock interview workspace</span>
+						<strong>Guided mode</strong>
+					</div>
+					<div class="practice-prompt">
+						<span>System design prompt</span>
+						<h3>Design a rate limiter for a high-traffic API.</h3>
+						<p>Talk through scale, consistency, failure modes, and the tradeoff you would ship.</p>
+					</div>
+					<div class="practice-checkpoints">
+						<div><span>01</span><strong>Clarify</strong><small>Traffic, latency, limits</small></div>
+						<div><span>02</span><strong>Design</strong><small>Data model, flow, storage</small></div>
+						<div><span>03</span><strong>Defend</strong><small>Tradeoffs and failure modes</small></div>
+					</div>
+					<div class="practice-feedback">
+						<span>Review note</span>
+						<p><strong>Good:</strong> clear bottleneck analysis. <strong>Next:</strong> explain the recovery path when the shared store is unavailable.</p>
 					</div>
 				</div>
+
+				<nav class="practice-track-list" aria-label="Interview guide tracks">
+					<a class="practice-track-card" href="<?php echo esc_url( home_url( '/system-design-interview-45-minute-framework/' ) ); ?>">
+						<span>01 / System design</span>
+						<h3>Senior Engineer</h3>
+						<p>Architecture, tradeoffs, ownership, and debugging judgment.</p>
+						<strong>Open track <b aria-hidden="true">&rarr;</b></strong>
+					</a>
+					<a class="practice-track-card is-featured" href="<?php echo esc_url( home_url( '/courses/build-production-ready-ai-agents/' ) ); ?>">
+						<span>02 / Applied AI</span>
+						<h3>AI Engineering</h3>
+						<p>Agents, evaluation, data pipelines, and production tradeoffs.</p>
+						<strong>Open track <b aria-hidden="true">&rarr;</b></strong>
+					</a>
+					<a class="practice-track-card" href="<?php echo esc_url( home_url( '/senior-engineer-interview-stories/' ) ); ?>">
+						<span>03 / Leadership</span>
+						<h3>Engineering Manager</h3>
+						<p>Team building, conflict, delivery stories, and technical leadership.</p>
+						<strong>Open track <b aria-hidden="true">&rarr;</b></strong>
+					</a>
+				</nav>
 			</div>
 		</div>
 	</section>
@@ -471,22 +531,73 @@ if ( $codesblock_is_frontend_member ) {
 		<div class="container member-strip">
 			<div class="member-strip-copy">
 				<p class="eyebrow">Community</p>
-				<h2>Follow, support, and keep learning.</h2>
+				<p class="community-subtext">Follow us for daily tips, open-source code &amp; updates:</p>
 			</div>
-			<nav class="community-links" aria-label="Community links">
+			<nav class="community-grid" aria-label="Community links">
 				<?php if ( $codesblock_is_frontend_member ) : ?>
-					<a href="#my-learning"><span class="action-icon">M</span><strong>My learning</strong><small>progress</small></a>
-					<a href="<?php echo esc_url( $codesblock_member_profile_url ); ?>"><span class="action-icon">P</span><strong>Profile</strong><small>account</small></a>
+					<a class="community-card cb-glass-pill" href="#my-learning">
+						<span class="community-icon-badge member-icon">
+							<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+						</span>
+						<strong>My Learning</strong>
+					</a>
+					<a class="community-card cb-glass-pill" href="<?php echo esc_url( $codesblock_member_profile_url ); ?>">
+						<span class="community-icon-badge profile-icon">
+							<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+						</span>
+						<strong>Profile</strong>
+					</a>
 				<?php elseif ( $codesblock_is_admin_session ) : ?>
-					<a href="<?php echo esc_url( admin_url() ); ?>"><span class="action-icon">A</span><strong>WP Admin</strong><small>dashboard</small></a>
+					<a class="community-card cb-glass-pill" href="<?php echo esc_url( admin_url() ); ?>">
+						<span class="community-icon-badge admin-icon">
+							<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+						</span>
+						<strong>WP Admin</strong>
+					</a>
 				<?php else : ?>
-					<a class="js-open-paywall" href="#paywall-overlay" aria-haspopup="dialog" aria-controls="paywall-overlay"><span class="action-icon">M</span><strong>Member</strong><small>join free</small></a>
-					<a class="js-open-member" data-member-view="signin" href="#paywall-overlay" aria-haspopup="dialog" aria-controls="paywall-overlay"><span class="action-icon">L</span><strong>Sign in</strong><small>members</small></a>
+					<a class="community-card cb-glass-pill js-open-paywall" href="#paywall-overlay" aria-haspopup="dialog" aria-controls="paywall-overlay">
+						<span class="community-icon-badge member-icon">
+							<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+						</span>
+						<strong>Join Member</strong>
+					</a>
 				<?php endif; ?>
-				<a href="https://www.buymeacoffee.com/codesblock" target="_blank" rel="noreferrer"><span class="action-icon coffee-icon">C</span><strong>Coffee</strong><small>support</small></a>
-				<a href="https://www.youtube.com/@codesblock" target="_blank" rel="noreferrer"><span class="social-icon youtube-icon">YT</span><strong>YouTube</strong><small>videos</small></a>
-				<a href="https://www.instagram.com/codesblock" target="_blank" rel="noreferrer"><span class="social-icon instagram-icon">IG</span><strong>Instagram</strong><small>updates</small></a>
-				<a href="https://github.com/codesblock" target="_blank" rel="noreferrer"><span class="social-icon github-icon">GH</span><strong>GitHub</strong><small>code</small></a>
+
+				<?php if ( get_theme_mod( 'codesblock_support_url', 'https://www.buymeacoffee.com/codesblock' ) ) : ?>
+					<a class="community-card cb-glass-pill coffee-card" href="<?php echo esc_url( get_theme_mod( 'codesblock_support_url', 'https://www.buymeacoffee.com/codesblock' ) ); ?>" target="_blank" rel="noopener noreferrer">
+						<span class="community-icon-badge coffee-icon">
+							<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1-2H7L6 7z" fill="#ffffff" stroke="#1e293b"/><path d="M6.5 9l1.2 10.5a2 2 0 0 0 2 1.8h4.6a2 2 0 0 0 2-1.8L17.5 9H6.5z" fill="#ffdd00" stroke="#1e293b"/><rect x="5.5" y="7" width="13" height="2" rx="1" fill="#ffffff" stroke="#1e293b"/></svg>
+						</span>
+						<strong>Buy Me a Coffee</strong>
+					</a>
+				<?php endif; ?>
+
+				<?php if ( get_theme_mod( 'codesblock_youtube_url', 'https://www.youtube.com/@codesblock' ) ) : ?>
+					<a class="community-card cb-glass-pill youtube-card" href="<?php echo esc_url( get_theme_mod( 'codesblock_youtube_url', 'https://www.youtube.com/@codesblock' ) ); ?>" target="_blank" rel="noopener noreferrer">
+						<span class="community-icon-badge youtube-icon">
+							<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+						</span>
+						<strong>YouTube</strong>
+					</a>
+				<?php endif; ?>
+
+				<?php if ( get_theme_mod( 'codesblock_instagram_url', 'https://www.instagram.com/codesblock' ) ) : ?>
+					<a class="community-card cb-glass-pill instagram-card" href="<?php echo esc_url( get_theme_mod( 'codesblock_instagram_url', 'https://www.instagram.com/codesblock' ) ); ?>" target="_blank" rel="noopener noreferrer">
+						<span class="community-icon-badge instagram-icon">
+							<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+						</span>
+						<strong>Instagram</strong>
+					</a>
+				<?php endif; ?>
+
+				<?php if ( get_theme_mod( 'codesblock_github_url', 'https://github.com/Pulkit-Rana/CodesBlock' ) ) : ?>
+					<a class="community-card cb-glass-pill github-card" href="<?php echo esc_url( get_theme_mod( 'codesblock_github_url', 'https://github.com/Pulkit-Rana/CodesBlock' ) ); ?>" target="_blank" rel="noopener noreferrer">
+						<span class="community-icon-badge github-icon">
+							<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+						</span>
+						<strong>GitHub</strong>
+					</a>
+				<?php endif; ?>
 			</nav>
 		</div>
 	</section>
@@ -498,7 +609,7 @@ if ( $codesblock_is_frontend_member ) {
 					<p class="eyebrow">Articles</p>
 					<h2>Latest writing from the blog.</h2>
 				</div>
-				<a class="text-link" href="<?php echo esc_url( get_permalink( get_option( 'page_for_posts' ) ) ?: home_url( '/blog/' ) ); ?>">View all posts</a>
+				<a class="text-link" href="<?php echo esc_url( codesblock_articles_url() ); ?>">View all posts</a>
 			</div>
 			<div class="post-grid">
 				<?php

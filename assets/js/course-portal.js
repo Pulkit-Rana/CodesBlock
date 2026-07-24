@@ -18,16 +18,6 @@
 		chips:       document.querySelectorAll('.ai-suggestion-chip'),
 	};
 
-	/* ─── Helper: escape HTML special chars ──────────────── */
-	function escHtml(str) {
-		return String(str)
-			.replace(/&/g, '&amp;')
-			.replace(/</g, '&lt;')
-			.replace(/>/g, '&gt;')
-			.replace(/"/g, '&quot;')
-			.replace(/'/g, '&#039;');
-	}
-
 	/* --- Course guide knowledge base (generated from page data) --- */
 	var courseData = window.cbPortalData || {};
 	var summary    = courseData.summary  || 'This course is designed to help you build practical skills step by step. Review the syllabus and learning outcomes on this page for the full outline.';
@@ -37,11 +27,11 @@
 	/* Keyword-based page guidance. */
 	var knowledgeBase = [
 		{ keys: ['price', 'cost', 'how much', 'free', 'enroll', 'subscribe', 'buy'],
-		  reply: 'Use the <strong>Enroll</strong> button on this page to review the currently available membership choices and final checkout price.' },
+		  reply: 'Use the Enroll button on this page to review the currently available membership choices and final checkout price.' },
 		{ keys: ['syllabus', 'curriculum', 'module', 'chapter', 'lesson'],
-		  reply: 'Scroll down to the <strong>Course Syllabus</strong> section on this page to see the full breakdown of modules and lessons — just click a module header to expand it.' },
+		  reply: 'Scroll down to the Course Syllabus section on this page to see the full breakdown of modules and lessons. Select a module header to expand it.' },
 		{ keys: ['prerequisite', 'need to know', 'level', 'beginner', 'experience', 'requirement'],
-		  reply: 'Check the <strong>Level</strong> badge in the course header. Beginner courses start from scratch, Intermediate assumes some experience, and Advanced targets senior engineers.' },
+		  reply: 'Check the Level badge in the course header. Beginner courses start from scratch, Intermediate assumes some experience, and Advanced targets senior engineers.' },
 		{ keys: ['duration', 'how long', 'hours', 'weeks', 'time'],
 		  reply: 'The estimated course duration is listed in the course header. Your account keeps saved progress so you can continue later.' },
 		{ keys: ['guide', 'help', 'how does this work'],
@@ -52,20 +42,19 @@
 		  reply: summary },
 	];
 
-	/* Also inject FAQ answers into knowledge base — sanitize text content */
+	/* FAQ answers are rendered as text, never as markup. */
 	faqs.forEach(function (faq) {
 		if (!faq || typeof faq.q !== 'string' || typeof faq.a !== 'string') { return; }
 		knowledgeBase.push({
 			keys: faq.q.toLowerCase().split(/\W+/).filter(function (w) { return w.length > 3; }),
-			/* Escape the FAQ answer so it renders as plain text, not markup */
-			reply: escHtml(faq.a),
+			reply: faq.a,
 		});
 	});
 
 	var fallbacks = [
-		'Great question! I&rsquo;d suggest checking the <strong>Syllabus</strong> and <strong>What You\'ll Learn</strong> sections below. Is there a specific topic you want me to explain?',
-		'I\'m here to help you navigate ' + escHtml(courseTitle) + '. Try asking about the course outline, pricing, prerequisites, or duration.',
-		'That\'s something I\'ll need more context to answer. Try asking: <em>"What will I learn?"</em>, <em>"How long is this course?"</em>, or <em>"What\'s included?"</em>',
+		'Great question! Check the Syllabus and What You’ll Learn sections below. Is there a specific topic you want me to explain?',
+		'I’m here to help you navigate ' + courseTitle + '. Try asking about the course outline, pricing, prerequisites, or duration.',
+		'That needs a little more context. Try asking “What will I learn?”, “How long is this course?”, or “What’s included?”',
 	];
 
 	function getBotReply(msg) {
@@ -86,9 +75,23 @@
 	}
 
 	/* --- Panel open / close --- */
+	var lastTutorFocus = null;
+	var closeTimer = null;
+
 	function openPanel() {
 		if (!tutor.panel) return;
-		tutor.panel.classList.add('is-open');
+		if (closeTimer) {
+			window.clearTimeout(closeTimer);
+			closeTimer = null;
+		}
+		lastTutorFocus = document.activeElement;
+		tutor.panel.hidden = false;
+		tutor.panel.removeAttribute('inert');
+		tutor.panel.setAttribute('aria-hidden', 'false');
+		window.requestAnimationFrame(function () {
+			tutor.panel.classList.add('is-open');
+			if (tutor.closeBtn) { tutor.closeBtn.focus(); }
+		});
 		if (tutor.toggleBtn) { tutor.toggleBtn.setAttribute('aria-expanded', 'true'); }
 		document.body.style.overflow = 'hidden';
 	}
@@ -96,8 +99,17 @@
 	function closePanel() {
 		if (!tutor.panel) return;
 		tutor.panel.classList.remove('is-open');
+		tutor.panel.setAttribute('aria-hidden', 'true');
+		tutor.panel.setAttribute('inert', '');
 		if (tutor.toggleBtn) { tutor.toggleBtn.setAttribute('aria-expanded', 'false'); }
 		document.body.style.overflow = '';
+		closeTimer = window.setTimeout(function () {
+			tutor.panel.hidden = true;
+			closeTimer = null;
+		}, 260);
+		if (lastTutorFocus && typeof lastTutorFocus.focus === 'function') {
+			lastTutorFocus.focus();
+		}
 	}
 
 	if (tutor.toggleBtn) {
@@ -118,23 +130,32 @@
 
 	/* Close on overlay click (outside panel) */
 	document.addEventListener('keydown', function (e) {
-		if (e.key === 'Escape') { closePanel(); closePaywall(); }
+		if (e.key === 'Escape' && tutor.panel && !tutor.panel.hidden) { closePanel(); }
 	});
 
 	/* --- Tabs --- */
+	function setTutorTab(target) {
+		tutor.tabs.forEach(function (tab) {
+			var active = tab.dataset.tab === target;
+			tab.classList.toggle('is-active', active);
+			tab.setAttribute('aria-selected', active ? 'true' : 'false');
+			tab.setAttribute('tabindex', active ? '0' : '-1');
+		});
+		tutor.tabContents.forEach(function (content) {
+			var active = content.id === 'ai-tab-' + target;
+			content.classList.toggle('is-active', active);
+			content.hidden = !active;
+		});
+	}
+
 	tutor.tabs.forEach(function (tab) {
 		tab.addEventListener('click', function () {
-			var target = tab.dataset.tab;
-			tutor.tabs.forEach(function (t) { t.classList.remove('is-active'); });
-			tutor.tabContents.forEach(function (c) { c.classList.remove('is-active'); });
-			tab.classList.add('is-active');
-			var content = document.getElementById('ai-tab-' + target);
-			if (content) { content.classList.add('is-active'); }
+			setTutorTab(tab.dataset.tab);
 		});
 	});
 
 	/* --- Chat messaging --- */
-	function appendMessage(html, role) {
+	function appendMessage(message, role) {
 		if (!tutor.messagesEl) return;
 		var isAi   = role === 'ai';
 		var wrap   = document.createElement('div');
@@ -146,7 +167,7 @@
 
 		var bubble = document.createElement('div');
 		bubble.className = 'chat-bubble';
-		bubble.innerHTML = html;
+		bubble.textContent = message;
 
 		if (isAi) {
 			wrap.appendChild(avatar);
@@ -171,7 +192,12 @@
 
 		var typing = document.createElement('div');
 		typing.className = 'chat-bubble';
-		typing.innerHTML = '<div class="chat-typing"><span></span><span></span><span></span></div>';
+		var typingDots = document.createElement('div');
+		typingDots.className = 'chat-typing';
+		for (var i = 0; i < 3; i++) {
+			typingDots.appendChild(document.createElement('span'));
+		}
+		typing.appendChild(typingDots);
 
 		wrap.appendChild(avatar);
 		wrap.appendChild(typing);
@@ -182,7 +208,7 @@
 
 	function sendMessage(msg) {
 		if (!msg.trim()) return;
-		appendMessage(escHtml(msg), 'user');
+		appendMessage(msg, 'user');
 		if (tutor.inputEl) { tutor.inputEl.value = ''; }
 
 		var typingEl = showTyping();
@@ -227,42 +253,6 @@
 	});
 
 	/* ─────────────────────────────────────────────────────────
-	   PAYWALL MODAL
-	   ───────────────────────────────────────────────────────── */
-
-	var paywallOverlay = document.getElementById('paywall-overlay');
-	var paywallCloseBtn = document.getElementById('paywall-close');
-
-	function openPaywall() {
-		if (!paywallOverlay) return;
-		paywallOverlay.classList.add('is-open');
-		document.body.style.overflow = 'hidden';
-	}
-
-	function closePaywall() {
-		if (!paywallOverlay) return;
-		paywallOverlay.classList.remove('is-open');
-		document.body.style.overflow = '';
-	}
-
-	/* All "Enroll Now" & "btn-enroll" triggers */
-	document.querySelectorAll('.btn-enroll, .js-open-paywall').forEach(function (btn) {
-		btn.addEventListener('click', function (e) {
-			e.preventDefault();
-			openPaywall();
-		});
-	});
-
-	if (paywallCloseBtn) { paywallCloseBtn.addEventListener('click', closePaywall); }
-
-	/* Close overlay on backdrop click */
-	if (paywallOverlay) {
-		paywallOverlay.addEventListener('click', function (e) {
-			if (e.target === paywallOverlay) { closePaywall(); }
-		});
-	}
-
-	/* ─────────────────────────────────────────────────────────
 	   SYLLABUS ACCORDION
 	   ───────────────────────────────────────────────────────── */
 
@@ -270,13 +260,18 @@
 		header.addEventListener('click', function () {
 			var mod = header.closest('.syllabus-module');
 			if (!mod) return;
-			mod.classList.toggle('is-open');
+			var isOpen = mod.classList.toggle('is-open');
+			header.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 		});
 	});
 
-	/* Open first module by default */
+	/* Keep server-rendered default state synchronized. */
 	var firstModule = document.querySelector('.syllabus-module');
-	if (firstModule) { firstModule.classList.add('is-open'); }
+	if (firstModule) {
+		firstModule.classList.add('is-open');
+		var firstHeader = firstModule.querySelector('.syllabus-module-header');
+		if (firstHeader) { firstHeader.setAttribute('aria-expanded', 'true'); }
+	}
 
 	/* ─────────────────────────────────────────────────────────
 	   COURSE FILTER PILLS (archive page)
@@ -285,22 +280,54 @@
 	var filterPills = document.querySelectorAll('.filter-pill[data-filter]');
 	var courseCards = document.querySelectorAll('.course-card-v2[data-level]');
 
+	function applyCourseFilter(filter, updateUrl) {
+		var matched = 0;
+
+		filterPills.forEach(function (pill) {
+			var active = pill.dataset.filter === filter;
+			pill.classList.toggle('is-active', active);
+			pill.setAttribute('aria-pressed', active ? 'true' : 'false');
+		});
+
+		courseCards.forEach(function (card) {
+			var level = (card.dataset.level || '').toLowerCase();
+			var show = filter === 'all' || level === filter;
+			card.hidden = !show;
+			if (show) { matched++; }
+		});
+
+		if (updateUrl && window.history && window.URL) {
+			var url = new URL(window.location.href);
+			if (filter === 'all') {
+				url.searchParams.delete('type');
+			} else {
+				url.searchParams.set('type', filter);
+			}
+			window.history.replaceState({}, '', url.toString());
+		}
+
+		var grid = document.getElementById('course-grid');
+		if (grid) {
+			grid.setAttribute('data-visible-courses', String(matched));
+		}
+		var status = document.getElementById('course-filter-status');
+		if (status) {
+			status.textContent = matched === 1 ? '1 course shown.' : matched + ' courses shown.';
+		}
+	}
+
 	filterPills.forEach(function (pill) {
 		pill.addEventListener('click', function () {
-			filterPills.forEach(function (p) { p.classList.remove('is-active'); });
-			pill.classList.add('is-active');
-
-			var filter = pill.dataset.filter;
-
-			courseCards.forEach(function (card) {
-				if (filter === 'all') {
-					card.style.display = '';
-				} else {
-					var level = (card.dataset.level || '').toLowerCase();
-					card.style.display = level === filter ? '' : 'none';
-				}
-			});
+			applyCourseFilter(pill.dataset.filter, true);
 		});
 	});
+
+	if (filterPills.length && courseCards.length) {
+		var requestedFilter = new URLSearchParams(window.location.search).get('type');
+		var validFilter = Array.prototype.some.call(filterPills, function (pill) {
+			return pill.dataset.filter === requestedFilter;
+		});
+		applyCourseFilter(validFilter ? requestedFilter : 'all', false);
+	}
 
 }());
