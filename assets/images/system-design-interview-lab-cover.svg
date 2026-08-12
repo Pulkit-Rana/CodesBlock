@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Abstract distributed system architecture</title>
+  <desc id="desc">A calm network of services, data stores, queues, and global users.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#08172d"/><stop offset=".55" stop-color="#102c5d"/><stop offset="1" stop-color="#061325"/></linearGradient>
+    <radialGradient id="halo"><stop stop-color="#47c9ef" stop-opacity=".38"/><stop offset="1" stop-color="#47c9ef" stop-opacity="0"/></radialGradient>
+    <linearGradient id="card" x1="0" x2="1"><stop stop-color="#143b70"/><stop offset="1" stop-color="#0d254c"/></linearGradient>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="9" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="1140" cy="390" r="430" fill="url(#halo)"/>
+  <path d="M0 720C260 655 360 785 630 720S1060 585 1600 720V900H0Z" fill="#061120" opacity=".45"/>
+  <g fill="none" stroke="#76d7f3" stroke-linecap="round" opacity=".62">
+    <path d="M780 450C915 365 945 218 1120 180" stroke-width="4"/>
+    <path d="M780 450C935 466 1015 525 1225 568" stroke-width="4"/>
+    <path d="M780 450C970 565 1025 675 1160 720" stroke-width="3"/>
+    <path d="M780 450C650 390 555 275 420 225" stroke-width="3"/>
+    <path d="M780 450C625 505 565 630 380 675" stroke-width="3"/>
+  </g>
+  <g fill="none" stroke="#9a8cff" stroke-dasharray="10 16" opacity=".6">
+    <path d="M1120 180C1280 255 1340 365 1225 568" stroke-width="3"/>
+    <path d="M420 225C500 365 545 520 380 675" stroke-width="3"/>
+  </g>
+  <g transform="translate(675 335)">
+    <circle cx="105" cy="115" r="130" fill="#0c2d61" stroke="#79d8f5" stroke-width="3"/>
+    <circle cx="105" cy="115" r="98" fill="none" stroke="#2e77bf" stroke-width="2" opacity=".9"/>
+    <path d="M61 112h88M105 68v88" stroke="#b8f3ff" stroke-width="7" stroke-linecap="round" filter="url(#glow)"/>
+    <circle cx="105" cy="115" r="16" fill="#59d9a9" filter="url(#glow)"/>
+  </g>
+  <g stroke="#8eddf4" stroke-width="2">
+    <g transform="translate(1060 112)"><rect width="170" height="105" rx="18" fill="url(#card)"/><path d="M46 64h78M46 43h48" opacity=".8"/><circle cx="33" cy="43" r="7" fill="#59d9a9" stroke="none"/></g>
+    <g transform="translate(1180 505)"><rect width="192" height="115" rx="18" fill="url(#card)"/><ellipse cx="96" cy="39" rx="52" ry="14" fill="none"/><path d="M44 39v43c0 19 104 19 104 0V39M44 60c0 19 104 19 104 0"/></g>
+    <g transform="translate(1085 680)"><rect width="160" height="92" rx="18" fill="url(#card)"/><path d="M47 30h66v14H47zM47 54h66v14H47z" fill="none"/><circle cx="130" cy="36" r="6" fill="#59d9a9" stroke="none"/></g>
+    <g transform="translate(290 164)"><rect width="174" height="108" rx="18" fill="url(#card)"/><path d="M50 35h74M50 56h48M50 77h62"/><circle cx="35" cy="35" r="6" fill="#9a8cff" stroke="none"/></g>
+    <g transform="translate(260 620)"><rect width="180" height="98" rx="18" fill="url(#card)"/><path d="M42 50h96M70 29v42M106 29v42"/><circle cx="42" cy="50" r="7" fill="#59d9a9" stroke="none"/></g>
+  </g>
+  <g fill="#e8f7ff" opacity=".9"><circle cx="1280" cy="265" r="7"/><circle cx="1320" cy="338" r="5"/><circle cx="460" cy="396" r="6"/><circle cx="320" cy="430" r="4"/><circle cx="1045" cy="330" r="5"/></g>
+</svg>

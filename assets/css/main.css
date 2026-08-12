@@ -92,7 +92,7 @@ input {
 	background:
 		linear-gradient(90deg, #101828, #173a8a 48%, #087a59);
 	color: #fff;
-	font-size: .88rem;
+	font-size: 0.93rem;
 	position: relative;
 	z-index: 25;
 }
@@ -104,8 +104,8 @@ input {
 	justify-content: center;
 	margin: 0 auto;
 	max-width: var(--container);
-	min-height: 38px;
-	padding: 7px 48px 7px 32px;
+	min-height: 40px;
+	padding: 8px 52px 8px 16px;
 	position: relative;
 	text-align: center;
 }
@@ -154,32 +154,32 @@ input {
 	background: transparent;
 	border: 0;
 	border-radius: 999px;
-	color: rgba(255, 255, 255, .78);
+	color: rgba(255, 255, 255, .80);
 	cursor: pointer;
 	display: inline-flex;
-	height: 30px;
+	height: 32px;
 	justify-content: center;
-	padding: 6px;
+	padding: 5px;
 	position: absolute;
-	right: 10px;
+	right: 12px;
 	top: 50%;
 	transform: translateY(-50%);
 	transition: background .2s ease, color .2s ease;
-	width: 30px;
+	width: 32px;
 }
 
 .promo-dismiss:hover {
-	background: rgba(255, 255, 255, .14);
+	background: rgba(255, 255, 255, .22);
 	color: #fff;
 }
 
 .promo-dismiss svg {
 	fill: none;
-	height: 16px;
+	height: 18px;
 	stroke: currentColor;
 	stroke-linecap: round;
-	stroke-width: 2;
-	width: 16px;
+	stroke-width: 2.5;
+	width: 18px;
 }
 
 .site-header {

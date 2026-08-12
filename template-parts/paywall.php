@@ -5,13 +5,17 @@
  * @package CodesBlock
  */
 
-if ( is_user_logged_in() ) {
-	return;
-}
-
-$redirect_url = home_url( '/' );
-$privacy_url  = get_privacy_policy_url();
-$interests    = function_exists( 'cbcommerce_allowed_interests' )
+$is_admin_session    = function_exists( 'cbcommerce_user_can_access_admin' )
+	? cbcommerce_user_can_access_admin()
+	: current_user_can( 'manage_options' );
+$has_paid_access     = function_exists( 'cbcommerce_user_has_paid_access' )
+	? cbcommerce_user_has_paid_access()
+	: $is_admin_session;
+$show_auth_modal     = ! is_user_logged_in();
+$show_purchase_modal = ! $has_paid_access;
+$redirect_url        = home_url( '/' );
+$privacy_url         = get_privacy_policy_url();
+$interests           = function_exists( 'cbcommerce_allowed_interests' )
 	? cbcommerce_allowed_interests()
 	: array(
 		'ai-coding'     => __( 'AI & coding', 'codesblock' ),
@@ -34,30 +38,37 @@ $providers      = array(
 	'google' => array( 'label' => __( 'Google', 'codesblock' ), 'mark' => 'G' ),
 );
 ?>
-<div id="paywall-overlay" class="cb-member-overlay" aria-hidden="true" hidden>
+<?php if ( $show_auth_modal ) : ?>
+<div id="member-overlay" class="cb-member-overlay cb-auth-overlay" aria-hidden="true" hidden>
 	<div class="cb-member-backdrop" data-member-close></div>
 	<section
-		class="cb-member-modal"
+		class="cb-member-modal cb-auth-modal"
 		role="dialog"
 		aria-modal="true"
-		aria-labelledby="paywall-title"
-		aria-describedby="paywall-description"
+		aria-labelledby="member-title"
+		aria-describedby="member-description"
 		tabindex="-1"
 	>
-		<button class="cb-member-close" type="button" data-member-close aria-label="<?php esc_attr_e( 'Close member dialog', 'codesblock' ); ?>">
+		<button class="cb-member-close" type="button" data-member-close aria-label="<?php esc_attr_e( 'Close account dialog', 'codesblock' ); ?>">
 			<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
 		</button>
 
-		<div class="cb-member-body">
+		<div class="cb-member-body cb-auth-only">
 			<div class="cb-auth-card">
 				<div class="cb-auth-heading">
 					<a class="cb-auth-brand" href="<?php echo esc_url( home_url( '/' ) ); ?>" tabindex="-1" aria-hidden="true">CB</a>
 					<div>
 						<span><?php esc_html_e( 'CodesBlock account', 'codesblock' ); ?></span>
-						<h2 id="paywall-title"><?php esc_html_e( 'Your learning, saved.', 'codesblock' ); ?></h2>
-						<p id="paywall-description"><?php esc_html_e( 'Create a free account in under a minute. Upgrade only when a paid course is useful.', 'codesblock' ); ?></p>
+						<h2 id="member-title"><?php esc_html_e( 'Create your learning workspace.', 'codesblock' ); ?></h2>
+						<p id="member-description"><?php esc_html_e( 'Save progress, choose what you want to master, and start at the right depth. Course purchase is a separate decision.', 'codesblock' ); ?></p>
 					</div>
 				</div>
+
+				<ul class="cb-signup-benefits" role="list">
+					<li><?php esc_html_e( 'Free to join', 'codesblock' ); ?></li>
+					<li><?php esc_html_e( 'Progress saved', 'codesblock' ); ?></li>
+					<li><?php esc_html_e( 'No card required', 'codesblock' ); ?></li>
+				</ul>
 
 				<div class="cb-auth-tabs" role="tablist" aria-label="<?php esc_attr_e( 'Account options', 'codesblock' ); ?>">
 					<button type="button" class="cb-auth-tab is-active" role="tab" aria-selected="true" aria-controls="cb-register-panel" id="cb-register-tab" data-member-view="register"><?php esc_html_e( 'Create account', 'codesblock' ); ?></button>
@@ -151,12 +162,32 @@ $providers      = array(
 					</form>
 				</div>
 			</div>
+		</div>
+	</section>
+</div>
+<?php endif; ?>
 
-			<aside class="cb-plan-panel" aria-labelledby="cb-plan-title">
+<?php if ( $show_purchase_modal ) : ?>
+<div id="paywall-overlay" class="cb-member-overlay cb-purchase-overlay" aria-hidden="true" hidden>
+	<div class="cb-member-backdrop" data-member-close></div>
+	<section
+		class="cb-member-modal cb-purchase-modal"
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="paywall-title"
+		aria-describedby="paywall-description"
+		tabindex="-1"
+	>
+		<button class="cb-member-close" type="button" data-member-close aria-label="<?php esc_attr_e( 'Close membership options', 'codesblock' ); ?>">
+			<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+		</button>
+
+		<div class="cb-member-body cb-purchase-only">
+			<aside class="cb-plan-panel" aria-labelledby="paywall-title">
 				<div class="cb-plan-heading">
-					<span><?php esc_html_e( 'Membership', 'codesblock' ); ?></span>
-					<h3 id="cb-plan-title"><?php esc_html_e( 'One payment. No surprise renewal.', 'codesblock' ); ?></h3>
-					<p><?php esc_html_e( 'Start free, or choose a fixed access pass. Paid plans renew only when you decide.', 'codesblock' ); ?></p>
+					<span><?php esc_html_e( 'Course access', 'codesblock' ); ?></span>
+					<h2 id="paywall-title"><?php esc_html_e( 'Choose your learning runway.', 'codesblock' ); ?></h2>
+					<p id="paywall-description"><?php esc_html_e( 'Unlock the full course library, learning tools, and saved progress for a fixed term. Renew only when you decide.', 'codesblock' ); ?></p>
 				</div>
 
 				<div class="cb-free-plan">
@@ -173,7 +204,7 @@ $providers      = array(
 					<article class="cb-plan-option is-featured">
 						<div class="cb-plan-badge"><?php echo esc_html( $annual_saving ? sprintf( __( 'Save %d%%', 'codesblock' ), $annual_saving ) : __( 'Best value', 'codesblock' ) ); ?></div>
 						<div class="cb-plan-option-top"><span><?php esc_html_e( '1-year pass', 'codesblock' ); ?></span><strong><?php echo wp_kses_post( $annual_price ); ?></strong></div>
-						<p><?php esc_html_e( 'A full year of courses, resources, certificates, and saved progress.', 'codesblock' ); ?></p>
+					<p><?php esc_html_e( 'A full year of paid courses, practical resources, learning tools, and saved progress.', 'codesblock' ); ?></p>
 						<a href="<?php echo esc_url( function_exists( 'cbcommerce_checkout_url' ) ? cbcommerce_checkout_url( 'pro_annual' ) : wp_registration_url() ); ?>"><?php echo esc_html( $payments_ready ? __( 'Choose 1 year', 'codesblock' ) : __( 'Get launch update', 'codesblock' ) ); ?></a>
 					</article>
 				</div>
@@ -209,3 +240,4 @@ $providers      = array(
 		</div>
 	</section>
 </div>
+<?php endif; ?>
