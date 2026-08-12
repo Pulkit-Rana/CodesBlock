@@ -20,7 +20,7 @@ $what_you_learn = get_post_meta( $post_id, '_course_what_you_learn', true );
 $syllabus       = get_post_meta( $post_id, '_course_syllabus', true );
 $ai_summary     = get_post_meta( $post_id, '_course_ai_summary', true ) ?: get_the_excerpt();
 $is_free        = ( 'free' === strtolower( (string) $price ) || '' === trim( (string) $price ) );
-$course_preview = get_the_excerpt() ? get_the_excerpt() : wp_trim_words( wp_strip_all_tags( get_the_content() ), 45 );
+$is_system_design_course = in_array( get_post_field( 'post_name', $post_id ), array( 'system-design-interview-sprint', 'system-design-interview-lab' ), true );
 
 /* ── User access check ──────────────────────────────────────────
    If Paid Memberships Pro is active, check membership.
@@ -46,6 +46,16 @@ $ai_suggestions = array(
 	__( 'What\'s the price?', 'codesblock' ),
 	__( 'What are the prerequisites?', 'codesblock' ),
 );
+
+if ( $is_system_design_course ) {
+	$ai_suggestions = array(
+		__( 'Explain this trade-off simply', 'codesblock' ),
+		__( 'Research the stronger alternative', 'codesblock' ),
+		__( 'Challenge my architecture', 'codesblock' ),
+		__( 'Ask me an interviewer follow-up', 'codesblock' ),
+		__( 'Turn this lesson into a drill', 'codesblock' ),
+	);
+}
 ?>
 
 <main id="main" class="single-course-wrap">
@@ -81,7 +91,7 @@ $ai_suggestions = array(
 						<?php endif; ?>
 						<span>
 							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-							<strong><?php esc_html_e( 'Interactive course guide', 'codesblock' ); ?></strong>
+							<strong><?php echo esc_html( $is_system_design_course ? __( 'AI-assisted learning', 'codesblock' ) : __( 'Interactive course guide', 'codesblock' ) ); ?></strong>
 						</span>
 					</div>
 				</div>
@@ -93,6 +103,8 @@ $ai_suggestions = array(
 						<div class="sticky-card-thumb">
 							<?php if ( has_post_thumbnail() ) : ?>
 								<?php the_post_thumbnail( 'large' ); ?>
+							<?php elseif ( $is_system_design_course ) : ?>
+								<img class="system-design-cover" src="<?php echo esc_url( get_theme_file_uri( '/assets/images/system-design-interview-lab-cover.svg' ) ); ?>" alt="" decoding="async">
 							<?php else : ?>
 								<div class="sticky-card-placeholder" aria-hidden="true">
 									<span>CB</span>
@@ -117,24 +129,25 @@ $ai_suggestions = array(
 							<!-- Enroll CTA -->
 							<?php if ( $codesblock_can_track_progress ) : ?>
 								<a class="btn-enroll" id="btn-enroll-main" href="#course-progress"><?php esc_html_e( 'Continue learning', 'codesblock' ); ?> &rarr;</a>
-							<?php elseif ( $codesblock_is_frontend_member ) : ?>
-								<a class="btn-enroll" id="btn-enroll-main" href="<?php echo esc_url( function_exists( 'cbcommerce_checkout_url' ) ? cbcommerce_checkout_url( 'pro' ) : home_url( '/#member' ) ); ?>"><?php esc_html_e( 'Upgrade to unlock', 'codesblock' ); ?> &rarr;</a>
 							<?php elseif ( $codesblock_is_admin_session ) : ?>
 								<a class="btn-enroll" id="btn-enroll-main" href="<?php echo esc_url( get_edit_post_link( $post_id ) ); ?>"><?php esc_html_e( 'Edit course in WP Admin', 'codesblock' ); ?> &rarr;</a>
+							<?php elseif ( $user_has_access ) : ?>
+								<a class="btn-enroll" id="btn-enroll-main" href="#about-heading"><?php esc_html_e( 'Start course', 'codesblock' ); ?> &rarr;</a>
 							<?php else : ?>
 								<button
 									class="btn-enroll js-open-paywall"
+									type="button"
 									id="btn-enroll-main"
 									aria-haspopup="dialog"
 									aria-controls="paywall-overlay"
 								>
-									<?php esc_html_e( 'Enroll Now', 'codesblock' ); ?> &rarr;
+									<?php esc_html_e( 'View access passes', 'codesblock' ); ?> &rarr;
 								</button>
 							<?php endif; ?>
 
 							<p class="enroll-guarantee">
 								<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-								<?php echo esc_html( $is_free ? __( 'No payment required', 'codesblock' ) : __( 'Clear pricing before checkout', 'codesblock' ) ); ?>
+								<?php echo esc_html( $is_free ? __( 'No payment required', 'codesblock' ) : __( 'One-time passes. No automatic renewal.', 'codesblock' ) ); ?>
 							</p>
 
 							<!-- Includes list -->
@@ -162,10 +175,35 @@ $ai_suggestions = array(
 		</div>
 	</section>
 
+	<?php if ( $is_system_design_course ) : ?>
+	<section class="course-value-rail" aria-label="<?php esc_attr_e( 'How this course helps you learn', 'codesblock' ); ?>">
+		<div class="container">
+			<div class="course-value-rail-inner">
+				<div><span>01</span><strong><?php esc_html_e( 'Read for understanding', 'codesblock' ); ?></strong><small><?php esc_html_e( 'Clear lessons, diagrams, and worked decisions.', 'codesblock' ); ?></small></div>
+				<div><span>02</span><strong><?php esc_html_e( 'Ask at the point of confusion', 'codesblock' ); ?></strong><small><?php esc_html_e( 'Select a line, request an explanation, and go deeper.', 'codesblock' ); ?></small></div>
+				<div><span>03</span><strong><?php esc_html_e( 'Defend the trade-off', 'codesblock' ); ?></strong><small><?php esc_html_e( 'Turn understanding into interview-ready reasoning.', 'codesblock' ); ?></small></div>
+			</div>
+		</div>
+	</section>
+	<?php endif; ?>
+
 	<!-- ══════════════════════════════════════════════════
 	     MAIN CONTENT LAYOUT
 	══════════════════════════════════════════════════ -->
 	<div class="container">
+		<nav class="course-jump-nav" aria-label="<?php esc_attr_e( 'Course page sections', 'codesblock' ); ?>">
+			<span><?php esc_html_e( 'On this page', 'codesblock' ); ?></span>
+			<div>
+				<?php if ( $what_you_learn ) : ?>
+					<a href="#learn-heading"><?php esc_html_e( 'Outcomes', 'codesblock' ); ?></a>
+				<?php endif; ?>
+				<a href="#about-heading"><?php echo esc_html( $user_has_access ? __( 'Course material', 'codesblock' ) : __( 'Access', 'codesblock' ) ); ?></a>
+				<?php if ( $syllabus ) : ?>
+					<a href="#syllabus-heading"><?php esc_html_e( 'Curriculum', 'codesblock' ); ?></a>
+				<?php endif; ?>
+				<a href="<?php echo esc_url( get_post_type_archive_link( 'course' ) ?: home_url( '/courses/' ) ); ?>"><?php esc_html_e( 'All courses', 'codesblock' ); ?> &rarr;</a>
+			</div>
+		</nav>
 		<div class="course-content-layout">
 
 			<!-- ── Left: course details ─────────────────────── -->
@@ -196,6 +234,40 @@ $ai_suggestions = array(
 					</section>
 				<?php endif; ?>
 
+				<?php if ( $is_system_design_course ) : ?>
+				<section class="course-section course-ai-spotlight" aria-labelledby="ai-learning-heading">
+					<div class="course-section-heading">
+						<p class="eyebrow"><?php esc_html_e( 'The CodesBlock difference', 'codesblock' ); ?></p>
+						<h2 id="ai-learning-heading"><?php esc_html_e( 'Keep the learning method that works. Add an AI thinking partner.', 'codesblock' ); ?></h2>
+						<p><?php esc_html_e( 'Read carefully, sketch the system, and form your own answer first. When a sentence or trade-off slows you down, ask in context—without leaving the lesson or losing your train of thought.', 'codesblock' ); ?></p>
+					</div>
+
+					<div class="ai-learning-demo" aria-label="<?php esc_attr_e( 'Example AI-assisted learning flow', 'codesblock' ); ?>">
+						<div class="ai-learning-selection">
+							<span><?php esc_html_e( 'Selected from the lesson', 'codesblock' ); ?></span>
+							<blockquote><?php esc_html_e( 'A cache reduces read latency, but it also creates a second place where data can become stale.', 'codesblock' ); ?></blockquote>
+							<div class="ai-learning-actions" aria-hidden="true">
+								<span><?php esc_html_e( 'Explain simply', 'codesblock' ); ?></span>
+								<span><?php esc_html_e( 'Research trade-offs', 'codesblock' ); ?></span>
+								<span><?php esc_html_e( 'Ask a follow-up', 'codesblock' ); ?></span>
+							</div>
+						</div>
+						<div class="ai-learning-answer">
+							<div class="ai-learning-answer-label"><span>AI</span><strong><?php esc_html_e( 'Study companion', 'codesblock' ); ?></strong><small><?php esc_html_e( 'Example learning flow', 'codesblock' ); ?></small></div>
+							<p><?php esc_html_e( 'Caching makes repeated reads faster, but the cached copy may lag behind the database. In an interview, name the acceptable staleness, choose an invalidation strategy, and explain what happens during a cache miss.', 'codesblock' ); ?></p>
+							<p class="ai-learning-followup"><?php esc_html_e( 'Follow-up: what would change if the product required read-your-own-writes consistency?', 'codesblock' ); ?></p>
+						</div>
+					</div>
+					<p class="ai-integration-note"><strong><?php esc_html_e( 'Product preview:', 'codesblock' ); ?></strong> <?php esc_html_e( 'This shows the intended in-lesson experience. Live model answers and web research require the AI service to be connected and verified.', 'codesblock' ); ?></p>
+
+					<ul class="ai-learning-benefits" role="list">
+						<li><strong><?php esc_html_e( 'Explain', 'codesblock' ); ?></strong><span><?php esc_html_e( 'Turn dense architecture language into a mental model you can repeat.', 'codesblock' ); ?></span></li>
+						<li><strong><?php esc_html_e( 'Research', 'codesblock' ); ?></strong><span><?php esc_html_e( 'Explore alternatives, caveats, and real-world context from the lesson.', 'codesblock' ); ?></span></li>
+						<li><strong><?php esc_html_e( 'Go deeper', 'codesblock' ); ?></strong><span><?php esc_html_e( 'Keep asking until you can defend the decision without the assistant.', 'codesblock' ); ?></span></li>
+					</ul>
+				</section>
+				<?php endif; ?>
+
 				<!-- What You'll Learn -->
 				<?php if ( $what_you_learn ) : ?>
 					<section class="course-section" aria-labelledby="learn-heading">
@@ -213,23 +285,64 @@ $ai_suggestions = array(
 					</section>
 				<?php endif; ?>
 
-				<!-- About this Course -->
-				<section class="course-section" aria-labelledby="about-heading">
-					<h2 id="about-heading"><?php esc_html_e( 'About This Course', 'codesblock' ); ?></h2>
+				<?php if ( $is_system_design_course ) : ?>
+				<section class="course-section course-level-path" aria-labelledby="level-path-heading">
+					<div class="course-section-heading">
+						<p class="eyebrow"><?php esc_html_e( 'One course, three depths', 'codesblock' ); ?></p>
+						<h2 id="level-path-heading"><?php esc_html_e( 'Start at your level. Grow into the next one.', 'codesblock' ); ?></h2>
+						<p><?php esc_html_e( 'The core interview method stays the same; the expected depth, vocabulary, and trade-off pressure increase as you progress.', 'codesblock' ); ?></p>
+					</div>
+					<div class="course-level-grid">
+						<article><span><?php esc_html_e( 'Intern / early career', 'codesblock' ); ?></span><h3><?php esc_html_e( 'Build the vocabulary', 'codesblock' ); ?></h3><p><?php esc_html_e( 'Learn requirements, APIs, databases, caching, queues, and how a complete system fits together.', 'codesblock' ); ?></p></article>
+						<article><span><?php esc_html_e( 'Intermediate', 'codesblock' ); ?></span><h3><?php esc_html_e( 'Build the method', 'codesblock' ); ?></h3><p><?php esc_html_e( 'Use a repeatable 45-minute framework, estimate scale, and make choices from constraints instead of habit.', 'codesblock' ); ?></p></article>
+						<article><span><?php esc_html_e( 'Advanced / senior', 'codesblock' ); ?></span><h3><?php esc_html_e( 'Defend the trade-offs', 'codesblock' ); ?></h3><p><?php esc_html_e( 'Stress-test reliability, consistency, cost, operations, and the deeper follow-ups that separate senior answers.', 'codesblock' ); ?></p></article>
+					</div>
+				</section>
+				<?php endif; ?>
+
+				<section class="course-section course-about-preview" aria-labelledby="about-heading">
+					<p class="eyebrow"><?php esc_html_e( 'About this course', 'codesblock' ); ?></p>
+					<h2 id="about-heading"><?php esc_html_e( 'Build a system design answer you can explain, draw, and defend.', 'codesblock' ); ?></h2>
+					<p><?php echo esc_html( $ai_summary ); ?></p>
+					<?php if ( $is_system_design_course ) : ?>
+						<div class="course-lab-stats" aria-label="<?php esc_attr_e( 'Course at a glance', 'codesblock' ); ?>">
+							<span><strong>12</strong><?php esc_html_e( 'modules', 'codesblock' ); ?></span>
+							<span><strong>60+</strong><?php esc_html_e( 'guided lessons', 'codesblock' ); ?></span>
+							<span><strong>12</strong><?php esc_html_e( 'design labs', 'codesblock' ); ?></span>
+							<span><strong>1</strong><?php esc_html_e( 'capstone review', 'codesblock' ); ?></span>
+						</div>
+					<?php endif; ?>
+				</section>
+
+				<!-- Course material or access decision -->
+				<section class="course-section <?php echo $user_has_access ? 'course-material-section' : 'course-access-section'; ?>" aria-labelledby="about-heading">
+					<h2 id="about-heading"><?php echo esc_html( $user_has_access ? __( 'Course Material', 'codesblock' ) : __( 'Course Access', 'codesblock' ) ); ?></h2>
 					<?php if ( $user_has_access ) : ?>
 						<div class="entry-content"><?php the_content(); ?></div>
 					<?php else : ?>
-						<!-- Paywall gate: only the server-generated preview reaches the browser. -->
-						<div class="content-gate-wrapper">
-							<div class="content-gate-blur entry-content">
-								<p><?php echo esc_html( $course_preview ); ?></p>
-							</div>
-							<div class="content-gate-overlay">
-								<h3><?php esc_html_e( 'Enroll to read the full course overview', 'codesblock' ); ?></h3>
-								<p><?php esc_html_e( 'Join Pro or Lifetime to unlock the complete course and member learning tools.', 'codesblock' ); ?></p>
-								<button class="button button-primary js-open-paywall" type="button" aria-haspopup="dialog" aria-controls="paywall-overlay">
-									<?php esc_html_e( 'Unlock Access', 'codesblock' ); ?>
-								</button>
+						<!-- The hero already provides the public preview; do not repeat it here. -->
+						<div class="content-gate-wrapper content-gate-wrapper-compact">
+							<div class="content-gate-overlay content-gate-overlay-static">
+								<span class="content-gate-eyebrow"><?php esc_html_e( 'Premium course', 'codesblock' ); ?></span>
+								<h3><?php esc_html_e( 'Continue with the complete course', 'codesblock' ); ?></h3>
+								<p><?php esc_html_e( 'Open the lessons and curriculum shown on this page, then keep your progress saved with a CodesBlock access pass.', 'codesblock' ); ?></p>
+								<ul class="content-gate-benefits" role="list">
+									<li><?php esc_html_e( 'Every paid course', 'codesblock' ); ?></li>
+									<li><?php esc_html_e( 'Saved progress', 'codesblock' ); ?></li>
+									<li><?php esc_html_e( 'No automatic renewal', 'codesblock' ); ?></li>
+								</ul>
+								<div class="content-gate-actions">
+									<button class="button button-primary js-open-paywall" type="button" aria-haspopup="dialog" aria-controls="paywall-overlay">
+										<?php esc_html_e( 'View access passes', 'codesblock' ); ?>
+									</button>
+									<?php if ( $codesblock_is_frontend_member ) : ?>
+										<a class="content-gate-secondary" href="<?php echo esc_url( get_post_type_archive_link( 'course' ) ?: home_url( '/courses/' ) ); ?>"><?php esc_html_e( 'Browse all courses', 'codesblock' ); ?></a>
+									<?php else : ?>
+										<button class="content-gate-secondary js-open-member" type="button" data-member-view="signin" aria-haspopup="dialog" aria-controls="member-overlay">
+											<?php esc_html_e( 'Already a member? Sign in', 'codesblock' ); ?>
+										</button>
+									<?php endif; ?>
+								</div>
 							</div>
 						</div>
 					<?php endif; ?>
@@ -313,56 +426,34 @@ $ai_suggestions = array(
 			<!-- ── Right: secondary sidebar ─────────────────── -->
 			<aside class="course-details-sidebar" aria-label="<?php esc_attr_e( 'Course extras', 'codesblock' ); ?>">
 
-				<!-- Newsletter mini box -->
-				<div class="course-section" style="margin-bottom:20px;">
-					<p class="eyebrow"><?php esc_html_e( 'Stay Updated', 'codesblock' ); ?></p>
-					<h2 style="font-size:1.1rem;margin-bottom:8px;"><?php esc_html_e( 'Get new course alerts', 'codesblock' ); ?></h2>
-					<p style="color:var(--muted);font-size:.85rem;margin-bottom:14px;"><?php esc_html_e( 'Be first to know when new courses and free lessons drop.', 'codesblock' ); ?></p>
-					<?php
-					/* If Newsletter plugin active: echo do_shortcode('[newsletter]'); */
-					/* If Mailchimp for WP active: echo do_shortcode('[mc4wp_form id="YOUR_FORM_ID"]'); */
-					?>
-					<form class="cb-newsletter-form" style="display:flex;flex-direction:column;gap:8px;" action="#" method="post" novalidate>
-						<label class="screen-reader-text" for="nl-email-sidebar"><?php esc_html_e( 'Email address', 'codesblock' ); ?></label>
-						<input
-							id="nl-email-sidebar"
-							type="email"
-							name="email"
-							autocomplete="email"
-							inputmode="email"
-							placeholder="<?php esc_attr_e( 'you@example.com', 'codesblock' ); ?>"
-							style="border:1px solid var(--line);border-radius:8px;padding:9px 12px;font:inherit;width:100%;outline:none;"
-							required
-						>
-						<button
-							type="submit"
-							class="button button-primary"
-							style="width:100%;justify-content:center;"
-						>
-							<?php esc_html_e( 'Notify Me', 'codesblock' ); ?>
-						</button>
-						<input class="cb-honeypot" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
-						<p class="cb-form-feedback" role="status" aria-live="polite"></p>
-					</form>
+				<?php if ( $is_system_design_course && ! is_user_logged_in() ) : ?>
+				<div class="course-section course-start-card">
+					<p class="eyebrow"><?php esc_html_e( 'Start free', 'codesblock' ); ?></p>
+					<h2><?php esc_html_e( 'Create your learning workspace', 'codesblock' ); ?></h2>
+					<p><?php esc_html_e( 'Save progress, personalize your path, and preview CodesBlock before choosing a paid access pass.', 'codesblock' ); ?></p>
+					<button class="button button-primary js-open-member" type="button" data-member-view="register" aria-haspopup="dialog" aria-controls="member-overlay"><?php esc_html_e( 'Create free account', 'codesblock' ); ?></button>
+					<small><?php esc_html_e( 'No card required. Signup and course purchase stay separate.', 'codesblock' ); ?></small>
 				</div>
+				<?php endif; ?>
 
-				<!-- Social share -->
-				<div class="course-section">
-					<strong style="display:block;margin-bottom:12px;font-size:.9rem;"><?php esc_html_e( 'Share this course', 'codesblock' ); ?></strong>
-					<div style="display:flex;gap:10px;">
+				<!-- Useful secondary actions; the previous unconnected newsletter form was removed. -->
+				<div class="course-section course-utility-card">
+					<p class="eyebrow"><?php esc_html_e( 'Keep exploring', 'codesblock' ); ?></p>
+					<h2><?php esc_html_e( 'Choose your next step', 'codesblock' ); ?></h2>
+					<a class="button button-secondary course-browse-link" href="<?php echo esc_url( get_post_type_archive_link( 'course' ) ?: home_url( '/courses/' ) ); ?>"><?php esc_html_e( 'Browse all courses', 'codesblock' ); ?> &rarr;</a>
+					<strong class="course-share-label"><?php esc_html_e( 'Share this course', 'codesblock' ); ?></strong>
+					<div class="course-share-links">
 						<a
 							href="https://twitter.com/intent/tweet?text=<?php echo rawurlencode( get_the_title() . ' — ' . get_permalink() ); ?>"
 							target="_blank"
 							rel="noopener noreferrer"
 							class="btn-view-course"
-							style="flex:1;text-align:center;"
 						>Twitter / X</a>
 						<a
 							href="https://www.linkedin.com/sharing/share-offsite/?url=<?php echo rawurlencode( get_permalink() ); ?>"
 							target="_blank"
 							rel="noopener noreferrer"
-							class="btn-view-course"
-							style="flex:1;text-align:center;background:#0a66c2;"
+							class="btn-view-course course-share-linkedin"
 						>LinkedIn</a>
 					</div>
 				</div>

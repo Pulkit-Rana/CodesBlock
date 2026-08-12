@@ -41,6 +41,12 @@ $pro_price           = $pro_level && function_exists( 'pmpro_formatPrice' ) ? pm
 $annual_price        = $annual_level && function_exists( 'pmpro_formatPrice' ) ? pmpro_formatPrice( $annual_amount ) : '₹8,499';
 $lifetime_price      = $lifetime_level && function_exists( 'pmpro_formatPrice' ) ? pmpro_formatPrice( $lifetime_amount ) : '₹19,999';
 $annual_saving       = $pro_amount > 0 ? max( 0, (int) round( ( 1 - ( $annual_amount / ( $pro_amount * 12 ) ) ) * 100 ) ) : 0;
+$is_admin_session    = function_exists( 'cbcommerce_user_can_access_admin' )
+	? cbcommerce_user_can_access_admin()
+	: current_user_can( 'manage_options' );
+$member_learning_url = function_exists( 'cbcommerce_member_account_url' )
+	? cbcommerce_member_account_url()
+	: home_url( '/#my-learning' );
 
 get_header();
 ?>
@@ -108,6 +114,8 @@ get_header();
 							<a href="<?php the_permalink(); ?>" class="course-thumb" aria-label="<?php the_title_attribute(); ?>" tabindex="-1">
 								<?php if ( has_post_thumbnail() ) : ?>
 									<?php the_post_thumbnail( 'medium_large' ); ?>
+								<?php elseif ( in_array( get_post_field( 'post_name', get_the_ID() ), array( 'system-design-interview-sprint', 'system-design-interview-lab' ), true ) ) : ?>
+									<img class="system-design-cover" src="<?php echo esc_url( get_theme_file_uri( '/assets/images/system-design-interview-lab-cover.svg' ) ); ?>" alt="" loading="lazy" decoding="async">
 								<?php else : ?>
 									<div class="course-thumb-placeholder"><?php the_title(); ?></div>
 								<?php endif; ?>
@@ -191,7 +199,13 @@ get_header();
 					<span><?php esc_html_e( 'Starter', 'codesblock' ); ?></span>
 					<h3><?php esc_html_e( 'Free', 'codesblock' ); ?></h3>
 					<p><?php esc_html_e( 'Public articles, the free starter course, saved progress, and weekly learning notes.', 'codesblock' ); ?></p>
-					<a class="button button-secondary js-open-paywall" href="#paywall-overlay"><?php esc_html_e( 'Create free account', 'codesblock' ); ?></a>
+					<?php if ( ! is_user_logged_in() ) : ?>
+						<a class="button button-secondary js-open-member" href="#member-overlay" data-member-view="register" aria-haspopup="dialog" aria-controls="member-overlay"><?php esc_html_e( 'Create free account', 'codesblock' ); ?></a>
+					<?php elseif ( $is_admin_session ) : ?>
+						<a class="button button-secondary" href="<?php echo esc_url( admin_url() ); ?>"><?php esc_html_e( 'Open WP Admin', 'codesblock' ); ?></a>
+					<?php else : ?>
+						<a class="button button-secondary" href="<?php echo esc_url( $member_learning_url ); ?>"><?php esc_html_e( 'Go to my learning', 'codesblock' ); ?></a>
+					<?php endif; ?>
 				</article>
 				<article class="course-plan-card">
 					<span><?php esc_html_e( '30-day pass', 'codesblock' ); ?></span>

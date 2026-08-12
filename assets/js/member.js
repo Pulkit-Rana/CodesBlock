@@ -2,97 +2,179 @@
 	'use strict';
 
 	var config = window.cbMemberData || {};
-	var overlay = document.getElementById('paywall-overlay');
-	var modal = overlay ? overlay.querySelector('.cb-member-modal') : null;
+	var authOverlay = document.getElementById('member-overlay');
+	var purchaseOverlay = document.getElementById('paywall-overlay');
+	var activeOverlay = null;
 	var lastFocused = null;
 
 	function setView(view, focusField) {
-		if (!overlay) return;
+		if (!authOverlay) return;
 		view = view === 'signin' ? 'signin' : 'register';
 
-		overlay.querySelectorAll('[data-member-view]').forEach(function (tab) {
+		authOverlay.querySelectorAll('[data-member-view]').forEach(function (tab) {
 			var active = tab.getAttribute('data-member-view') === view;
 			tab.classList.toggle('is-active', active);
 			tab.setAttribute('aria-selected', active ? 'true' : 'false');
 			tab.setAttribute('tabindex', active ? '0' : '-1');
 		});
 
-		overlay.querySelectorAll('[data-member-panel]').forEach(function (panel) {
+		authOverlay.querySelectorAll('[data-member-panel]').forEach(function (panel) {
 			var active = panel.getAttribute('data-member-panel') === view;
 			panel.classList.toggle('is-active', active);
 			panel.hidden = !active;
 		});
 
 		if (focusField) {
-			var field = overlay.querySelector('[data-member-panel="' + view + '"] input:not([type="hidden"]):not(.cb-honeypot)');
+			var field = authOverlay.querySelector('[data-member-panel="' + view + '"] input:not([type="hidden"]):not(.cb-honeypot)');
 			if (field) field.focus();
 		}
 	}
 
-	function openMember(view) {
-		if (!overlay || !modal) return;
-		lastFocused = document.activeElement;
-		overlay.hidden = false;
-		overlay.setAttribute('aria-hidden', 'false');
-		document.body.classList.add('cb-modal-open');
-		setView(view || 'register', false);
-		modal.scrollTop = 0;
-		window.requestAnimationFrame(function () {
-			modal.focus();
-		});
-	}
-
-	function closeMember() {
+	function hideOverlay(overlay) {
 		if (!overlay) return;
 		overlay.hidden = true;
 		overlay.setAttribute('aria-hidden', 'true');
-		document.body.classList.remove('cb-modal-open');
-		if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
 	}
 
-	document.querySelectorAll('.js-open-paywall, .js-open-member').forEach(function (trigger) {
-		trigger.addEventListener('click', function (event) {
-			event.preventDefault();
-			openMember(trigger.getAttribute('data-member-view') || 'register');
-		});
-	});
+	function openOverlay(overlay, view) {
+		if (!overlay) return false;
+		var modal = overlay.querySelector('.cb-member-modal');
+		if (!modal) return false;
 
-	if (overlay) {
+		if (!activeOverlay) {
+			lastFocused = document.activeElement;
+		} else if (activeOverlay !== overlay) {
+			hideOverlay(activeOverlay);
+		}
+
+		activeOverlay = overlay;
+		overlay.hidden = false;
+		overlay.setAttribute('aria-hidden', 'false');
+		document.body.classList.add('cb-modal-open');
+		if (overlay === authOverlay) setView(view || 'register', false);
+		modal.scrollTop = 0;
+		window.requestAnimationFrame(function () {
+			var initialFocus = overlay === authOverlay
+				? modal.querySelector('[role="tab"][aria-selected="true"]')
+				: modal.querySelector('.cb-member-close');
+			(initialFocus || modal).focus();
+		});
+		return true;
+	}
+
+	function closeOverlay(overlay) {
+		if (!overlay) return;
+		hideOverlay(overlay);
+		if (activeOverlay === overlay) activeOverlay = null;
+
+		if ((!authOverlay || authOverlay.hidden) && (!purchaseOverlay || purchaseOverlay.hidden)) {
+			document.body.classList.remove('cb-modal-open');
+		}
+
+		var focusTarget = lastFocused;
+		lastFocused = null;
+		if (focusTarget && document.contains(focusTarget) && typeof focusTarget.focus === 'function') {
+			focusTarget.focus();
+		}
+	}
+
+	function bindTriggers(selector, overlay, defaultView) {
+		document.querySelectorAll(selector).forEach(function (trigger) {
+			if (overlay) {
+				trigger.setAttribute('aria-haspopup', 'dialog');
+				trigger.setAttribute('aria-controls', overlay.id);
+				if (trigger.tagName === 'A' && (trigger.getAttribute('href') || '').charAt(0) === '#') {
+					trigger.setAttribute('href', '#' + overlay.id);
+				}
+			}
+
+			trigger.addEventListener('click', function (event) {
+				if (!overlay) return;
+				event.preventDefault();
+				openOverlay(overlay, trigger.getAttribute('data-member-view') || defaultView);
+			});
+		});
+	}
+
+	function bindOverlay(overlay) {
+		if (!overlay) return;
+		var modal = overlay.querySelector('.cb-member-modal');
+
 		overlay.querySelectorAll('[data-member-close]').forEach(function (button) {
-			button.addEventListener('click', closeMember);
-		});
-
-		overlay.querySelectorAll('[data-member-view]').forEach(function (tab) {
-			tab.addEventListener('click', function () {
-				setView(tab.getAttribute('data-member-view'), true);
+			button.addEventListener('click', function () {
+				closeOverlay(overlay);
 			});
 		});
 
-		overlay.querySelectorAll('[data-focus-register]').forEach(function (button) {
-			button.addEventListener('click', function () { setView('register', true); });
-		});
+		if (overlay === authOverlay) {
+			var tabs = Array.prototype.slice.call(overlay.querySelectorAll('[data-member-view]'));
+			tabs.forEach(function (tab, index) {
+				tab.addEventListener('click', function () {
+					setView(tab.getAttribute('data-member-view'), true);
+				});
+				tab.addEventListener('keydown', function (event) {
+					var nextIndex = null;
+					if (event.key === 'ArrowRight') nextIndex = (index + 1) % tabs.length;
+					if (event.key === 'ArrowLeft') nextIndex = (index - 1 + tabs.length) % tabs.length;
+					if (event.key === 'Home') nextIndex = 0;
+					if (event.key === 'End') nextIndex = tabs.length - 1;
+					if (nextIndex === null) return;
+
+					event.preventDefault();
+					setView(tabs[nextIndex].getAttribute('data-member-view'), false);
+					tabs[nextIndex].focus();
+				});
+			});
+
+			overlay.querySelectorAll('[data-focus-register]').forEach(function (button) {
+				button.addEventListener('click', function () { setView('register', true); });
+			});
+		}
 
 		overlay.addEventListener('keydown', function (event) {
 			if (event.key === 'Escape') {
-				closeMember();
+				closeOverlay(overlay);
 				return;
 			}
 
 			if (event.key !== 'Tab' || !modal) return;
 			var focusable = Array.prototype.slice.call(modal.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), [tabindex]:not([tabindex="-1"])'))
-				.filter(function (element) { return !element.closest('[hidden]'); });
+				.filter(function (element) {
+					return !element.closest('[hidden]') && element.getAttribute('tabindex') !== '-1';
+				});
 			if (!focusable.length) return;
 			var first = focusable[0];
 			var last = focusable[focusable.length - 1];
-			if (event.shiftKey && document.activeElement === first) {
+			if (event.shiftKey && (document.activeElement === first || document.activeElement === modal)) {
 				event.preventDefault();
 				last.focus();
+			} else if (!event.shiftKey && document.activeElement === modal) {
+				event.preventDefault();
+				first.focus();
 			} else if (!event.shiftKey && document.activeElement === last) {
 				event.preventDefault();
 				first.focus();
 			}
 		});
 	}
+
+	bindTriggers('.js-open-member', authOverlay, 'register');
+	bindTriggers('.js-open-paywall', purchaseOverlay, '');
+	bindOverlay(authOverlay);
+	bindOverlay(purchaseOverlay);
+
+	/* Keep access CTAs reliable when a course template or later script adds them after this file runs. */
+	document.addEventListener('click', function (event) {
+		var target = event.target;
+		var trigger = target && target.closest ? target.closest('.js-open-member, .js-open-paywall') : null;
+		if (!trigger) return;
+
+		var overlay = trigger.classList.contains('js-open-member') ? authOverlay : purchaseOverlay;
+		if (!overlay || !overlay.hidden) return;
+
+		event.preventDefault();
+		openOverlay(overlay, trigger.getAttribute('data-member-view') || (overlay === authOverlay ? 'register' : ''));
+	});
 
 	document.querySelectorAll('[data-password-toggle]').forEach(function (button) {
 		button.addEventListener('click', function () {
@@ -149,8 +231,8 @@
 			.then(function (result) {
 				var payload = result && result.data ? result.data : {};
 				if (!result || !result.success) {
-					if (payload.view && overlay) setView(payload.view, false);
-					var targetPanel = payload.view && overlay ? overlay.querySelector('[data-member-panel="' + payload.view + '"]') : form;
+					if (payload.view && authOverlay) setView(payload.view, false);
+					var targetPanel = payload.view && authOverlay ? authOverlay.querySelector('[data-member-panel="' + payload.view + '"]') : form;
 					var targetFeedback = targetPanel ? targetPanel.querySelector('.cb-form-feedback') : feedback;
 					if (targetFeedback) targetFeedback.textContent = payload.message || 'Please check your details and try again.';
 					return;
@@ -240,5 +322,11 @@
 		});
 	});
 
-	if (window.location.hash === '#join' || window.location.hash === '#paywall-overlay') openMember('register');
+	if (window.location.hash === '#join' || window.location.hash === '#member-overlay') {
+		openOverlay(authOverlay, 'register');
+	} else if (window.location.hash === '#signin') {
+		openOverlay(authOverlay, 'signin');
+	} else if (window.location.hash === '#paywall-overlay') {
+		openOverlay(purchaseOverlay, '');
+	}
 }());
