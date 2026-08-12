@@ -428,10 +428,20 @@ if ( $codesblock_is_frontend_member ) {
 								<?php
 								while ( $codesblock_recommended_articles->have_posts() ) :
 									$codesblock_recommended_articles->the_post();
+									$codesblock_recommendation_initials = strtoupper( substr( preg_replace( '/[^A-Za-z0-9]/', '', get_the_title() ), 0, 2 ) );
 									?>
 									<a class="side-card-link" href="<?php the_permalink(); ?>">
-										<small><?php echo esc_html( get_the_date() ); ?></small>
-										<strong><?php the_title(); ?></strong>
+										<span class="side-card-thumb">
+											<?php if ( has_post_thumbnail() ) : ?>
+												<?php the_post_thumbnail( 'thumbnail', array( 'loading' => 'lazy' ) ); ?>
+											<?php else : ?>
+												<span class="side-card-thumb-fallback" aria-hidden="true"><?php echo esc_html( $codesblock_recommendation_initials ?: 'CB' ); ?></span>
+											<?php endif; ?>
+										</span>
+										<span class="side-card-copy">
+											<small><?php echo esc_html( get_the_date() ); ?></small>
+											<strong><?php the_title(); ?></strong>
+										</span>
 									</a>
 								<?php endwhile; ?>
 								<?php wp_reset_postdata(); ?>
@@ -454,10 +464,20 @@ if ( $codesblock_is_frontend_member ) {
 								<?php
 								while ( $codesblock_recommended_courses->have_posts() ) :
 									$codesblock_recommended_courses->the_post();
+									$codesblock_recommendation_initials = strtoupper( substr( preg_replace( '/[^A-Za-z0-9]/', '', get_the_title() ), 0, 2 ) );
 									?>
 									<a class="side-card-link" href="<?php the_permalink(); ?>">
-										<small><?php echo esc_html( get_the_date() ); ?></small>
-										<strong><?php the_title(); ?></strong>
+										<span class="side-card-thumb side-card-thumb-course">
+											<?php if ( has_post_thumbnail() ) : ?>
+												<?php the_post_thumbnail( 'thumbnail', array( 'loading' => 'lazy' ) ); ?>
+											<?php else : ?>
+												<span class="side-card-thumb-fallback" aria-hidden="true"><?php echo esc_html( $codesblock_recommendation_initials ?: 'CB' ); ?></span>
+											<?php endif; ?>
+										</span>
+										<span class="side-card-copy">
+											<small><?php echo esc_html( get_the_date() ); ?></small>
+											<strong><?php the_title(); ?></strong>
+										</span>
 									</a>
 								<?php endwhile; ?>
 								<?php wp_reset_postdata(); ?>
@@ -555,11 +575,11 @@ if ( $codesblock_is_frontend_member ) {
 						<strong>WP Admin</strong>
 					</a>
 				<?php else : ?>
-					<a class="community-card cb-glass-pill js-open-paywall" href="#paywall-overlay" aria-haspopup="dialog" aria-controls="paywall-overlay">
+					<a class="community-card cb-glass-pill js-open-member" href="#member-overlay" data-member-view="register" aria-haspopup="dialog" aria-controls="member-overlay">
 						<span class="community-icon-badge member-icon">
 							<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
 						</span>
-						<strong>Join Member</strong>
+						<strong><?php esc_html_e( 'Join free', 'codesblock' ); ?></strong>
 					</a>
 				<?php endif; ?>
 

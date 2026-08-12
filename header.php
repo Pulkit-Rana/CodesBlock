@@ -17,26 +17,63 @@
 <a class="skip-link" href="#main"><?php esc_html_e( 'Skip to content', 'codesblock' ); ?></a>
 <?php $codesblock_promo = function_exists( 'codesblock_get_promo_config' ) ? codesblock_get_promo_config() : array( 'visible' => false ); ?>
 <?php if ( ! empty( $codesblock_promo['visible'] ) ) : ?>
+	<?php
+	$codesblock_dismiss_labels = array(
+		'session' => __( 'Dismiss announcement until the next browser session', 'codesblock' ),
+		'24'      => __( 'Dismiss announcement for 1 day', 'codesblock' ),
+		'168'     => __( 'Dismiss announcement for 7 days', 'codesblock' ),
+		'720'     => __( 'Dismiss announcement for 30 days', 'codesblock' ),
+	);
+	$codesblock_dismissal = isset( $codesblock_promo['dismissal'] ) ? (string) $codesblock_promo['dismissal'] : '168';
+	$codesblock_bar_classes = array( 'top-promo-bar', 'promo-scheme-' . $codesblock_promo['scheme'] );
+	if ( ! empty( $codesblock_promo['status'] ) ) {
+		$codesblock_bar_classes[] = 'promo-status-' . sanitize_html_class( $codesblock_promo['status'] );
+	}
+	if ( empty( $codesblock_promo['mobile'] ) ) {
+		$codesblock_bar_classes[] = 'promo-hide-mobile';
+	}
+	?>
 	<div
-		class="top-promo-bar"
+		class="<?php echo esc_attr( implode( ' ', $codesblock_bar_classes ) ); ?>"
 		role="region"
 		aria-label="<?php esc_attr_e( 'CodesBlock announcement', 'codesblock' ); ?>"
 		data-promo-campaign="<?php echo esc_attr( $codesblock_promo['campaign'] ); ?>"
+		data-promo-dismissal="<?php echo esc_attr( $codesblock_dismissal ); ?>"
+		data-promo-preview="<?php echo ! empty( $codesblock_promo['preview'] ) ? '1' : '0'; ?>"
+		<?php if ( ! empty( $codesblock_promo['ends_at'] ) ) : ?>data-promo-expires="<?php echo esc_attr( (string) ( $codesblock_promo['ends_at'] * 1000 ) ); ?>"<?php endif; ?>
 	>
+		<span class="promo-glow promo-glow-one" aria-hidden="true"></span>
+		<span class="promo-glow promo-glow-two" aria-hidden="true"></span>
 		<div class="top-promo-inner">
-			<span class="promo-badge"><?php echo esc_html( $codesblock_promo['badge'] ); ?></span>
-			<p><?php echo esc_html( $codesblock_promo['text'] ); ?></p>
-			<a
-				class="promo-cta <?php echo esc_attr( implode( ' ', $codesblock_promo['classes'] ) ); ?>"
-				href="<?php echo esc_url( $codesblock_promo['url'] ); ?>"
-				data-promo-action="click"
-				<?php if ( ! empty( $codesblock_promo['member_view'] ) ) : ?>data-member-view="<?php echo esc_attr( $codesblock_promo['member_view'] ); ?>" aria-haspopup="dialog" aria-controls="paywall-overlay"<?php endif; ?>
-			>
-				<?php echo esc_html( $codesblock_promo['cta'] ); ?>
-			</a>
+			<?php if ( ! empty( $codesblock_promo['icon'] ) ) : ?>
+				<span class="promo-icon" aria-hidden="true"><?php echo esc_html( $codesblock_promo['icon'] ); ?></span>
+			<?php endif; ?>
+			<div class="promo-message">
+				<span class="promo-badge"><?php echo esc_html( $codesblock_promo['badge'] ); ?></span>
+				<p><?php echo esc_html( $codesblock_promo['text'] ); ?></p>
+			</div>
+			<?php if ( ! empty( $codesblock_promo['countdown'] ) ) : ?>
+				<div class="promo-countdown" role="img" aria-label="<?php echo esc_attr( sprintf( __( 'Campaign ends %s', 'codesblock' ), wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $codesblock_promo['ends_at'], wp_timezone() ) ) ); ?>">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+					<span><?php esc_html_e( 'Ends in', 'codesblock' ); ?></span>
+					<strong data-promo-countdown aria-hidden="true">--</strong>
+				</div>
+			<?php endif; ?>
+			<?php if ( ! empty( $codesblock_promo['cta'] ) && ! empty( $codesblock_promo['url'] ) ) : ?>
+				<a
+					class="promo-cta <?php echo esc_attr( implode( ' ', $codesblock_promo['classes'] ) ); ?>"
+					href="<?php echo esc_url( $codesblock_promo['url'] ); ?>"
+					data-promo-action="click"
+					<?php if ( ! empty( $codesblock_promo['new_tab'] ) ) : ?>target="_blank" rel="noopener noreferrer"<?php endif; ?>
+					<?php if ( ! empty( $codesblock_promo['member_view'] ) ) : ?>data-member-view="<?php echo esc_attr( $codesblock_promo['member_view'] ); ?>" aria-haspopup="dialog" aria-controls="member-overlay"<?php endif; ?>
+				>
+					<span><?php echo esc_html( $codesblock_promo['cta'] ); ?></span>
+					<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"></path></svg>
+				</a>
+			<?php endif; ?>
 			<?php if ( ! empty( $codesblock_promo['dismissible'] ) ) : ?>
-				<button class="promo-dismiss" type="button" data-promo-dismiss aria-label="<?php esc_attr_e( 'Dismiss announcement for 7 days', 'codesblock' ); ?>">
-					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+				<button class="promo-dismiss" type="button" data-promo-dismiss aria-label="<?php echo esc_attr( $codesblock_dismiss_labels[ $codesblock_dismissal ] ?? $codesblock_dismiss_labels['168'] ); ?>">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
 				</button>
 			<?php endif; ?>
 		</div>
@@ -109,7 +146,7 @@
 			<?php elseif ( $codesblock_is_admin_session ) : ?>
 				<a class="header-link" href="<?php echo esc_url( admin_url() ); ?>"><?php esc_html_e( 'WP Admin', 'codesblock' ); ?></a>
 			<?php else : ?>
-				<a class="header-link js-open-member" data-member-view="signin" href="#paywall-overlay" aria-haspopup="dialog" aria-controls="paywall-overlay"><?php esc_html_e( 'Sign in', 'codesblock' ); ?></a>
+				<a class="header-link js-open-member" data-member-view="signin" href="#member-overlay" aria-haspopup="dialog" aria-controls="member-overlay"><?php esc_html_e( 'Sign in', 'codesblock' ); ?></a>
 				<a class="header-button js-open-paywall" href="#paywall-overlay" aria-haspopup="dialog" aria-controls="paywall-overlay"><?php esc_html_e( 'Become a member', 'codesblock' ); ?></a>
 			<?php endif; ?>
 		</div>

@@ -5,15 +5,13 @@
 	if (promoBar) {
 		var promoCampaign = promoBar.getAttribute('data-promo-campaign') || 'announcement';
 		var promoStorageKey = 'codesblock_promo_' + promoCampaign;
-		var promoDismissedUntil = 0;
-
-		try {
-			promoDismissedUntil = parseInt(window.localStorage.getItem(promoStorageKey), 10) || 0;
-		} catch (storageError) {
-			promoDismissedUntil = 0;
-		}
+		var promoDismissal = promoBar.getAttribute('data-promo-dismissal') || '168';
+		var promoExpires = parseInt(promoBar.getAttribute('data-promo-expires'), 10) || 0;
+		var promoPreview = promoBar.getAttribute('data-promo-preview') === '1';
+		var promoCountdownTimer = null;
 
 		function trackPromo(eventName) {
+			if (promoPreview) return;
 			var eventData = {
 				event: 'codesblock_promo_' + eventName,
 				campaign: promoCampaign
@@ -23,9 +21,58 @@
 			if (typeof window.clarity === 'function') window.clarity('event', 'promo_' + eventName + '_' + promoCampaign);
 		}
 
-		if (promoDismissedUntil > Date.now()) {
-			promoBar.hidden = true;
+		function hidePromo(animate) {
+			if (promoCountdownTimer) window.clearInterval(promoCountdownTimer);
+			if (!animate) {
+				promoBar.hidden = true;
+				return;
+			}
+			promoBar.classList.add('is-leaving');
+			window.setTimeout(function () { promoBar.hidden = true; }, 200);
+		}
+
+		function isPromoDismissed() {
+			if (promoPreview) return false;
+			try {
+				if (promoDismissal === 'session') {
+					return window.sessionStorage.getItem(promoStorageKey) === 'dismissed';
+				}
+				var dismissedUntil = parseInt(window.localStorage.getItem(promoStorageKey), 10) || 0;
+				if (dismissedUntil > Date.now()) return true;
+				if (dismissedUntil) window.localStorage.removeItem(promoStorageKey);
+			} catch (storageError) {
+				return false;
+			}
+			return false;
+		}
+
+		function updatePromoCountdown() {
+			var countdown = promoBar.querySelector('[data-promo-countdown]');
+			if (!countdown || !promoExpires) return;
+			var remaining = Math.max(0, Math.floor((promoExpires - Date.now()) / 1000));
+			if (remaining <= 0) {
+				hidePromo(true);
+				trackPromo('expired');
+				return;
+			}
+			var days = Math.floor(remaining / 86400);
+			var hours = Math.floor((remaining % 86400) / 3600);
+			var minutes = Math.floor((remaining % 3600) / 60);
+			var seconds = remaining % 60;
+			var pad = function (value) { return String(value).padStart(2, '0'); };
+			countdown.textContent = days > 0
+				? days + 'd ' + pad(hours) + 'h ' + pad(minutes) + 'm'
+				: pad(hours) + 'h ' + pad(minutes) + 'm ' + pad(seconds) + 's';
+		}
+
+		var hiddenOnThisDevice = promoBar.classList.contains('promo-hide-mobile') && window.matchMedia('(max-width: 640px)').matches;
+		if ((!promoPreview && promoExpires && promoExpires <= Date.now()) || isPromoDismissed() || hiddenOnThisDevice) {
+			hidePromo(false);
 		} else {
+			updatePromoCountdown();
+			if (promoBar.querySelector('[data-promo-countdown]')) {
+				promoCountdownTimer = window.setInterval(updatePromoCountdown, 1000);
+			}
 			trackPromo('impression');
 		}
 
@@ -37,13 +84,19 @@
 		var promoDismiss = promoBar.querySelector('[data-promo-dismiss]');
 		if (promoDismiss) {
 			promoDismiss.addEventListener('click', function () {
-				var sevenDays = 7 * 24 * 60 * 60 * 1000;
-				try {
-					window.localStorage.setItem(promoStorageKey, String(Date.now() + sevenDays));
-				} catch (storageError) {
-					// The bar still dismisses for this page when storage is unavailable.
+				if (!promoPreview) {
+					try {
+						if (promoDismissal === 'session') {
+							window.sessionStorage.setItem(promoStorageKey, 'dismissed');
+						} else {
+							var dismissalHours = parseInt(promoDismissal, 10) || 168;
+							window.localStorage.setItem(promoStorageKey, String(Date.now() + (dismissalHours * 60 * 60 * 1000)));
+						}
+					} catch (storageError) {
+						// The bar still dismisses for this page when storage is unavailable.
+					}
 				}
-				promoBar.hidden = true;
+				hidePromo(true);
 				trackPromo('dismiss');
 			});
 		}
@@ -89,6 +142,45 @@
 
 	window.addEventListener('scroll', onScroll, { passive: true });
 	onScroll(); // run once on load
+
+	/* Subtle long-page wayfinding: a thin progress line and one-time section reveals. */
+	var scrollProgress = document.createElement('div');
+	scrollProgress.className = 'cb-scroll-progress';
+	scrollProgress.setAttribute('aria-hidden', 'true');
+	document.body.appendChild(scrollProgress);
+
+	var progressTicking = false;
+	function updateScrollProgress() {
+		var scrollRange = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+		var progress = Math.min(1, Math.max(0, window.scrollY / scrollRange));
+		scrollProgress.style.transform = 'scaleX(' + progress + ')';
+		progressTicking = false;
+	}
+
+	window.addEventListener('scroll', function () {
+		if (progressTicking) return;
+		progressTicking = true;
+		window.requestAnimationFrame(updateScrollProgress);
+	}, { passive: true });
+	updateScrollProgress();
+
+	var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	var revealItems = document.querySelectorAll('body.home main > .section > .container, body.home .learning-strip .strip-item, body.single-course .course-section');
+	if (!prefersReducedMotion && revealItems.length && 'IntersectionObserver' in window) {
+		document.documentElement.classList.add('cb-motion-ready');
+		var revealObserver = new IntersectionObserver(function (entries, observer) {
+			entries.forEach(function (entry) {
+				if (!entry.isIntersecting) return;
+				entry.target.classList.add('is-visible');
+				observer.unobserve(entry.target);
+			});
+		}, { rootMargin: '0px 0px -8% 0px', threshold: .08 });
+
+		revealItems.forEach(function (item) {
+			item.classList.add('cb-reveal-item');
+			revealObserver.observe(item);
+		});
+	}
 
 	/* ── Learning-strip liquid ripple on hover ── */
 	var stripItems = document.querySelectorAll('.strip-item');
