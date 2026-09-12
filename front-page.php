@@ -29,7 +29,7 @@ if ( 'page' === get_option( 'show_on_front' ) && have_posts() ) {
 	rewind_posts();
 }
 
-$hero_eyebrow = get_theme_mod( 'codesblock_hero_eyebrow', 'Stay Relevant' );
+$hero_eyebrow = get_theme_mod( 'codesblock_hero_eyebrow', 'Stay Relevant.Stay Curious' );
 $hero_title   = get_theme_mod( 'codesblock_hero_title', 'CodesBlock' );
 $hero_lede    = get_theme_mod( 'codesblock_hero_lede', 'Production AI engineering, system design, and interview practice for developers who want practical proof - not another passive tutorial catalog.' );
 $codesblock_published_course_count = (int) wp_count_posts( 'course' )->publish;
