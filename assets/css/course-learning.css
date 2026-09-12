@@ -402,23 +402,15 @@
 	max-width: 930px;
 }
 
-.cb-lesson-breadcrumbs {
-	align-items: center;
+.cb-lesson-hero .cb-breadcrumbs {
 	color: #6c7e92;
-	display: flex;
-	font-size: .74rem;
-	font-weight: 700;
-	gap: 8px;
-	margin: 0 0 18px;
+	margin-bottom: 18px;
 }
 
-.cb-lesson-breadcrumbs a {
+.cb-lesson-hero .cb-breadcrumbs a:hover,
+.cb-lesson-hero .cb-breadcrumbs a:focus-visible,
+.cb-lesson-hero .cb-breadcrumbs [aria-current='page'] {
 	color: #275ea8;
-	text-decoration: none;
-}
-
-.cb-lesson-breadcrumbs span[aria-hidden="true"] {
-	color: #a0adbc;
 }
 
 .cb-lesson-kicker {
