@@ -13,7 +13,7 @@ function codesblock_default_menu() {
 		<li class="<?php echo ( is_post_type_archive( 'course' ) || is_singular( 'course' ) ) ? 'current-menu-item' : ''; ?>"><a href="<?php echo esc_url( $courses_url ); ?>">Courses</a></li>
 		<li class="<?php echo ( is_page( 'articles' ) || ( is_home() && ! is_front_page() ) || is_singular( 'post' ) ) ? 'current-menu-item' : ''; ?>"><a href="<?php echo esc_url( codesblock_articles_url() ); ?>">Articles</a></li>
 		<li><a href="<?php echo esc_url( home_url( '/#practice' ) ); ?>">Interview Guides</a></li>
-		<li class="menu-item-start-here"><a href="<?php echo esc_url( home_url( '/#start' ) ); ?>">Start Here</a></li>
+		<li class="menu-item-start-here"><a href="<?php echo esc_url( home_url( '/#start' ) ); ?>">Start</a></li>
 	</ul>
 	<?php
 }
