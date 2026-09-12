@@ -14,6 +14,9 @@ Pushes and merges to `main` are deployed by Hostinger's existing GitHub
 integration. Check Advanced > Git > Deployments in hPanel for the result, then
 check the homepage, `/articles/`, `/courses/`, and `/wp-json/`.
 
+Automatic deployment enabled on September 12, 2026. The follow-up documentation
+commit is used to verify a real push-triggered deployment without changing UI.
+
 The September 12 baseline preserves the theme recovered from the September 10
 production backup. Uncommitted LocalWP edits remain in the original local
 checkout and must be reviewed and committed deliberately.
