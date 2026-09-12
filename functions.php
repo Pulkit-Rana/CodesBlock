@@ -1104,3 +1104,22 @@ function codesblock_favicon_links() {
 	<?php
 }
 add_action( 'wp_head', 'codesblock_favicon_links', 100 );
+
+add_action('rest_api_init', function () {
+  register_rest_route('codesblock/v1', '/stats', array(
+    'methods' => 'GET',
+    'callback' => 'codesblock_get_stats',
+    'permission_callback' => '__return_true'
+  ));
+});
+function codesblock_get_stats() {
+  \ = (int) wp_count_posts('course')->publish;
+  \ = (int) wp_count_posts('post')->publish;
+  \ = count_users();
+  return array(
+    'courses' => \,
+    'articles' => \,
+    'learners' => \['total_users']
+  );
+}
+
