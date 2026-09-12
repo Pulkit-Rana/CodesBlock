@@ -104,117 +104,11 @@ $codesblock_is_admin_session = function_exists( 'cbcommerce_user_can_access_admi
 $codesblock_is_frontend_member = function_exists( 'cbcommerce_is_frontend_member' )
 	? cbcommerce_is_frontend_member()
 	: ( is_user_logged_in() && ! $codesblock_is_admin_session );
-$codesblock_member_user          = null;
-$codesblock_member_courses       = array();
-$codesblock_member_progress      = array();
-$codesblock_member_average       = 0;
-$codesblock_member_completed     = 0;
-$codesblock_member_level_name    = __( 'Starter', 'codesblock' );
-$codesblock_member_profile_url   = function_exists( 'cbcommerce_member_profile_url' ) ? cbcommerce_member_profile_url() : home_url( '/#my-learning' );
-$codesblock_member_account_url   = function_exists( 'cbcommerce_member_account_url' ) ? cbcommerce_member_account_url() : home_url( '/#my-learning' );
-
-if ( $codesblock_is_frontend_member ) {
-	$codesblock_member_user = wp_get_current_user();
-	if ( function_exists( 'pmpro_getMembershipLevelForUser' ) ) {
-		$codesblock_member_level = pmpro_getMembershipLevelForUser( $codesblock_member_user->ID );
-		if ( $codesblock_member_level && ! empty( $codesblock_member_level->name ) ) {
-			$codesblock_member_level_name = $codesblock_member_level->name;
-		}
-	}
-
-	if ( function_exists( 'cbcommerce_get_user_course_progress' ) ) {
-		$codesblock_member_progress = cbcommerce_get_user_course_progress( $codesblock_member_user->ID );
-	}
-
-	if ( $codesblock_member_progress ) {
-		$codesblock_progress_query = new WP_Query(
-			array(
-				'post_type'      => 'course',
-				'post_status'    => 'publish',
-				'posts_per_page' => 6,
-				'post__in'       => array_keys( $codesblock_member_progress ),
-				'orderby'        => 'post__in',
-			)
-		);
-		$codesblock_member_courses = $codesblock_progress_query->posts;
-		wp_reset_postdata();
-
-		$codesblock_progress_total = 0;
-		foreach ( $codesblock_member_courses as $codesblock_member_course ) {
-			$codesblock_course_percent = absint( $codesblock_member_progress[ $codesblock_member_course->ID ]['percent'] );
-			$codesblock_progress_total += $codesblock_course_percent;
-			if ( 100 === $codesblock_course_percent ) {
-				$codesblock_member_completed++;
-			}
-		}
-		if ( $codesblock_member_courses ) {
-			$codesblock_member_average = (int) round( $codesblock_progress_total / count( $codesblock_member_courses ) );
-		}
-	}
-}
+$codesblock_member_profile_url = function_exists( 'cbcommerce_member_profile_url' ) ? cbcommerce_member_profile_url() : home_url( '/my-learning/#profile' );
+$codesblock_member_learning_url = function_exists( 'cbcommerce_member_home_url' ) ? cbcommerce_member_home_url() : home_url( '/my-learning/' );
 ?>
 
 <main id="main">
-	<?php if ( $codesblock_is_frontend_member && $codesblock_member_user ) : ?>
-		<section class="cb-learning-hub" id="my-learning" aria-labelledby="cb-learning-title">
-			<div class="container">
-				<div class="cb-learning-heading">
-					<div>
-						<p class="eyebrow"><?php esc_html_e( 'Your learning space', 'codesblock' ); ?></p>
-						<h2 id="cb-learning-title"><?php printf( esc_html__( 'Welcome back, %s', 'codesblock' ), esc_html( $codesblock_member_user->display_name ) ); ?></h2>
-						<p><?php esc_html_e( 'Continue where you left off and keep your CodesBlock profile in one place.', 'codesblock' ); ?></p>
-					</div>
-					<a class="button button-secondary" href="<?php echo esc_url( get_post_type_archive_link( 'course' ) ); ?>"><?php esc_html_e( 'Browse courses', 'codesblock' ); ?></a>
-				</div>
-
-				<div class="cb-learning-grid">
-					<aside class="cb-profile-card" aria-label="<?php esc_attr_e( 'Member profile', 'codesblock' ); ?>">
-						<div class="cb-profile-person">
-							<?php echo get_avatar( $codesblock_member_user->ID, 72, '', '', array( 'class' => 'cb-profile-avatar' ) ); ?>
-							<div>
-								<strong><?php echo esc_html( $codesblock_member_user->display_name ); ?></strong>
-								<span><?php echo esc_html( $codesblock_member_user->user_email ); ?></span>
-							</div>
-						</div>
-						<span class="cb-member-level"><?php echo esc_html( $codesblock_member_level_name ); ?> <?php esc_html_e( 'member', 'codesblock' ); ?></span>
-						<div class="cb-profile-actions">
-							<a href="<?php echo esc_url( $codesblock_member_profile_url ); ?>"><?php esc_html_e( 'Edit profile', 'codesblock' ); ?></a>
-							<a href="<?php echo esc_url( $codesblock_member_account_url ); ?>"><?php esc_html_e( 'Membership & billing', 'codesblock' ); ?></a>
-							<a href="<?php echo esc_url( wp_logout_url( home_url( '/' ) ) ); ?>"><?php esc_html_e( 'Sign out', 'codesblock' ); ?></a>
-						</div>
-					</aside>
-
-					<div class="cb-progress-card">
-						<div class="cb-progress-summary">
-							<div>
-								<span><?php esc_html_e( 'Average progress', 'codesblock' ); ?></span>
-								<strong><?php echo esc_html( $codesblock_member_average ); ?>%</strong>
-							</div>
-							<p><?php printf( esc_html__( '%1$d active course(s) · %2$d completed', 'codesblock' ), count( $codesblock_member_courses ), $codesblock_member_completed ); ?></p>
-						</div>
-
-						<?php if ( $codesblock_member_courses ) : ?>
-							<div class="cb-learning-list">
-								<?php foreach ( $codesblock_member_courses as $codesblock_member_course ) : ?>
-									<?php $codesblock_course_percent = absint( $codesblock_member_progress[ $codesblock_member_course->ID ]['percent'] ); ?>
-									<a class="cb-learning-row" href="<?php echo esc_url( get_permalink( $codesblock_member_course ) ); ?>">
-										<span class="cb-learning-row-copy"><strong><?php echo esc_html( get_the_title( $codesblock_member_course ) ); ?></strong><small><?php echo 100 === $codesblock_course_percent ? esc_html__( 'Completed', 'codesblock' ) : esc_html__( 'Continue learning', 'codesblock' ); ?></small></span>
-										<span class="cb-learning-row-progress"><span><i style="width: <?php echo esc_attr( $codesblock_course_percent ); ?>%"></i></span><b><?php echo esc_html( $codesblock_course_percent ); ?>%</b></span>
-									</a>
-								<?php endforeach; ?>
-							</div>
-						<?php else : ?>
-							<div class="cb-learning-empty">
-								<strong><?php esc_html_e( 'Your first course is waiting.', 'codesblock' ); ?></strong>
-								<p><?php esc_html_e( 'Open a course and save your progress to build your learning list here.', 'codesblock' ); ?></p>
-								<a href="<?php echo esc_url( get_post_type_archive_link( 'course' ) ); ?>"><?php esc_html_e( 'Explore courses', 'codesblock' ); ?> &rarr;</a>
-							</div>
-						<?php endif; ?>
-					</div>
-				</div>
-			</div>
-		</section>
-	<?php endif; ?>
 	<section class="hero">
 		<div class="container hero-grid">
 			<div class="hero-copy">
@@ -555,7 +449,7 @@ if ( $codesblock_is_frontend_member ) {
 			</div>
 			<nav class="community-grid" aria-label="Community links">
 				<?php if ( $codesblock_is_frontend_member ) : ?>
-					<a class="community-card cb-glass-pill" href="#my-learning">
+					<a class="community-card cb-glass-pill" href="<?php echo esc_url( $codesblock_member_learning_url ); ?>">
 						<span class="community-icon-badge member-icon">
 							<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
 						</span>
@@ -582,7 +476,6 @@ if ( $codesblock_is_frontend_member ) {
 						<strong><?php esc_html_e( 'Join free', 'codesblock' ); ?></strong>
 					</a>
 				<?php endif; ?>
-
 				<?php if ( get_theme_mod( 'codesblock_support_url', 'https://www.buymeacoffee.com/codesblock' ) ) : ?>
 					<a class="community-card cb-glass-pill coffee-card" href="<?php echo esc_url( get_theme_mod( 'codesblock_support_url', 'https://www.buymeacoffee.com/codesblock' ) ); ?>" target="_blank" rel="noopener noreferrer">
 						<span class="community-icon-badge coffee-icon">
@@ -591,7 +484,6 @@ if ( $codesblock_is_frontend_member ) {
 						<strong>Buy Me a Coffee</strong>
 					</a>
 				<?php endif; ?>
-
 				<?php if ( get_theme_mod( 'codesblock_youtube_url', 'https://www.youtube.com/@codesblock' ) ) : ?>
 					<a class="community-card cb-glass-pill youtube-card" href="<?php echo esc_url( get_theme_mod( 'codesblock_youtube_url', 'https://www.youtube.com/@codesblock' ) ); ?>" target="_blank" rel="noopener noreferrer">
 						<span class="community-icon-badge youtube-icon">
@@ -600,7 +492,6 @@ if ( $codesblock_is_frontend_member ) {
 						<strong>YouTube</strong>
 					</a>
 				<?php endif; ?>
-
 				<?php if ( get_theme_mod( 'codesblock_instagram_url', 'https://www.instagram.com/codesblock' ) ) : ?>
 					<a class="community-card cb-glass-pill instagram-card" href="<?php echo esc_url( get_theme_mod( 'codesblock_instagram_url', 'https://www.instagram.com/codesblock' ) ); ?>" target="_blank" rel="noopener noreferrer">
 						<span class="community-icon-badge instagram-icon">
@@ -609,7 +500,6 @@ if ( $codesblock_is_frontend_member ) {
 						<strong>Instagram</strong>
 					</a>
 				<?php endif; ?>
-
 				<?php if ( get_theme_mod( 'codesblock_github_url', 'https://github.com/Pulkit-Rana/CodesBlock' ) ) : ?>
 					<a class="community-card cb-glass-pill github-card" href="<?php echo esc_url( get_theme_mod( 'codesblock_github_url', 'https://github.com/Pulkit-Rana/CodesBlock' ) ); ?>" target="_blank" rel="noopener noreferrer">
 						<span class="community-icon-badge github-icon">
@@ -666,38 +556,6 @@ if ( $codesblock_is_frontend_member ) {
 					</article>
 					<?php
 				endif;
-				?>
-			</div>
-		</div>
-	</section>
-
-	<section class="section cta" id="contact">
-		<div class="container cta-inner">
-			<div>
-				<p class="eyebrow">Contact</p>
-				<h2>Ask about courses, membership, or AI-assisted prep.</h2>
-				<p>Send a note for paid-course access, interview guide questions, collaborations, or feedback on what to build next.</p>
-			</div>
-			<div class="contact-form-shell">
-				<?php
-				$codesblock_forms = get_posts(
-					array(
-						'post_type'      => 'wpcf7_contact_form',
-						'posts_per_page' => 1,
-						'post_status'    => 'publish',
-					)
-				);
-
-				if ( ! empty( $codesblock_forms ) ) {
-					echo do_shortcode( '[contact-form-7 id="' . absint( $codesblock_forms[0]->ID ) . '"]' );
-				} else {
-					?>
-					<div class="contact-fallback">
-						<p><?php esc_html_e( 'The contact form is being configured. You can still reach CodesBlock directly by email.', 'codesblock' ); ?></p>
-						<a class="button button-primary" href="mailto:hello@codesblock.com"><?php esc_html_e( 'Email CodesBlock', 'codesblock' ); ?></a>
-					</div>
-					<?php
-				}
 				?>
 			</div>
 		</div>

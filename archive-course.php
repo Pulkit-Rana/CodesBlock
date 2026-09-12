@@ -44,9 +44,9 @@ $annual_saving       = $pro_amount > 0 ? max( 0, (int) round( ( 1 - ( $annual_am
 $is_admin_session    = function_exists( 'cbcommerce_user_can_access_admin' )
 	? cbcommerce_user_can_access_admin()
 	: current_user_can( 'manage_options' );
-$member_learning_url = function_exists( 'cbcommerce_member_account_url' )
-	? cbcommerce_member_account_url()
-	: home_url( '/#my-learning' );
+$member_learning_url = function_exists( 'cbcommerce_member_home_url' )
+	? cbcommerce_member_home_url()
+	: home_url( '/my-learning/' );
 
 get_header();
 ?>

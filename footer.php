@@ -5,7 +5,7 @@
  * @package CodesBlock
  */
 ?>
-<footer class="site-footer">
+<footer id="contact" class="site-footer">
 	<div class="container footer-grid">
 		<div>
 			<a class="brand footer-brand" href="<?php echo esc_url( home_url( '/' ) ); ?>">
@@ -30,17 +30,11 @@
 			);
 			?>
 		</div>
-		<div id="newsletter" class="footer-newsletter-card">
-			<h2><?php echo esc_html( get_theme_mod( 'codesblock_newsletter_heading', 'Join the weekly build note' ) ); ?></h2>
-			<p><?php echo esc_html( get_theme_mod( 'codesblock_newsletter_copy', 'One practical engineering idea and one focused learning prompt, delivered without the noise.' ) ); ?></p>
-			<form class="footer-form cb-newsletter-form" action="#" method="post" novalidate>
-				<label class="screen-reader-text" for="footer-email">Email</label>
-				<input id="footer-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required>
-				<input class="cb-honeypot" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
-				<button type="submit">Join</button>
-				<p class="cb-form-feedback" role="status" aria-live="polite"></p>
-			</form>
-			<p class="footer-form-note"><?php esc_html_e( 'Marketing email only. Confirm through your inbox; unsubscribe anytime.', 'codesblock' ); ?></p>
+		<div class="footer-contact-card">
+			<p class="footer-kicker"><?php esc_html_e( 'Contact', 'codesblock' ); ?></p>
+			<h2><?php esc_html_e( 'Questions about learning or access?', 'codesblock' ); ?></h2>
+			<p><?php esc_html_e( 'For course access, interview guides, partnerships, or feedback, send the CodesBlock team a note.', 'codesblock' ); ?></p>
+			<a class="footer-contact-button" href="mailto:hello@codesblock.com"><?php esc_html_e( 'Start a conversation', 'codesblock' ); ?><span aria-hidden="true">&rarr;</span></a>
 		</div>
 	</div>
 	<div class="container footer-bottom">

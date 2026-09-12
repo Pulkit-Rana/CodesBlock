@@ -855,7 +855,10 @@
 	transition: border-color .18s;
 }
 
-.ai-chat-input:focus { border-color: var(--blue); }
+.ai-chat-input:focus-visible {
+	border-color: var(--blue);
+	box-shadow: 0 0 0 3px rgba(49, 95, 216, .18);
+}
 
 .ai-chat-send {
 	align-items: center;
@@ -1182,6 +1185,10 @@
 }
 
 .newsletter-form input::placeholder { color: rgba(255,255,255,.5); }
+
+.newsletter-form:focus-within {
+	box-shadow: 0 0 0 3px rgba(255, 255, 255, .28);
+}
 
 .newsletter-form button {
 	background: var(--green);
