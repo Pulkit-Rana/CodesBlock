@@ -150,13 +150,13 @@ $codesblock_member_learning_url = function_exists( 'cbcommerce_member_home_url' 
 					<div class="choice active">Optimized Database Queries</div>
 					<div class="choice">Scalable Architecture</div>
 				</div>
-				<div class="sketch-card code-card" style="transform: rotate(-1deg); padding-bottom: 24px;">
+				<div class="sketch-card code-card" style="padding-bottom: 24px;">
 					<code>const score = evaluate(agent, cases);<br><br>if (score &lt; launchGate) {<br>&nbsp;&nbsp;rollback();<br>}</code>
 				</div>
-				<div class="sketch-card extra-card" style="transform: rotate(1.5deg);">
-					<span>Starter Library</span>
-					<strong><?php echo esc_html( $codesblock_published_course_count ); ?> courses &middot; <?php echo esc_html( $codesblock_published_post_count ); ?> articles</strong>
-					<p style="font-size: 0.8rem; color: #66788a; margin-top: 6px;"><?php esc_html_e( 'Self-paced paths with saved progress.', 'codesblock' ); ?></p>
+				<div class="sketch-card extra-card">
+					<span>CodesBlock Community</span>
+					<strong><span id="cb-course-counter"><?php echo esc_html( $codesblock_published_course_count ); ?></span> courses &middot; <span id="cb-article-counter"><?php echo esc_html( $codesblock_published_post_count ); ?></span> articles &middot; <span id="cb-learner-counter"><?php $u_count = count_users(); echo esc_html( $u_count['total_users'] ); ?></span> learners</strong>
+					<p style="font-size: 0.8rem; color: #66788a; margin-top: 6px;"><?php esc_html_e( 'Join our growing community of developers.', 'codesblock' ); ?></p>
 				</div>
 			</div>
 		</div>
@@ -218,6 +218,11 @@ $codesblock_member_learning_url = function_exists( 'cbcommerce_member_home_url' 
 							<a class="course-card course-card-link <?php echo 0 === $codesblock_course_index ? 'featured' : ''; ?>" href="<?php the_permalink(); ?>">
 								<div class="course-card-inner static">
 									<div class="course-card-face course-card-front">
+										<?php if ( has_post_thumbnail() ) : ?>
+											<div class="course-card-image" style="margin: -16px -16px 12px; border-radius: 10px 10px 0 0; overflow: hidden; aspect-ratio: 16/9; flex-shrink: 0; background: #fff;">
+												<?php the_post_thumbnail( 'medium_large', array( 'style' => 'width: 100%; height: 100%; object-fit: contain; display: block;' ) ); ?>
+											</div>
+										<?php endif; ?>
 										<p class="tag"><?php echo esc_html( $codesblock_course_tag ); ?></p>
 										<h3><?php the_title(); ?></h3>
 										<p class="card-desc"><?php echo esc_html( wp_trim_words( $codesblock_course_summary, 18 ) ); ?></p>
@@ -418,24 +423,56 @@ $codesblock_member_learning_url = function_exists( 'cbcommerce_member_home_url' 
 				</div>
 
 				<nav class="practice-track-list" aria-label="Interview guide tracks">
-					<a class="practice-track-card" href="<?php echo esc_url( home_url( '/system-design-interview-45-minute-framework/' ) ); ?>">
-						<span>01 / System design</span>
-						<h3>Senior Engineer</h3>
-						<p>Architecture, tradeoffs, ownership, and debugging judgment.</p>
-						<strong>Open track <b aria-hidden="true">&rarr;</b></strong>
-					</a>
-					<a class="practice-track-card is-featured" href="<?php echo esc_url( home_url( '/courses/build-production-ready-ai-agents/' ) ); ?>">
-						<span>02 / Applied AI</span>
-						<h3>AI Engineering</h3>
-						<p>Agents, evaluation, data pipelines, and production tradeoffs.</p>
-						<strong>Open track <b aria-hidden="true">&rarr;</b></strong>
-					</a>
-					<a class="practice-track-card" href="<?php echo esc_url( home_url( '/senior-engineer-interview-stories/' ) ); ?>">
-						<span>03 / Leadership</span>
-						<h3>Engineering Manager</h3>
-						<p>Team building, conflict, delivery stories, and technical leadership.</p>
-						<strong>Open track <b aria-hidden="true">&rarr;</b></strong>
-					</a>
+					<?php
+					$codesblock_practice_courses = new WP_Query(
+						array(
+							'post_type'           => 'course',
+							'posts_per_page'      => 3,
+							'post_status'         => 'publish',
+							'ignore_sticky_posts' => true,
+							'orderby'             => 'date',
+							'order'               => 'DESC',
+						)
+					);
+
+					if ( $codesblock_practice_courses->have_posts() ) :
+						$practice_index = 1;
+						while ( $codesblock_practice_courses->have_posts() ) :
+							$codesblock_practice_courses->the_post();
+							$course_level = get_post_meta( get_the_ID(), '_course_level', true ) ?: 'All Levels';
+							$is_featured = $practice_index === 2 ? 'is-featured' : '';
+							?>
+							<a class="practice-track-card <?php echo esc_attr( $is_featured ); ?>" href="<?php the_permalink(); ?>">
+								<span><?php echo esc_html( sprintf( '%02d', $practice_index ) ); ?> / <?php echo esc_html( $course_level ); ?></span>
+								<h3><?php the_title(); ?></h3>
+								<p><?php echo esc_html( wp_trim_words( get_the_excerpt() ?: wp_strip_all_tags( get_the_content() ), 12 ) ); ?></p>
+								<strong>Open track <b aria-hidden="true">&rarr;</b></strong>
+							</a>
+							<?php
+							$practice_index++;
+						endwhile;
+						wp_reset_postdata();
+					else :
+					?>
+						<a class="practice-track-card" href="<?php echo esc_url( home_url( '/system-design-interview-45-minute-framework/' ) ); ?>">
+							<span>01 / System design</span>
+							<h3>Senior Engineer</h3>
+							<p>Architecture, tradeoffs, ownership, and debugging judgment.</p>
+							<strong>Open track <b aria-hidden="true">&rarr;</b></strong>
+						</a>
+						<a class="practice-track-card is-featured" href="<?php echo esc_url( home_url( '/courses/build-production-ready-ai-agents/' ) ); ?>">
+							<span>02 / Applied AI</span>
+							<h3>AI Engineering</h3>
+							<p>Agents, evaluation, data pipelines, and production tradeoffs.</p>
+							<strong>Open track <b aria-hidden="true">&rarr;</b></strong>
+						</a>
+						<a class="practice-track-card" href="<?php echo esc_url( home_url( '/senior-engineer-interview-stories/' ) ); ?>">
+							<span>03 / Leadership</span>
+							<h3>Engineering Manager</h3>
+							<p>Team building, conflict, delivery stories, and technical leadership.</p>
+							<strong>Open track <b aria-hidden="true">&rarr;</b></strong>
+						</a>
+					<?php endif; ?>
 				</nav>
 			</div>
 		</div>

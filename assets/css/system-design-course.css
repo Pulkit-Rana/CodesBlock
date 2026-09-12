@@ -166,6 +166,8 @@ body.single-course .course-sticky-card {
 	box-shadow: 0 28px 70px rgba(32, 59, 94, .14), 0 5px 18px rgba(32, 59, 94, .06);
 	position: relative;
 	top: auto;
+	overflow: hidden;
+	margin-top: -50px;
 }
 
 body.single-course .course-sticky-card::before {
@@ -178,7 +180,7 @@ body.single-course .course-sticky-card::before {
 }
 
 body.single-course .sticky-card-thumb {
-	aspect-ratio: 16 / 9;
+	aspect-ratio: 16 / 11;
 	background: #eef4fa;
 }
 

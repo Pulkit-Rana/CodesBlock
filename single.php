@@ -109,8 +109,8 @@ function codesblock_prepare_article_content( $content ) {
 				'post_status'         => 'publish',
 				'post__not_in'        => array( get_the_ID() ),
 				'ignore_sticky_posts' => true,
-				'orderby'             => 'date',
-				'order'               => 'DESC',
+				'meta_key'            => '_cbcore_views',
+				'orderby'             => array( 'meta_value_num' => 'DESC', 'date' => 'DESC' ),
 			)
 		);
 		?>
@@ -134,6 +134,9 @@ function codesblock_prepare_article_content( $content ) {
 					?>
 					<h1><?php the_title(); ?></h1>
 					<p class="article-meta"><?php echo esc_html( implode( ' · ', $article_meta ) ); ?></p>
+					<?php if ( function_exists( 'cbcore_render_engagement_summary' ) ) : ?>
+						<?php cbcore_render_engagement_summary( get_the_ID() ); ?>
+					<?php endif; ?>
 				</div>
 			</header>
 
@@ -186,6 +189,10 @@ function codesblock_prepare_article_content( $content ) {
 						<div class="article-content">
 							<?php echo $prepared['content']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						</div>
+					<?php endif; ?>
+
+					<?php if ( function_exists( 'cbcore_render_engagement_controls' ) ) : ?>
+						<?php cbcore_render_engagement_controls( get_the_ID() ); ?>
 					<?php endif; ?>
 				</div>
 

@@ -4506,3 +4506,79 @@ body.single-course .course-share-linkedin {
 		font-size: .8rem;
 	}
 }
+
+/* Floating Animation for Sketch Cards */
+@keyframes sketchFloat {
+	0% { transform: translateY(0px) rotate(var(--sk-rot, 0deg)); }
+	50% { transform: translateY(-8px) rotate(calc(var(--sk-rot, 0deg) + 1deg)); }
+	100% { transform: translateY(0px) rotate(var(--sk-rot, 0deg)); }
+}
+
+@keyframes sketchPulse {
+	0% { box-shadow: inset 0 1.5px 1px #fff, inset 0 -1px 1px rgba(0, 0, 0, 0.03), 0 18px 45px rgba(16, 24, 40, 0.1); }
+	50% { box-shadow: inset 0 2px 2px #fff, inset 0 -1px 1px rgba(0, 0, 0, 0.05), 0 25px 60px rgba(37, 99, 235, 0.15); }
+	100% { box-shadow: inset 0 1.5px 1px #fff, inset 0 -1px 1px rgba(0, 0, 0, 0.03), 0 18px 45px rgba(16, 24, 40, 0.1); }
+}
+
+.sketch-card.lesson-card {
+	--sk-rot: 0deg;
+	animation: sketchFloat 6s ease-in-out infinite, sketchPulse 6s ease-in-out infinite;
+}
+
+.sketch-card.quiz-card {
+	--sk-rot: 0deg;
+	animation: sketchFloat 7s ease-in-out infinite alternate, sketchPulse 7s ease-in-out infinite alternate;
+	animation-delay: 1s;
+}
+
+.sketch-card.code-card {
+	--sk-rot: -1deg;
+	animation: sketchFloat 8s ease-in-out infinite, sketchPulse 8s ease-in-out infinite;
+	animation-delay: 2s;
+}
+
+.sketch-card.extra-card {
+	--sk-rot: 1.5deg;
+	animation: sketchFloat 6.5s ease-in-out infinite alternate, sketchPulse 6.5s ease-in-out infinite alternate;
+	animation-delay: 0.5s;
+}
+
+
+/* Mesmerising Hero Background */
+.hero {
+	position: relative;
+	overflow: visible;
+}
+.hero::before {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 800px;
+	height: 800px;
+	background: radial-gradient(circle, rgba(37,99,235,0.15) 0%, rgba(147,197,253,0.05) 40%, transparent 70%);
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+	z-index: -1;
+	animation: pulseOrb 12s infinite alternate ease-in-out;
+}
+@keyframes pulseOrb {
+	0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+	100% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+}
+
+
+/* Dynamic Mesmerising Hero Background Override */
+.hero {
+	background: linear-gradient(-45deg, #f7fbff, #eef8ff, #e0f2fe, #f0fdf4);
+	background-size: 400% 400%;
+	animation: heroGradient 15s ease infinite;
+	overflow: hidden;
+}
+
+@keyframes heroGradient {
+	0% { background-position: 0% 50%; }
+	50% { background-position: 100% 50%; }
+	100% { background-position: 0% 50%; }
+}
+
