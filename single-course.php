@@ -357,8 +357,12 @@ if ( $is_system_design_course ) {
 
 				<section class="course-section course-about-preview" aria-labelledby="about-heading">
 					<p class="eyebrow"><?php esc_html_e( 'About this course', 'codesblock' ); ?></p>
-					<h2 id="about-heading"><?php esc_html_e( 'Build a system design answer you can explain, draw, and defend.', 'codesblock' ); ?></h2>
-					<p><?php echo esc_html( $ai_summary ); ?></p>
+					<h2 id="about-heading"><?php esc_html_e( 'Crack the interview. Build the system.', 'codesblock' ); ?></h2>
+					<?php if ( $is_system_design_course ) : ?>
+						<p><?php esc_html_e( 'Master real-world interview questions, understand the latest architectural trends, and see how AI is reshaping modern system designs.', 'codesblock' ); ?></p>
+					<?php else : ?>
+						<p><?php echo esc_html( $ai_summary ); ?></p>
+					<?php endif; ?>
 					<?php if ( $is_system_design_course ) : ?>
 						<div class="course-lab-stats" aria-label="<?php esc_attr_e( 'Course at a glance', 'codesblock' ); ?>">
 							<span><strong>12</strong><?php esc_html_e( 'modules', 'codesblock' ); ?></span>
