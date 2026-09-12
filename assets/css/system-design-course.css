@@ -67,32 +67,52 @@ body.single-course .advanced-meta {
 	flex-wrap: wrap;
 	gap: 12px 24px;
 	margin-top: 14px;
-	padding: 12px 18px;
-	background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.4));
-	backdrop-filter: blur(12px);
-	border: 1px solid rgba(255, 255, 255, 0.6);
-	border-radius: 12px;
-	box-shadow: 0 4px 15px rgba(16, 24, 40, 0.05);
+	padding: 0;
+	background: transparent;
 }
 
-body.single-course .advanced-meta span {
+body.single-course .advanced-meta > span {
 	align-items: center;
-	color: var(--sd-muted);
-	display: inline-flex;
-	font-size: 0.85rem;
-	font-weight: 500;
-	gap: 6px;
-}
-
-body.single-course .advanced-meta strong {
 	color: var(--sd-ink);
-	font-weight: 600;
+	display: inline-flex;
+	font-size: 0.95rem;
+	font-weight: 400;
+	gap: 8px;
 }
 
 body.single-course .advanced-meta svg:not([fill="currentColor"]) {
-	color: var(--sd-blue);
-	width: 16px;
-	height: 16px;
+	color: #4f46e5;
+	width: 17px;
+	height: 17px;
+	stroke-width: 1.8;
+}
+
+/* Pulse animation for active users counter */
+body.single-course .advanced-meta .pulse-dot {
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	background-color: #10b981;
+	border-radius: 50%;
+	position: relative;
+	margin-right: 4px;
+}
+
+body.single-course .advanced-meta .pulse-dot::after {
+	content: '';
+	position: absolute;
+	top: -2px;
+	left: -2px;
+	width: 14px;
+	height: 14px;
+	background-color: #10b981;
+	border-radius: 50%;
+	animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+@keyframes pulse-ring {
+	0% { transform: scale(1); opacity: 0.8; }
+	100% { transform: scale(2.4); opacity: 0; }
 }
 
 body.single-course .course-hero-content h1 {
