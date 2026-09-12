@@ -25,8 +25,9 @@ $is_system_design_course = in_array( get_post_field( 'post_name', $post_id ), ar
 $lessons_array   = function_exists( 'cbcore_get_course_lessons' ) ? cbcore_get_course_lessons( $post_id ) : array();
 $lesson_count    = count( $lessons_array ) > 0 ? count( $lessons_array ) : 206;
 $mock_interviews = get_post_meta( $post_id, '_course_mock_interviews', true ) ?: 8;
-$course_rating   = get_post_meta( $post_id, '_course_rating', true ) ?: '4.7';
-$users_learning  = get_post_meta( $post_id, '_course_users_learning', true ) ?: ( 4000 + ( $post_id * 3 ) );
+$course_metrics  = function_exists( 'cbcore_get_engagement_metrics' ) ? cbcore_get_engagement_metrics( $post_id ) : array( 'views' => 0, 'rating_average' => 0, 'rating_count' => 0 );
+$course_rating   = ! empty( $course_metrics['rating_count'] ) ? number_format_i18n( $course_metrics['rating_average'], 1 ) : __( 'New', 'codesblock' );
+$users_learning  = function_exists( 'cbcore_get_course_learners_count' ) ? cbcore_get_course_learners_count( $post_id ) : 0;
 
 /* ── User access check ──────────────────────────────────────────
    If Paid Memberships Pro is active, check membership.
@@ -99,18 +100,25 @@ if ( $is_system_design_course ) {
 					<?php endif; ?>
 
 					<h1><?php the_title(); ?></h1>
-					<p class="course-subtitle"><?php echo esc_html( get_the_excerpt() ); ?></p>
+					<?php if ( $is_system_design_course ) : ?>
+						<p class="course-subtitle"><?php esc_html_e( 'Prepare for the System Design Interview by learning how to design scalable, reliable, and high-performance systems from the ground up. Master the frameworks and patterns behind real-world architectures, practice common system design interview questions, and learn to reason through trade-offs with confidence. Then take it further with modern system design—from distributed systems and event-driven architectures to RAG, AI agents, tool calling, vector databases, and the infrastructure powering today’s AI applications.', 'codesblock' ); ?></p>
+					<?php else : ?>
+						<p class="course-subtitle"><?php echo esc_html( get_the_excerpt() ); ?></p>
+					<?php endif; ?>
 
 					<div class="course-hero-meta advanced-meta">
-						<span class="meta-rating" title="<?php echo esc_attr( $course_rating ); ?> out of 5 stars">
-							<span class="stars" aria-hidden="true" style="display:flex; align-items:center; gap:2px; color:#f59e0b;">
-								<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+						<span class="meta-rating" title="<?php echo esc_attr( ! empty( $course_metrics['rating_count'] ) ? sprintf( __( '%s out of 5 stars', 'codesblock' ), $course_rating ) : __( 'No ratings yet', 'codesblock' ) ); ?>">
 								<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
 								<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
 								<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
 								<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
 							</span>
 							<span><?php echo esc_html( $course_rating ); ?></span>
+							<?php if ( ! empty( $course_metrics['rating_count'] ) ) : ?><small>(<?php echo esc_html( number_format_i18n( $course_metrics['rating_count'] ) ); ?>)</small><?php endif; ?>
+						</span>
+						<span class="meta-views" title="<?php esc_attr_e( 'Unique course views', 'codesblock' ); ?>">
+							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
+							<span><?php echo esc_html( number_format_i18n( $course_metrics['views'] ) ); ?> <?php esc_html_e( 'views', 'codesblock' ); ?></span>
 						</span>
 						<span class="meta-lessons">
 							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
@@ -398,7 +406,7 @@ if ( $is_system_design_course ) {
 					<p class="eyebrow"><?php esc_html_e( 'About this course', 'codesblock' ); ?></p>
 					<h2 id="about-heading"><?php esc_html_e( 'Crack the interview. Build the system.', 'codesblock' ); ?></h2>
 					<?php if ( $is_system_design_course ) : ?>
-						<p><?php esc_html_e( 'Master real-world interview questions, understand the latest architectural trends, and see how AI is reshaping modern system designs.', 'codesblock' ); ?></p>
+						<p><?php esc_html_e( 'Prepare for the System Design Interview by learning how to design scalable, reliable, and high-performance systems from the ground up. Master the frameworks and patterns behind real-world architectures, practice common system design interview questions, and learn to reason through trade-offs with confidence. Then take it further with modern system design—from distributed systems and event-driven architectures to RAG, AI agents, tool calling, vector databases, and the infrastructure powering today’s AI applications.', 'codesblock' ); ?></p>
 					<?php else : ?>
 						<p><?php echo esc_html( $ai_summary ); ?></p>
 					<?php endif; ?>

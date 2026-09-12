@@ -113,7 +113,7 @@ get_header();
 							<!-- Thumbnail -->
 							<a href="<?php the_permalink(); ?>" class="course-thumb" aria-label="<?php the_title_attribute(); ?>" tabindex="-1">
 								<?php if ( has_post_thumbnail() ) : ?>
-									<?php the_post_thumbnail( 'medium_large' ); ?>
+									<?php the_post_thumbnail( 'medium_large', array( 'style' => 'object-fit: contain; background: #fff; width: 100%; height: 100%;' ) ); ?>
 								<?php elseif ( in_array( get_post_field( 'post_name', get_the_ID() ), array( 'system-design-interview-sprint', 'system-design-interview-lab' ), true ) ) : ?>
 									<img class="system-design-cover" src="<?php echo esc_url( get_theme_file_uri( '/assets/images/system-design-interview-lab-cover.svg' ) ); ?>" alt="" loading="lazy" decoding="async">
 								<?php else : ?>

@@ -156,6 +156,9 @@ $course_query = new WP_Query(
 										<?php if ( 0 === $index || in_array( $index, array( 1, 2, 3, 4, 5 ), true ) ) : ?>
 											<p><?php echo esc_html( wp_trim_words( get_the_excerpt(), 22 ) ); ?></p>
 										<?php endif; ?>
+										<?php if ( function_exists( 'cbcore_render_engagement_summary' ) ) : ?>
+											<?php cbcore_render_engagement_summary( get_the_ID(), 'compact' ); ?>
+										<?php endif; ?>
 									</div>
 								</a>
 							</article>

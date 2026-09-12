@@ -219,3 +219,51 @@
 	});
 
 }());
+
+	/* ── Live Counters Animation ── */
+	function animateCounter(el, start, end, duration) {
+		var range = end - start;
+		var current = start;
+		var increment = end > start ? 1 : -1;
+		var stepTime = Math.abs(Math.floor(duration / range));
+		if (stepTime < 10) stepTime = 10;
+		var timer = setInterval(function() {
+			current += increment;
+			el.textContent = current;
+			if (current == end) {
+				clearInterval(timer);
+			}
+		}, stepTime);
+	}
+
+	function fetchLiveCounters() {
+		var courseCounter = document.getElementById('cb-course-counter');
+		var articleCounter = document.getElementById('cb-article-counter');
+		var learnerCounter = document.getElementById('cb-learner-counter');
+		
+		if (!courseCounter || !articleCounter || !learnerCounter) return;
+
+		fetch('/wp-json/codesblock/v1/stats')
+			.then(response => response.json())
+			.then(data => {
+				var courses = parseInt(data.courses, 10);
+				var articles = parseInt(data.articles, 10);
+				var learners = parseInt(data.learners, 10);
+
+				var currentCourses = parseInt(courseCounter.textContent, 10) || 0;
+				var currentArticles = parseInt(articleCounter.textContent, 10) || 0;
+				var currentLearners = parseInt(learnerCounter.textContent, 10) || 0;
+
+				if (courses !== currentCourses) animateCounter(courseCounter, currentCourses, courses, 1500);
+				if (articles !== currentArticles) animateCounter(articleCounter, currentArticles, articles, 1500);
+				if (learners !== currentLearners) animateCounter(learnerCounter, currentLearners, learners, 1500);
+			})
+			.catch(err => console.error('Error fetching live stats:', err));
+	}
+
+	// Fetch on load and set interval for live updates every 30 seconds
+	if (document.getElementById('cb-course-counter')) {
+		fetchLiveCounters();
+		setInterval(fetchLiveCounters, 30000);
+	}
+
