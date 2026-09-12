@@ -1,0 +1,9 @@
+# Protect deployment metadata even if the enclosing WordPress rules change.
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule (^|/)\.git(/|$) - [F,L]
+RewriteRule (^|/)\.github(/|$) - [F,L]
+</IfModule>
+<FilesMatch "(?i)^(DEPLOYMENT\.md|.*\.(sql|log|bak))$">
+Require all denied
+</FilesMatch>

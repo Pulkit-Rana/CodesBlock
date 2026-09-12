@@ -32,13 +32,17 @@ add_action( 'after_setup_theme', 'codesblock_setup' );
 function codesblock_assets() {
 	$main_css_path   = get_template_directory() . '/assets/css/main.css';
 	$member_css_path = get_template_directory() . '/assets/css/member.css';
+	$account_css_path = get_template_directory() . '/assets/css/member-dashboard.css';
 	$polish_css_path = get_template_directory() . '/assets/css/polish.css';
 	$main_js_path    = get_template_directory() . '/assets/js/main.js';
 	$member_js_path  = get_template_directory() . '/assets/js/member.js';
-	wp_enqueue_style( 'codesblock-fonts', 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap', array(), null );
+	wp_enqueue_style( 'codesblock-fonts', 'https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap', array(), null );
 	wp_enqueue_style( 'codesblock-main', get_template_directory_uri() . '/assets/css/main.css', array(), file_exists( $main_css_path ) ? (string) filemtime( $main_css_path ) : '2.0.0' );
 	wp_enqueue_style( 'codesblock-member', get_template_directory_uri() . '/assets/css/member.css', array( 'codesblock-main' ), file_exists( $member_css_path ) ? (string) filemtime( $member_css_path ) : '1.1.0' );
 	wp_enqueue_style( 'codesblock-polish', get_template_directory_uri() . '/assets/css/polish.css', array( 'codesblock-main', 'codesblock-member' ), file_exists( $polish_css_path ) ? (string) filemtime( $polish_css_path ) : '2.0.0' );
+	if ( is_page_template( 'page-my-learning.php' ) ) {
+		wp_enqueue_style( 'codesblock-member-dashboard', get_template_directory_uri() . '/assets/css/member-dashboard.css', array( 'codesblock-polish' ), file_exists( $account_css_path ) ? (string) filemtime( $account_css_path ) : '1.0.0' );
+	}
 	wp_enqueue_script( 'codesblock-main', get_template_directory_uri() . '/assets/js/main.js', array(), file_exists( $main_js_path ) ? (string) filemtime( $main_js_path ) : '2.0.0', true );
 	wp_enqueue_script( 'codesblock-member', get_template_directory_uri() . '/assets/js/member.js', array( 'codesblock-main' ), file_exists( $member_js_path ) ? (string) filemtime( $member_js_path ) : '1.1.0', true );
 	wp_localize_script(
@@ -59,6 +63,7 @@ function codesblock_course_portal_assets() {
 	$is_course = is_singular( 'course' ) || is_post_type_archive( 'course' );
 	$is_premium_post = is_singular( 'post' ) && (bool) get_post_meta( get_the_ID(), '_codesblock_premium', true );
 	$course_css_path = get_template_directory() . '/assets/css/course-portal.css';
+	$system_design_css_path = get_template_directory() . '/assets/css/system-design-course.css';
 	$course_js_path  = get_template_directory() . '/assets/js/course-portal.js';
 
 	if ( ! $is_course && ! $is_premium_post ) {
@@ -71,6 +76,15 @@ function codesblock_course_portal_assets() {
 		array( 'codesblock-main' ),
 		file_exists( $course_css_path ) ? (string) filemtime( $course_css_path ) : '2.0.0'
 	);
+
+	if ( is_singular( 'course' ) && in_array( get_post_field( 'post_name', get_the_ID() ), array( 'system-design-interview-sprint', 'system-design-interview-lab' ), true ) ) {
+		wp_enqueue_style(
+			'codesblock-system-design-course',
+			get_template_directory_uri() . '/assets/css/system-design-course.css',
+			array( 'codesblock-course-portal', 'codesblock-polish' ),
+			file_exists( $system_design_css_path ) ? (string) filemtime( $system_design_css_path ) : '1.0.0'
+		);
+	}
 
 	wp_enqueue_script(
 		'codesblock-course-portal',
@@ -95,11 +109,111 @@ function codesblock_course_portal_assets() {
 				'summary'     => $user_can_access ? wp_strip_all_tags( get_post_meta( $post_id, '_course_ai_summary', true ) ?: get_the_excerpt() ) : '',
 				'faqs'        => is_array( $ai_faqs ) ? $ai_faqs : array(),
 				'canUseGuide' => $user_can_access,
+				'startCourseOnLoad' => $user_can_access && is_user_logged_in() && absint( isset( $_GET['cb_course_start'] ) ? $_GET['cb_course_start'] : 0 ) === $post_id,
 			)
 		);
 	}
 }
 add_action( 'wp_enqueue_scripts', 'codesblock_course_portal_assets' );
+
+/**
+ * Load the course map only inside the lesson-reading experience.
+ */
+function codesblock_course_learning_assets() {
+	if ( ! is_singular( 'course_lesson' ) ) {
+		return;
+	}
+
+	$learning_css_path = get_template_directory() . '/assets/css/course-learning.css';
+	$learning_js_path  = get_template_directory() . '/assets/js/course-learning.js';
+
+	wp_enqueue_style(
+		'codesblock-course-learning',
+		get_template_directory_uri() . '/assets/css/course-learning.css',
+		array( 'codesblock-polish' ),
+		file_exists( $learning_css_path ) ? (string) filemtime( $learning_css_path ) : '1.0.0'
+	);
+
+	wp_enqueue_script(
+		'codesblock-course-learning',
+		get_template_directory_uri() . '/assets/js/course-learning.js',
+		array(),
+		file_exists( $learning_js_path ) ? (string) filemtime( $learning_js_path ) : '1.0.0',
+		true
+	);
+}
+add_action( 'wp_enqueue_scripts', 'codesblock_course_learning_assets' );
+
+/**
+ * Keep the shared reading scale last in the cascade on every front-end view.
+ */
+function codesblock_typography_assets() {
+	$typography_css_path = get_template_directory() . '/assets/css/typography.css';
+	$responsive_css_path = get_template_directory() . '/assets/css/responsive.css';
+	$dependencies        = array( 'codesblock-polish' );
+
+	foreach ( array( 'codesblock-course-portal', 'codesblock-system-design-course', 'codesblock-course-learning' ) as $style_handle ) {
+		if ( wp_style_is( $style_handle, 'enqueued' ) ) {
+			$dependencies[] = $style_handle;
+		}
+	}
+
+	wp_enqueue_style(
+		'codesblock-typography',
+		get_template_directory_uri() . '/assets/css/typography.css',
+		$dependencies,
+		file_exists( $typography_css_path ) ? (string) filemtime( $typography_css_path ) : '1.0.0'
+	);
+
+	wp_enqueue_style(
+		'codesblock-responsive',
+		get_template_directory_uri() . '/assets/css/responsive.css',
+		array( 'codesblock-typography' ),
+		file_exists( $responsive_css_path ) ? (string) filemtime( $responsive_css_path ) : '1.0.0'
+	);
+}
+add_action( 'wp_enqueue_scripts', 'codesblock_typography_assets', 99 );
+
+/**
+ * Convert the editable "## Module" / "- Lesson" curriculum into a course tree.
+ *
+ * @param int $course_id Course post ID.
+ * @return array<int, array{title:string,lessons:array<int,string>}>
+ */
+function codesblock_get_course_outline( $course_id ) {
+	$syllabus = (string) get_post_meta( absint( $course_id ), '_course_syllabus', true );
+	$modules  = array();
+	$current  = -1;
+
+	foreach ( preg_split( '/\R/', $syllabus ) as $raw_line ) {
+		$line = trim( $raw_line );
+		if ( '' === $line ) {
+			continue;
+		}
+
+		if ( 0 === strpos( $line, '##' ) ) {
+			$modules[] = array(
+				'title'   => trim( substr( $line, 2 ) ),
+				'lessons' => array(),
+			);
+			$current = count( $modules ) - 1;
+			continue;
+		}
+
+		if ( 0 === strpos( $line, '-' ) ) {
+			if ( $current < 0 ) {
+				$modules[] = array(
+					'title'   => __( 'Course lessons', 'codesblock' ),
+					'lessons' => array(),
+				);
+				$current = 0;
+			}
+			$modules[ $current ]['lessons'][] = trim( substr( $line, 1 ) );
+		}
+	}
+
+	return $modules;
+}
 
 /**
  * Add conservative browser protections that do not interfere with checkout,
@@ -111,6 +225,8 @@ function codesblock_security_headers() {
 	}
 
 	header( 'X-Content-Type-Options: nosniff' );
+	header( 'X-Frame-Options: SAMEORIGIN' );
+	header( "Content-Security-Policy: frame-ancestors 'self'" );
 	header( 'Referrer-Policy: strict-origin-when-cross-origin' );
 	header( 'Permissions-Policy: camera=(), microphone=(), geolocation=()' );
 }
@@ -166,7 +282,7 @@ function codesblock_sanitize_promo_url( $url ) {
 		return $url;
 	}
 
-	if ( str_starts_with( $url, '/' ) && ! str_starts_with( $url, '//' ) ) {
+	if ( 0 === strpos( $url, '/' ) && 0 !== strpos( $url, '//' ) ) {
 		return esc_url_raw( $url );
 	}
 
@@ -734,10 +850,10 @@ function codesblock_customize_register( $wp_customize ) {
 			array(
 				'label'           => $field['label'],
 				'description'     => $field['description'] ?? '',
-				'section'         => str_starts_with( $setting_id, 'codesblock_promo_' ) ? 'codesblock_announcement' : 'codesblock_homepage',
+				'section'         => 0 === strpos( $setting_id, 'codesblock_promo_' ) ? 'codesblock_announcement' : 'codesblock_homepage',
 				'type'            => $field['type'],
 				'input_attrs'     => $field['input_attrs'] ?? array(),
-				'active_callback' => str_starts_with( $setting_id, 'codesblock_promo_' ) ? 'codesblock_customize_promo_is_custom' : '__return_true',
+				'active_callback' => 0 === strpos( $setting_id, 'codesblock_promo_' ) ? 'codesblock_customize_promo_is_custom' : '__return_true',
 			)
 		);
 	}
@@ -885,6 +1001,7 @@ function codesblock_filter_nav_menu_css_class( $classes, $item ) {
 	$item_url      = isset( $item->url ) ? (string) $item->url : '';
 	$item_path     = (string) wp_parse_url( $item_url, PHP_URL_PATH );
 	$item_fragment = (string) wp_parse_url( $item_url, PHP_URL_FRAGMENT );
+	$item_title    = isset( $item->title ) ? strtolower( trim( wp_strip_all_tags( $item->title ) ) ) : '';
 	$item_path = rtrim( $item_path, '/' );
 	if ( '' === $item_path ) {
 		$item_path = '/';
@@ -902,6 +1019,10 @@ function codesblock_filter_nav_menu_css_class( $classes, $item ) {
 		$classes[] = 'current-menu-item';
 	} elseif ( $is_articles_context && ( '/articles' === $item_path || '/blog' === $item_path ) ) {
 		$classes[] = 'current-menu-item';
+	}
+
+	if ( 'start' === $item_fragment || 'start here' === $item_title ) {
+		$classes[] = 'menu-item-start-here';
 	}
 
 	return array_unique( $classes );

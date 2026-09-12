@@ -1,0 +1,285 @@
+/**
+ * CodesBlock typography system.
+ *
+ * Loaded after every feature stylesheet so the reading scale stays consistent
+ * across the homepage, articles, courses, lessons, account screens and dialogs.
+ */
+
+:root {
+	--font-body: "Source Sans 3", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	--font-heading: "Source Sans 3", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	--type-display: clamp(2.55rem, 4vw, 3.05rem);
+	--type-page-title: clamp(2.2rem, 3.4vw, 2.65rem);
+	--type-section-title: clamp(1.7rem, 2.5vw, 2.05rem);
+	--type-content-title: clamp(1.48rem, 2vw, 1.75rem);
+	--type-card-title: 1.125rem;
+	--type-body: 1rem;
+	--type-body-small: .9rem;
+	--type-label: .78rem;
+}
+
+html {
+	font-size: 106.25%;
+}
+
+body {
+	font-family: var(--font-body);
+	font-size: var(--type-body);
+	line-height: 1.6;
+	text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select,
+textarea {
+	font-family: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: var(--font-heading);
+	font-weight: 600;
+	letter-spacing: -.018em;
+	text-wrap: balance;
+}
+
+p,
+li {
+	text-wrap: pretty;
+}
+
+/* Display titles are noticeable without dominating the page. */
+.hero-copy h1 {
+	/* The brand hero gets a small presence boost without changing page titles. */
+	font-size: clamp(2.45rem, 4.2vw, 3.2rem) !important;
+	letter-spacing: -.035em !important;
+	line-height: 1.04 !important;
+}
+
+.articles-hero h1,
+.archive-hero h1,
+.article-header h1,
+.article-reading-header h1,
+.dashboard-intro h1,
+.course-archive-hero h1,
+.course-hero-content h1,
+.cb-lesson-hero h1,
+.social-login-box h1 {
+	font-size: var(--type-page-title) !important;
+	letter-spacing: -.03em !important;
+	line-height: 1.1 !important;
+}
+
+/* Primary section headings share one restrained level. */
+.section-heading h2,
+.article-section h2,
+.practice-header h2,
+.course-pricing-heading h2,
+.sd-showcase-heading h2,
+.cb-learning-heading h2,
+.newsletter-strip h2 {
+	font-size: var(--type-section-title) !important;
+	line-height: 1.18 !important;
+}
+
+.courses-h2,
+.course-section h2,
+.course-section-heading h2,
+.article-content h2,
+.article-reading-layout .article-content h2,
+.cb-lesson-content h2,
+.cb-member-hero h2,
+.cb-plan-heading h2,
+.cb-plan-heading h3,
+.cb-auth-heading h2,
+.paywall-modal-header h2,
+.content-gate-overlay h3 {
+	font-size: var(--type-content-title) !important;
+	line-height: 1.25 !important;
+}
+
+.hero-sketch h2 {
+	font-size: var(--type-content-title) !important;
+	line-height: 1.2 !important;
+}
+
+.practice-prompt h3 {
+	font-size: clamp(1.25rem, 1.8vw, 1.5rem) !important;
+	line-height: 1.25 !important;
+}
+
+.course-card h3,
+.course-card-v2 h2,
+.post-card h3,
+.practice-track-card h3,
+.sd-case-card h3,
+.cb-lesson-content h3,
+.article-reading-layout .article-content h3 {
+	font-size: var(--type-card-title) !important;
+	line-height: 1.35 !important;
+}
+
+/* Reading text remains comfortable and predictable across long-form surfaces. */
+.article-content,
+.article-reading-layout .article-content,
+.cb-lesson-content {
+	font-size: var(--type-body) !important;
+	line-height: 1.7;
+}
+
+.article-content p,
+.article-content li,
+.article-reading-layout .article-content p,
+.article-reading-layout .article-content li,
+.cb-lesson-content p,
+.cb-lesson-content li {
+	font-size: inherit !important;
+	line-height: inherit;
+}
+
+.article-content > :where(p, ul, ol, blockquote),
+.article-reading-layout .article-content > :where(p, ul, ol, blockquote),
+.cb-lesson-content > :where(p, ul, ol, blockquote) {
+	max-width: 72ch;
+}
+
+.hero-lede,
+.articles-hero p,
+.archive-hero p,
+.course-subtitle,
+.cb-lesson-intro,
+.section-heading p:not(.eyebrow),
+.practice-lede {
+	font-size: clamp(1rem, 1.2vw, 1.08rem) !important;
+	line-height: 1.65 !important;
+}
+
+.eyebrow,
+.course-eyebrow,
+.course-badge-hero,
+.cb-lesson-kicker {
+	font-size: var(--type-label) !important;
+	line-height: 1.3 !important;
+}
+
+/* Keep navigation, actions, cards and metadata above the former micro-type. */
+.primary-nav .menu a {
+	font-size: .875rem !important;
+}
+
+.header-link,
+.header-button,
+.button,
+.btn-enroll,
+.btn-view-course,
+.explore-courses-btn {
+	font-size: .875rem !important;
+}
+
+.hero-search-form input,
+.hero-search-form button {
+	font-size: .9rem !important;
+}
+
+.keyword-picker :where(span, a) {
+	font-size: .8125rem !important;
+}
+
+.strip-grid p,
+.practice-track-card p,
+.course-card .card-desc {
+	font-size: .875rem !important;
+	line-height: 1.55 !important;
+}
+
+.strip-grid > * > span,
+.practice-track-card > span,
+.course-card .tag,
+.course-card .course-meta span,
+.course-card .card-enrolled,
+.course-card .card-price,
+.post-date {
+	font-size: .75rem !important;
+	line-height: 1.4 !important;
+}
+
+.practice-track-card strong,
+.course-card .course-card-cta {
+	font-size: .8125rem !important;
+}
+
+.course-section-heading > p:not(.eyebrow),
+.sd-showcase-heading > p {
+	font-size: 1rem !important;
+	line-height: 1.65 !important;
+}
+
+.course-jump-nav a {
+	font-size: .8125rem !important;
+}
+
+.ai-learning-answer p,
+.course-level-grid article p,
+.course-start-card > p,
+.course-utility-card > p {
+	font-size: .9375rem !important;
+	line-height: 1.6 !important;
+}
+
+.ai-integration-note {
+	font-size: .8125rem !important;
+	line-height: 1.55 !important;
+}
+
+/* Diagram labels stay compact, but no longer read like fine print. */
+.sd-hero-visual figcaption span { font-size: .65rem !important; }
+.sd-hero-visual figcaption strong { font-size: .8rem !important; }
+.sd-board-toolbar { font-size: .75rem !important; }
+.sd-board-note small { font-size: .68rem !important; }
+.sd-board-note strong { font-size: .9rem !important; }
+.sd-board-note span { font-size: .75rem !important; }
+.sd-node-icon { font-size: .7rem !important; }
+.sd-node strong { font-size: .8rem !important; }
+.sd-node small { font-size: .7rem !important; }
+.sd-board-branches strong { font-size: .78rem !important; }
+.sd-board-branches small { font-size: .68rem !important; }
+.sd-request-board figcaption strong { font-size: .85rem !important; }
+.sd-request-board figcaption span { font-size: .75rem !important; }
+.sd-case-meta span,
+.sd-case-meta small { font-size: .68rem !important; }
+.sd-case-card p { font-size: .85rem !important; }
+.sd-mini-diagram b,
+.sd-ai-diagram b { font-size: .65rem !important; }
+.sd-mini-diagram i,
+.sd-ai-diagram i { font-size: .75rem !important; }
+.sd-lock-diagram span { font-size: .68rem !important; }
+.sd-lock-diagram b { font-size: .7rem !important; }
+.sd-lock-diagram small { font-size: .6rem !important; }
+.sd-case-card footer span { font-size: .68rem !important; }
+.sd-method-strip span { font-size: .65rem !important; }
+.sd-method-strip strong { font-size: .85rem !important; }
+.sd-method-strip small { font-size: .68rem !important; }
+
+@media (max-width: 760px) {
+	:root {
+		--type-display: clamp(2.3rem, 10vw, 2.65rem);
+		--type-page-title: clamp(2.1rem, 8.5vw, 2.4rem);
+		--type-section-title: clamp(1.6rem, 6.5vw, 1.85rem);
+		--type-content-title: clamp(1.45rem, 5.5vw, 1.65rem);
+	}
+
+	.hero-lede,
+	.articles-hero p,
+	.archive-hero p,
+	.course-subtitle,
+	.cb-lesson-intro,
+	.section-heading p:not(.eyebrow),
+	.practice-lede {
+		font-size: 1rem !important;
+	}
+}

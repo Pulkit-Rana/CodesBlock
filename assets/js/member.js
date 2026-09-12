@@ -4,12 +4,17 @@
 	var config = window.cbMemberData || {};
 	var authOverlay = document.getElementById('member-overlay');
 	var purchaseOverlay = document.getElementById('paywall-overlay');
+	var courseAuthOverlay = document.getElementById('course-auth-overlay');
 	var activeOverlay = null;
 	var lastFocused = null;
 
 	function setView(view, focusField) {
 		if (!authOverlay) return;
 		view = view === 'signin' ? 'signin' : 'register';
+		var heading = authOverlay.querySelector('#member-title');
+		var description = authOverlay.querySelector('#member-description');
+		if (heading) heading.textContent = heading.getAttribute('data-' + view + '-title') || heading.textContent;
+		if (description) description.textContent = description.getAttribute('data-' + view + '-description') || description.textContent;
 
 		authOverlay.querySelectorAll('[data-member-view]').forEach(function (tab) {
 			var active = tab.getAttribute('data-member-view') === view;
@@ -67,7 +72,7 @@
 		hideOverlay(overlay);
 		if (activeOverlay === overlay) activeOverlay = null;
 
-		if ((!authOverlay || authOverlay.hidden) && (!purchaseOverlay || purchaseOverlay.hidden)) {
+		if ((!authOverlay || authOverlay.hidden) && (!purchaseOverlay || purchaseOverlay.hidden) && (!courseAuthOverlay || courseAuthOverlay.hidden)) {
 			document.body.classList.remove('cb-modal-open');
 		}
 
@@ -160,16 +165,18 @@
 
 	bindTriggers('.js-open-member', authOverlay, 'register');
 	bindTriggers('.js-open-paywall', purchaseOverlay, '');
+	bindTriggers('.js-open-course-auth', courseAuthOverlay, '');
 	bindOverlay(authOverlay);
 	bindOverlay(purchaseOverlay);
+	bindOverlay(courseAuthOverlay);
 
 	/* Keep access CTAs reliable when a course template or later script adds them after this file runs. */
 	document.addEventListener('click', function (event) {
 		var target = event.target;
-		var trigger = target && target.closest ? target.closest('.js-open-member, .js-open-paywall') : null;
+		var trigger = target && target.closest ? target.closest('.js-open-member, .js-open-paywall, .js-open-course-auth') : null;
 		if (!trigger) return;
 
-		var overlay = trigger.classList.contains('js-open-member') ? authOverlay : purchaseOverlay;
+		var overlay = trigger.classList.contains('js-open-member') ? authOverlay : (trigger.classList.contains('js-open-paywall') ? purchaseOverlay : courseAuthOverlay);
 		if (!overlay || !overlay.hidden) return;
 
 		event.preventDefault();
@@ -321,6 +328,69 @@
 				});
 		});
 	});
+
+	function startCourse(trigger) {
+		var courseId = parseInt(trigger.getAttribute('data-course-id'), 10) || 0;
+		var target = trigger.getAttribute('data-course-target') || '#about-heading';
+		var nextPage = trigger.getAttribute('data-course-destination') || '';
+		var destination = document.querySelector(target);
+		var navigate = function () {
+			if (nextPage) window.location.assign(nextPage);
+		};
+
+		if (!nextPage && destination) destination.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		if (!courseId || !config.ajaxUrl || !config.nonce) {
+			navigate();
+			return;
+		}
+
+		trigger.setAttribute('aria-busy', 'true');
+		trigger.classList.add('is-starting');
+		fetch(config.ajaxUrl, {
+			method: 'POST',
+			credentials: 'same-origin',
+			keepalive: true,
+			body: new URLSearchParams({ action: 'cbcommerce_start_course', nonce: config.nonce, course_id: String(courseId) })
+		})
+			.then(function (response) { return response.json(); })
+			.then(function (result) {
+				if (!result || !result.success) return;
+				var percent = Math.max(0, Math.min(100, parseInt(result.data && result.data.percent, 10) || 0));
+				document.querySelectorAll('[data-course-progress-value]').forEach(function (value) { value.textContent = percent + '%'; });
+				document.querySelectorAll('[data-course-progress-fill]').forEach(function (fill) { fill.style.width = percent + '%'; });
+				document.querySelectorAll('[role="progressbar"]').forEach(function (bar) { bar.setAttribute('aria-valuenow', String(percent)); });
+			})
+			.catch(function () {
+				// Navigation is intentionally independent from progress saving.
+			})
+			.finally(function () {
+				trigger.removeAttribute('aria-busy');
+				trigger.classList.remove('is-starting');
+			});
+
+		if (nextPage) window.setTimeout(navigate, 90);
+	}
+
+	document.querySelectorAll('.js-start-course').forEach(function (trigger) {
+		trigger.addEventListener('click', function (event) {
+			event.preventDefault();
+			startCourse(trigger);
+		});
+	});
+
+	if (window.cbPortalData && window.cbPortalData.startCourseOnLoad) {
+		var autoStart = document.querySelector('.js-start-course');
+		if (autoStart) {
+			startCourse(autoStart);
+			try {
+				var url = new URL(window.location.href);
+				url.searchParams.delete('cb_course_start');
+				window.history.replaceState({}, document.title, url.href);
+			} catch (error) {
+				// The course still starts even if the cosmetic URL cleanup is unavailable.
+			}
+		}
+	}
 
 	if (window.location.hash === '#join' || window.location.hash === '#member-overlay') {
 		openOverlay(authOverlay, 'register');

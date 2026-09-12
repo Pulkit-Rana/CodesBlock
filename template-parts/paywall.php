@@ -13,7 +13,7 @@ $has_paid_access     = function_exists( 'cbcommerce_user_has_paid_access' )
 	: $is_admin_session;
 $show_auth_modal     = ! is_user_logged_in();
 $show_purchase_modal = ! $has_paid_access;
-$redirect_url        = home_url( '/' );
+$redirect_url        = function_exists( 'cbcommerce_member_home_url' ) ? cbcommerce_member_home_url() : home_url( '/my-learning/' );
 $privacy_url         = get_privacy_policy_url();
 $interests           = function_exists( 'cbcommerce_allowed_interests' )
 	? cbcommerce_allowed_interests()
@@ -59,8 +59,8 @@ $providers      = array(
 					<a class="cb-auth-brand" href="<?php echo esc_url( home_url( '/' ) ); ?>" tabindex="-1" aria-hidden="true">CB</a>
 					<div>
 						<span><?php esc_html_e( 'CodesBlock account', 'codesblock' ); ?></span>
-						<h2 id="member-title"><?php esc_html_e( 'Create your learning workspace.', 'codesblock' ); ?></h2>
-						<p id="member-description"><?php esc_html_e( 'Save progress, choose what you want to master, and start at the right depth. Course purchase is a separate decision.', 'codesblock' ); ?></p>
+						<h2 id="member-title" data-register-title="<?php esc_attr_e( 'Create your learning workspace.', 'codesblock' ); ?>" data-signin-title="<?php esc_attr_e( 'Welcome back. Keep moving.', 'codesblock' ); ?>"><?php esc_html_e( 'Create your learning workspace.', 'codesblock' ); ?></h2>
+						<p id="member-description" data-register-description="<?php esc_attr_e( 'Save progress, choose what you want to master, and start at the right depth. Course purchase is a separate decision.', 'codesblock' ); ?>" data-signin-description="<?php esc_attr_e( 'Sign in to open your private My Learning page and continue from your last saved course.', 'codesblock' ); ?>"><?php esc_html_e( 'Save progress, choose what you want to master, and start at the right depth. Course purchase is a separate decision.', 'codesblock' ); ?></p>
 					</div>
 				</div>
 
@@ -184,6 +184,10 @@ $providers      = array(
 
 		<div class="cb-member-body cb-purchase-only">
 			<aside class="cb-plan-panel" aria-labelledby="paywall-title">
+				<div class="cb-purchase-brand" aria-hidden="true">
+					<span>CB</span>
+					<strong><?php esc_html_e( 'CodesBlock learning access', 'codesblock' ); ?></strong>
+				</div>
 				<div class="cb-plan-heading">
 					<span><?php esc_html_e( 'Course access', 'codesblock' ); ?></span>
 					<h2 id="paywall-title"><?php esc_html_e( 'Choose your learning runway.', 'codesblock' ); ?></h2>

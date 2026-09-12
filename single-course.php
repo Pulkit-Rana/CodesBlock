@@ -37,6 +37,11 @@ $codesblock_is_frontend_member = function_exists( 'cbcommerce_is_frontend_member
 	: ( is_user_logged_in() && ! $codesblock_is_admin_session );
 $codesblock_can_track_progress = $codesblock_is_frontend_member && $user_has_access && function_exists( 'cbcommerce_user_can_track_course' ) && cbcommerce_user_can_track_course( $post_id );
 $codesblock_course_progress    = $codesblock_can_track_progress && function_exists( 'cbcommerce_get_course_progress' ) ? cbcommerce_get_course_progress( $post_id ) : 0;
+$codesblock_first_lesson       = function_exists( 'cbcore_get_first_course_lesson' ) ? cbcore_get_first_course_lesson( $post_id ) : null;
+$codesblock_start_destination  = $codesblock_first_lesson ? get_permalink( $codesblock_first_lesson ) : '#about-heading';
+$codesblock_course_start_url   = add_query_arg( 'cb_course_start', $post_id, get_permalink( $post_id ) );
+$codesblock_payments_ready     = function_exists( 'cbcommerce_payments_ready' ) && cbcommerce_payments_ready();
+$codesblock_billing_url        = function_exists( 'cbcommerce_checkout_url' ) ? cbcommerce_checkout_url( 'pro' ) : wp_login_url( get_permalink( $post_id ) );
 
 /* ── Course guide suggestion chips (shown in panel) ─────────── */
 $ai_suggestions = array(
@@ -59,7 +64,6 @@ if ( $is_system_design_course ) {
 ?>
 
 <main id="main" class="single-course-wrap">
-
 	<!-- ══════════════════════════════════════════════════
 	     COURSE HERO BANNER
 	══════════════════════════════════════════════════ -->
@@ -101,10 +105,10 @@ if ( $is_system_design_course ) {
 					<div class="course-sticky-card">
 						<!-- Thumbnail -->
 						<div class="sticky-card-thumb">
-							<?php if ( has_post_thumbnail() ) : ?>
+							<?php if ( $is_system_design_course ) : ?>
+								<?php get_template_part( 'template-parts/system-design-hero-visual' ); ?>
+							<?php elseif ( has_post_thumbnail() ) : ?>
 								<?php the_post_thumbnail( 'large' ); ?>
-							<?php elseif ( $is_system_design_course ) : ?>
-								<img class="system-design-cover" src="<?php echo esc_url( get_theme_file_uri( '/assets/images/system-design-interview-lab-cover.svg' ) ); ?>" alt="" decoding="async">
 							<?php else : ?>
 								<div class="sticky-card-placeholder" aria-hidden="true">
 									<span>CB</span>
@@ -128,20 +132,24 @@ if ( $is_system_design_course ) {
 
 							<!-- Enroll CTA -->
 							<?php if ( $codesblock_can_track_progress ) : ?>
-								<a class="btn-enroll" id="btn-enroll-main" href="#course-progress"><?php esc_html_e( 'Continue learning', 'codesblock' ); ?> &rarr;</a>
+								<a class="btn-enroll js-start-course" id="btn-enroll-main" href="<?php echo esc_url( $codesblock_start_destination ); ?>" data-course-id="<?php echo esc_attr( $post_id ); ?>" data-course-target="#about-heading" data-course-destination="<?php echo esc_url( $codesblock_start_destination ); ?>">
+									<?php echo esc_html( $codesblock_course_progress ? __( 'Continue learning', 'codesblock' ) : __( 'Start course', 'codesblock' ) ); ?> &rarr;
+								</a>
 							<?php elseif ( $codesblock_is_admin_session ) : ?>
 								<a class="btn-enroll" id="btn-enroll-main" href="<?php echo esc_url( get_edit_post_link( $post_id ) ); ?>"><?php esc_html_e( 'Edit course in WP Admin', 'codesblock' ); ?> &rarr;</a>
-							<?php elseif ( $user_has_access ) : ?>
-								<a class="btn-enroll" id="btn-enroll-main" href="#about-heading"><?php esc_html_e( 'Start course', 'codesblock' ); ?> &rarr;</a>
+							<?php elseif ( $is_free ) : ?>
+								<button class="btn-enroll js-open-course-auth" type="button" id="btn-enroll-main" aria-haspopup="dialog" aria-controls="course-auth-overlay">
+									<?php esc_html_e( 'Sign in to start learning', 'codesblock' ); ?> &rarr;
+								</button>
 							<?php else : ?>
 								<button
-									class="btn-enroll js-open-paywall"
+									class="btn-enroll <?php echo $codesblock_is_frontend_member ? 'js-open-paywall' : 'js-open-course-auth'; ?>"
 									type="button"
 									id="btn-enroll-main"
 									aria-haspopup="dialog"
-									aria-controls="paywall-overlay"
+									aria-controls="<?php echo $codesblock_is_frontend_member ? 'paywall-overlay' : 'course-auth-overlay'; ?>"
 								>
-									<?php esc_html_e( 'View access passes', 'codesblock' ); ?> &rarr;
+									<?php echo esc_html( $codesblock_is_frontend_member ? __( 'View access passes', 'codesblock' ) : ( $codesblock_payments_ready ? __( 'Sign in to buy', 'codesblock' ) : __( 'Sign in for launch updates', 'codesblock' ) ) ); ?> &rarr;
 								</button>
 							<?php endif; ?>
 
@@ -175,6 +183,47 @@ if ( $is_system_design_course ) {
 		</div>
 	</section>
 
+	<?php if ( ! is_user_logged_in() ) : ?>
+		<div id="course-auth-overlay" class="cb-member-overlay cb-auth-overlay" aria-hidden="true" hidden>
+			<div class="cb-member-backdrop" data-member-close></div>
+			<section class="cb-member-modal cb-auth-modal cb-course-auth-modal" role="dialog" aria-modal="true" aria-labelledby="course-auth-title" aria-describedby="course-auth-description" tabindex="-1">
+				<button class="cb-member-close" type="button" data-member-close aria-label="<?php esc_attr_e( 'Close course sign-in dialog', 'codesblock' ); ?>">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+				</button>
+				<div class="cb-course-auth-layout">
+					<div class="cb-course-auth-story">
+						<a class="cb-course-auth-brand" href="<?php echo esc_url( home_url( '/' ) ); ?>" tabindex="-1" aria-hidden="true">CB</a>
+						<span class="cb-course-auth-kicker"><?php echo esc_html( $is_free ? __( 'Free learning path', 'codesblock' ) : __( 'Protected learning path', 'codesblock' ) ); ?></span>
+						<h2 id="course-auth-title"><?php echo esc_html( $is_free ? __( 'Your first lesson is one click away.', 'codesblock' ) : ( $codesblock_payments_ready ? __( 'Sign in before choosing access.', 'codesblock' ) : __( 'Sign in for the paid-course launch.', 'codesblock' ) ) ); ?></h2>
+						<p id="course-auth-description"><?php echo esc_html( get_the_title( $post_id ) ); ?></p>
+						<ol class="cb-course-auth-steps">
+							<li><span>1</span><strong><?php esc_html_e( 'Continue securely', 'codesblock' ); ?></strong></li>
+							<li><span>2</span><strong><?php echo esc_html( $is_free ? __( 'Open lesson one', 'codesblock' ) : ( $codesblock_payments_ready ? __( 'Choose your pass', 'codesblock' ) : __( 'Get launch updates', 'codesblock' ) ) ); ?></strong></li>
+							<li><span>3</span><strong><?php esc_html_e( 'Keep progress saved', 'codesblock' ); ?></strong></li>
+						</ol>
+					</div>
+					<div class="cb-course-auth-action">
+						<span class="cb-course-auth-eyebrow"><?php esc_html_e( 'CodesBlock account', 'codesblock' ); ?></span>
+						<h3><?php esc_html_e( 'Continue with Google', 'codesblock' ); ?></h3>
+						<p><?php echo esc_html( $is_free ? __( 'We will open your first lesson immediately after sign-in.', 'codesblock' ) : ( $codesblock_payments_ready ? __( 'We will take you to secure billing immediately after sign-in.', 'codesblock' ) : __( 'We will take you to launch updates while payment setup is completed and verified.', 'codesblock' ) ) ); ?></p>
+						<div class="cb-social-grid cb-course-social-grid" aria-label="<?php esc_attr_e( 'Social sign in', 'codesblock' ); ?>">
+							<?php
+							$codesblock_social_redirect = $is_free ? $codesblock_course_start_url : $codesblock_billing_url;
+							$codesblock_social_buttons  = shortcode_exists( 'nextend_social_login' ) ? do_shortcode( '[nextend_social_login redirect="' . esc_url( $codesblock_social_redirect ) . '"]' ) : '';
+							if ( false !== strpos( $codesblock_social_buttons, 'nsl-button' ) ) {
+								echo $codesblock_social_buttons; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Trusted provider shortcode output.
+							} else {
+								echo '<p class="cb-form-feedback">' . esc_html__( 'Social sign-in is not configured yet. Enable a provider to start this course.', 'codesblock' ) . '</p>';
+							}
+							?>
+						</div>
+						<div class="cb-course-auth-trust"><span aria-hidden="true">&#10003;</span><p><strong><?php esc_html_e( 'No password to remember', 'codesblock' ); ?></strong><small><?php esc_html_e( 'Only basic profile details are used for your learning account.', 'codesblock' ); ?></small></p></div>
+					</div>
+				</div>
+			</section>
+		</div>
+	<?php endif; ?>
+
 	<?php if ( $is_system_design_course ) : ?>
 	<section class="course-value-rail" aria-label="<?php esc_attr_e( 'How this course helps you learn', 'codesblock' ); ?>">
 		<div class="container">
@@ -197,13 +246,19 @@ if ( $is_system_design_course ) {
 				<?php if ( $what_you_learn ) : ?>
 					<a href="#learn-heading"><?php esc_html_e( 'Outcomes', 'codesblock' ); ?></a>
 				<?php endif; ?>
-				<a href="#about-heading"><?php echo esc_html( $user_has_access ? __( 'Course material', 'codesblock' ) : __( 'Access', 'codesblock' ) ); ?></a>
+				<?php if ( $is_system_design_course ) : ?>
+					<a href="#design-labs"><?php esc_html_e( 'Design labs', 'codesblock' ); ?></a>
+				<?php endif; ?>
+				<a href="#material-heading"><?php echo esc_html( $user_has_access ? __( 'Course material', 'codesblock' ) : __( 'Access', 'codesblock' ) ); ?></a>
 				<?php if ( $syllabus ) : ?>
 					<a href="#syllabus-heading"><?php esc_html_e( 'Curriculum', 'codesblock' ); ?></a>
 				<?php endif; ?>
 				<a href="<?php echo esc_url( get_post_type_archive_link( 'course' ) ?: home_url( '/courses/' ) ); ?>"><?php esc_html_e( 'All courses', 'codesblock' ); ?> &rarr;</a>
 			</div>
 		</nav>
+		<?php if ( $is_system_design_course ) : ?>
+			<?php get_template_part( 'template-parts/system-design-course-visuals' ); ?>
+		<?php endif; ?>
 		<div class="course-content-layout">
 
 			<!-- ── Left: course details ─────────────────────── -->
@@ -315,8 +370,8 @@ if ( $is_system_design_course ) {
 				</section>
 
 				<!-- Course material or access decision -->
-				<section class="course-section <?php echo $user_has_access ? 'course-material-section' : 'course-access-section'; ?>" aria-labelledby="about-heading">
-					<h2 id="about-heading"><?php echo esc_html( $user_has_access ? __( 'Course Material', 'codesblock' ) : __( 'Course Access', 'codesblock' ) ); ?></h2>
+				<section class="course-section <?php echo $user_has_access ? 'course-material-section' : 'course-access-section'; ?>" aria-labelledby="material-heading">
+					<h2 id="material-heading"><?php echo esc_html( $user_has_access ? __( 'Course Material', 'codesblock' ) : __( 'Course Access', 'codesblock' ) ); ?></h2>
 					<?php if ( $user_has_access ) : ?>
 						<div class="entry-content"><?php the_content(); ?></div>
 					<?php else : ?>
@@ -332,8 +387,8 @@ if ( $is_system_design_course ) {
 									<li><?php esc_html_e( 'No automatic renewal', 'codesblock' ); ?></li>
 								</ul>
 								<div class="content-gate-actions">
-									<button class="button button-primary js-open-paywall" type="button" aria-haspopup="dialog" aria-controls="paywall-overlay">
-										<?php esc_html_e( 'View access passes', 'codesblock' ); ?>
+								<button class="button button-primary <?php echo esc_attr( $codesblock_is_frontend_member ? 'js-open-paywall' : 'js-open-course-auth' ); ?>" type="button" aria-haspopup="dialog" aria-controls="<?php echo esc_attr( $codesblock_is_frontend_member ? 'paywall-overlay' : 'course-auth-overlay' ); ?>">
+									<?php echo esc_html( $codesblock_is_frontend_member ? __( 'View access passes', 'codesblock' ) : __( 'Sign in to continue', 'codesblock' ) ); ?>
 									</button>
 									<?php if ( $codesblock_is_frontend_member ) : ?>
 										<a class="content-gate-secondary" href="<?php echo esc_url( get_post_type_archive_link( 'course' ) ?: home_url( '/courses/' ) ); ?>"><?php esc_html_e( 'Browse all courses', 'codesblock' ); ?></a>
@@ -431,8 +486,8 @@ if ( $is_system_design_course ) {
 					<p class="eyebrow"><?php esc_html_e( 'Start free', 'codesblock' ); ?></p>
 					<h2><?php esc_html_e( 'Create your learning workspace', 'codesblock' ); ?></h2>
 					<p><?php esc_html_e( 'Save progress, personalize your path, and preview CodesBlock before choosing a paid access pass.', 'codesblock' ); ?></p>
-					<button class="button button-primary js-open-member" type="button" data-member-view="register" aria-haspopup="dialog" aria-controls="member-overlay"><?php esc_html_e( 'Create free account', 'codesblock' ); ?></button>
-					<small><?php esc_html_e( 'No card required. Signup and course purchase stay separate.', 'codesblock' ); ?></small>
+					<button class="button button-primary js-open-course-auth" type="button" aria-haspopup="dialog" aria-controls="course-auth-overlay"><?php esc_html_e( 'Continue with Google', 'codesblock' ); ?></button>
+					<small><?php esc_html_e( 'No password or card required. Course purchase stays separate.', 'codesblock' ); ?></small>
 				</div>
 				<?php endif; ?>
 

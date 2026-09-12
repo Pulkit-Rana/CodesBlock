@@ -102,7 +102,7 @@
 				</span>
 			</a>
 		<?php endif; ?>
-		<button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu" aria-label="<?php esc_attr_e( 'Toggle navigation', 'codesblock' ); ?>" data-nav-toggle>
+		<button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu" aria-label="<?php esc_attr_e( 'Open navigation', 'codesblock' ); ?>" data-nav-toggle>
 			<span></span>
 			<span></span>
 			<span></span>
@@ -136,17 +136,18 @@
 			<?php if ( $codesblock_is_frontend_member ) : ?>
 				<?php
 					$current_user = wp_get_current_user();
-					$profile_url = function_exists( 'cbcommerce_member_profile_url' ) ? cbcommerce_member_profile_url() : home_url( '/#my-learning' );
+					$profile_url = function_exists( 'cbcommerce_member_profile_url' ) ? cbcommerce_member_profile_url() : home_url( '/my-learning/#profile' );
+					$learning_url = function_exists( 'cbcommerce_member_home_url' ) ? cbcommerce_member_home_url() : home_url( '/my-learning/' );
 				?>
 				<a class="header-profile" href="<?php echo esc_url( $profile_url ); ?>">
 					<?php echo get_avatar( $current_user->ID, 32, '', '', array( 'class' => 'header-profile-avatar' ) ); ?>
 					<span><?php echo esc_html( $current_user->display_name ); ?></span>
 				</a>
-				<a class="header-button" href="<?php echo esc_url( home_url( '/#my-learning' ) ); ?>"><?php esc_html_e( 'My learning', 'codesblock' ); ?></a>
+				<a class="header-button header-learning-button" href="<?php echo esc_url( $learning_url ); ?>"><span aria-hidden="true">&#9654;</span><?php esc_html_e( 'My learning', 'codesblock' ); ?></a>
 			<?php elseif ( $codesblock_is_admin_session ) : ?>
 				<a class="header-link" href="<?php echo esc_url( admin_url() ); ?>"><?php esc_html_e( 'WP Admin', 'codesblock' ); ?></a>
 			<?php else : ?>
-				<a class="header-link js-open-member" data-member-view="signin" href="#member-overlay" aria-haspopup="dialog" aria-controls="member-overlay"><?php esc_html_e( 'Sign in', 'codesblock' ); ?></a>
+				<a class="header-link header-signin-button js-open-member" data-member-view="signin" href="#member-overlay" aria-haspopup="dialog" aria-controls="member-overlay"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg><?php esc_html_e( 'Sign in', 'codesblock' ); ?></a>
 				<a class="header-button js-open-paywall" href="#paywall-overlay" aria-haspopup="dialog" aria-controls="paywall-overlay"><?php esc_html_e( 'Become a member', 'codesblock' ); ?></a>
 			<?php endif; ?>
 		</div>

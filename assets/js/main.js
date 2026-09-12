@@ -110,13 +110,31 @@
 		toggle.addEventListener('click', function () {
 			var isOpen = nav.classList.toggle('is-open');
 			toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+			toggle.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
 		});
 
 		nav.addEventListener('click', function (event) {
 			if (event.target.tagName === 'A') {
 				nav.classList.remove('is-open');
 				toggle.setAttribute('aria-expanded', 'false');
+				toggle.setAttribute('aria-label', 'Open navigation');
 			}
+		});
+
+		document.addEventListener('keydown', function (event) {
+			if (event.key === 'Escape' && nav.classList.contains('is-open')) {
+				nav.classList.remove('is-open');
+				toggle.setAttribute('aria-expanded', 'false');
+				toggle.setAttribute('aria-label', 'Open navigation');
+				toggle.focus();
+			}
+		});
+
+		document.addEventListener('click', function (event) {
+			if (!nav.classList.contains('is-open') || nav.contains(event.target) || toggle.contains(event.target)) return;
+			nav.classList.remove('is-open');
+			toggle.setAttribute('aria-expanded', 'false');
+			toggle.setAttribute('aria-label', 'Open navigation');
 		});
 	}
 
