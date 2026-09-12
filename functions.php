@@ -77,7 +77,7 @@ function codesblock_course_portal_assets() {
 		file_exists( $course_css_path ) ? (string) filemtime( $course_css_path ) : '2.0.0'
 	);
 
-	if ( is_singular( 'course' ) && in_array( get_post_field( 'post_name', get_the_ID() ), array( 'system-design-interview-sprint', 'system-design-interview-lab' ), true ) ) {
+	if ( is_singular( 'course' ) && in_array( get_post_field( 'post_name', get_the_ID() ), array( 'system-design-interview-sprint', 'system-design-interview-lab', 'crack-the-system-design-interview' ), true ) ) {
 		wp_enqueue_style(
 			'codesblock-system-design-course',
 			get_template_directory_uri() . '/assets/css/system-design-course.css',
