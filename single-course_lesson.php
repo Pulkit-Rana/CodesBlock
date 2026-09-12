@@ -59,11 +59,25 @@ get_template_part(
 <main id="main" class="cb-lesson-page">
 	<section class="cb-lesson-hero">
 		<div class="container">
-			<nav class="cb-lesson-breadcrumbs" aria-label="<?php esc_attr_e( 'Breadcrumb', 'codesblock' ); ?>">
-				<a href="<?php echo esc_url( get_permalink( $course_id ) ); ?>"><?php echo esc_html( get_the_title( $course_id ) ); ?></a>
-				<span aria-hidden="true">/</span>
-				<span><?php echo esc_html( $module_title ); ?></span>
-			</nav>
+			<?php
+			get_template_part(
+				'template-parts/breadcrumbs',
+				null,
+				array(
+					'items'   => array(
+						array(
+							'label' => __( 'Courses', 'codesblock' ),
+							'url'   => get_post_type_archive_link( 'course' ) ?: home_url( '/courses/' ),
+						),
+						array(
+							'label' => get_the_title( $course_id ),
+							'url'   => get_permalink( $course_id ),
+						),
+					),
+					'current' => get_the_title(),
+				)
+			);
+			?>
 			<p class="cb-lesson-kicker">
 				<?php
 				printf(

@@ -69,6 +69,21 @@ if ( $is_system_design_course ) {
 	══════════════════════════════════════════════════ -->
 	<section class="course-hero-banner">
 		<div class="container">
+			<?php
+			get_template_part(
+				'template-parts/breadcrumbs',
+				null,
+				array(
+					'items'   => array(
+						array(
+							'label' => __( 'Courses', 'codesblock' ),
+							'url'   => get_post_type_archive_link( 'course' ) ?: home_url( '/courses/' ),
+						),
+					),
+					'current' => get_the_title(),
+				)
+			);
+			?>
 			<div class="course-hero-inner">
 
 				<!-- Left: text -->

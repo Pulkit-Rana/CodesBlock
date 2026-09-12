@@ -25,6 +25,16 @@ body.single-course .course-hero-banner {
 	padding: clamp(46px, 6vw, 76px) 0 clamp(44px, 6vw, 68px);
 }
 
+body.single-course .course-hero-banner .cb-breadcrumbs {
+	color: var(--sd-muted);
+}
+
+body.single-course .course-hero-banner .cb-breadcrumbs a:hover,
+body.single-course .course-hero-banner .cb-breadcrumbs a:focus-visible,
+body.single-course .course-hero-banner .cb-breadcrumbs [aria-current='page'] {
+	color: var(--sd-blue);
+}
+
 body.single-course .course-hero-banner::before {
 	background-image:
 		linear-gradient(rgba(37, 99, 235, .05) 1px, transparent 1px),

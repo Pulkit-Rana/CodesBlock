@@ -2837,6 +2837,94 @@ body.single-course .course-hero-banner > .container {
 	z-index: 1;
 }
 
+/* Shared detail-page context trail: quiet enough for reading, clear enough for a quick return. */
+.cb-breadcrumbs {
+	color: rgba(229, 239, 255, .72);
+	font-size: .75rem;
+	font-weight: 700;
+	letter-spacing: .015em;
+	margin: 0 0 22px;
+}
+
+.cb-breadcrumbs ol {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px 9px;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.cb-breadcrumbs li {
+	align-items: center;
+	display: inline-flex;
+	gap: 9px;
+	max-width: 100%;
+}
+
+.cb-breadcrumbs li + li::before {
+	color: currentColor;
+	content: '/';
+	opacity: .45;
+}
+
+.cb-breadcrumbs a {
+	border-radius: 4px;
+	color: inherit;
+	text-decoration: none;
+	text-underline-offset: 3px;
+}
+
+.cb-breadcrumbs a:hover,
+.cb-breadcrumbs a:focus-visible {
+	color: #fff;
+	text-decoration: underline;
+}
+
+.cb-breadcrumbs [aria-current='page'] {
+	color: #fff;
+	font-weight: 600;
+	min-width: 0;
+}
+
+.cb-breadcrumbs [aria-current='page'] span {
+	overflow-wrap: anywhere;
+}
+
+.article-reading-header .cb-breadcrumbs {
+	color: #66788f;
+	margin-bottom: 16px;
+}
+
+.article-reading-header .cb-breadcrumbs a:hover,
+.article-reading-header .cb-breadcrumbs a:focus-visible,
+.article-reading-header .cb-breadcrumbs [aria-current='page'] {
+	color: #1d4ed8;
+}
+
+.article-header:not(.article-reading-header) .cb-breadcrumbs {
+	color: #66788f;
+}
+
+.article-header:not(.article-reading-header) .cb-breadcrumbs a:hover,
+.article-header:not(.article-reading-header) .cb-breadcrumbs a:focus-visible,
+.article-header:not(.article-reading-header) .cb-breadcrumbs [aria-current='page'] {
+	color: #1d4ed8;
+}
+
+@media (max-width: 640px) {
+	.cb-breadcrumbs {
+		font-size: .7rem;
+		margin-bottom: 16px;
+	}
+
+	.cb-breadcrumbs ol,
+	.cb-breadcrumbs li {
+		gap: 5px;
+	}
+}
+
 body.single-course .course-value-rail {
 	background:
 		repeating-linear-gradient(0deg, transparent 0 27px, rgba(71, 85, 105, .04) 27px 28px),
@@ -3354,6 +3442,16 @@ body.post-type-archive-course .course-pricing-section {
 }
 
 .article-reading-page .article-reading-header :where(.article-back, .article-meta, a) {
+	color: var(--cb-bold-mint);
+}
+
+.article-reading-page .article-reading-header .cb-breadcrumbs {
+	color: rgba(255, 255, 255, .7);
+}
+
+.article-reading-page .article-reading-header .cb-breadcrumbs a:hover,
+.article-reading-page .article-reading-header .cb-breadcrumbs a:focus-visible,
+.article-reading-page .article-reading-header .cb-breadcrumbs [aria-current='page'] {
 	color: var(--cb-bold-mint);
 }
 

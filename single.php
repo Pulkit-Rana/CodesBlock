@@ -117,7 +117,21 @@ function codesblock_prepare_article_content( $content ) {
 		<article <?php post_class( 'article-shell' ); ?>>
 			<header class="article-header article-reading-header">
 				<div class="container article-title-wrap">
-					<a class="text-link" href="<?php echo esc_url( home_url( '/articles/' ) ); ?>">Back to articles</a>
+					<?php
+					get_template_part(
+						'template-parts/breadcrumbs',
+						null,
+						array(
+							'items'   => array(
+								array(
+									'label' => __( 'Articles', 'codesblock' ),
+									'url'   => home_url( '/articles/' ),
+								),
+							),
+							'current' => get_the_title(),
+						)
+					);
+					?>
 					<h1><?php the_title(); ?></h1>
 					<p class="article-meta"><?php echo esc_html( implode( ' · ', $article_meta ) ); ?></p>
 				</div>
