@@ -220,7 +220,7 @@ $codesblock_member_learning_url = function_exists( 'cbcommerce_member_home_url' 
 									<div class="course-card-face course-card-front">
 										<?php if ( has_post_thumbnail() ) : ?>
 											<div class="course-card-image" style="margin: -16px -16px 12px; border-radius: 10px 10px 0 0; overflow: hidden; aspect-ratio: 16/9; flex-shrink: 0; background: #fff;">
-												<?php the_post_thumbnail( 'medium_large', array( 'style' => 'width: 100%; height: 100%; object-fit: contain; display: block;' ) ); ?>
+												<?php the_post_thumbnail( 'medium_large', array( 'style' => 'width: 100%; height: 100%; object-fit: cover; display: block;' ) ); ?>
 											</div>
 										<?php endif; ?>
 										<p class="tag"><?php echo esc_html( $codesblock_course_tag ); ?></p>
