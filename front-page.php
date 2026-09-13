@@ -253,50 +253,7 @@ $codesblock_member_learning_url = function_exists( 'cbcommerce_member_home_url' 
 						<?php endforeach; ?>
 						<?php wp_reset_postdata(); ?>
 
-						<?php
-						$existing_count = count( $codesblock_home_course_posts );
-						if ( $existing_count < 6 ) :
-							$fallback_cards = array(
-								array(
-									'tag'      => 'New course',
-									'title'    => 'Production RAG & Knowledge Systems',
-									'desc'     => 'Architect vector search, hybrid retrieval, and real-time evaluation pipelines for high-throughput enterprise search.',
-									'meta'     => array( '4 weeks', 'Intermediate' ),
-									'price'    => 'Free',
-									'is_free'  => true,
-									'link'     => get_post_type_archive_link( 'course' ) ?: home_url( '/courses/' ),
-								),
-							);
 
-							$needed = min( 6 - $existing_count, count( $fallback_cards ) );
-							for ( $i = 0; $i < $needed; $i++ ) :
-								$fb = $fallback_cards[ $i ];
-								?>
-								<a class="course-card course-card-link" href="<?php echo esc_url( $fb['link'] ); ?>">
-									<div class="course-card-inner static">
-										<div class="course-card-face course-card-front">
-											<p class="tag"><?php echo esc_html( $fb['tag'] ); ?></p>
-											<h3><?php echo esc_html( $fb['title'] ); ?></h3>
-											<p class="card-desc"><?php echo esc_html( $fb['desc'] ); ?></p>
-											<div class="course-meta">
-												<?php foreach ( $fb['meta'] as $meta_item ) : ?>
-													<span><?php echo esc_html( $meta_item ); ?></span>
-												<?php endforeach; ?>
-											</div>
-											<div class="card-footer-row">
-												<span class="card-enrolled"><?php esc_html_e( 'Self-paced course', 'codesblock' ); ?></span>
-												<?php if ( $fb['is_free'] ) : ?>
-													<span class="card-price free-badge"><?php esc_html_e( 'Free', 'codesblock' ); ?></span>
-												<?php else : ?>
-													<span class="card-price"><?php echo esc_html( $fb['price'] ); ?></span>
-												<?php endif; ?>
-											</div>
-											<span class="course-card-cta"><?php esc_html_e( 'Open course', 'codesblock' ); ?></span>
-										</div>
-									</div>
-								</a>
-							<?php endfor; ?>
-						<?php endif; ?>
 					<?php else : ?>
 						<article class="empty-post-card">
 							<p class="tag"><?php esc_html_e( 'No courses yet', 'codesblock' ); ?></p>
