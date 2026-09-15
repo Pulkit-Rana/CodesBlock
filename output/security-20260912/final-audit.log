@@ -1,0 +1,52 @@
+
+UPLOAD EXECUTABLE CONTENT
+wp-content/uploads/mailpoet/exports/index.php
+wp-content/uploads/mailpoet/index.php
+
+USER INI FILES
+
+POST COUNTS
+post_type	post_status	count
+attachment	inherit	14
+attachment	private	1
+course	publish	4
+course_lesson	draft	1
+course_lesson	publish	1
+custom_css	publish	1
+mailpoet_page	publish	2
+nav_menu_item	publish	5
+page	publish	12
+post	auto-draft	1
+post	publish	5
+pronamic_gateway	publish	1
+pronamic_payment	payment_completed	1
+revision	inherit	15
+wp_global_styles	publish	1
+wp_navigation	publish	1
+
+
+PHP LINT
+No syntax errors detected in wp-content/plugins/codesblock-core/includes/admin.php
+No syntax errors detected in wp-content/plugins/codesblock-core/includes/access-control.php
+No syntax errors detected in wp-content/plugins/codesblock-core/includes/course-offers.php
+No syntax errors detected in wp-content/plugins/codesblock-core/includes/content-model.php
+No syntax errors detected in wp-content/plugins/codesblock-commerce/codesblock-commerce.php
+
+PLUGIN VERIFICATION AFTER UPDATES
+Warning: Couldn't fetch response from https://downloads.wordpress.org/plugin-checksums/codesblock-commerce/1.6.1.json (HTTP code 404).
+Warning: Could not retrieve the checksums for version 1.6.1 of plugin codesblock-commerce, skipping.
+Warning: Couldn't fetch response from https://downloads.wordpress.org/plugin-checksums/codesblock-core/1.3.1.json (HTTP code 404).
+Warning: Could not retrieve the checksums for version 1.3.1 of plugin codesblock-core, skipping.
+Warning: Couldn't fetch response from https://downloads.wordpress.org/plugin-checksums/paid-memberships-pro/3.8.5.json (HTTP code 404).
+Warning: Could not retrieve the checksums for version 3.8.5 of plugin paid-memberships-pro, skipping.
+Success: Verified 8 of 11 plugins (3 skipped).
+
+ADMIN SESSION COUNTS
+2
+HOSTING CONFIG METADATA
+total 32
+drwxr-xr-x  2 u955006780 o1009953919 4096 Sep 12 00:56 .
+drwx--x--- 11 u955006780 apache      4096 Sep 12 10:18 ..
+-rw-r--r--  1 u955006780 o1009953919 1319 Sep  2 13:30 alt_php83.cfg
+-rw-r--r--  1 u955006780 o1009953919 1302 Sep  2 14:04 alt_php85.cfg
+-rw-r--r--  1 u955006780 o1009953919 4011 Sep 12 00:56 defaults.cfg

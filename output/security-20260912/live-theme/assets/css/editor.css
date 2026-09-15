@@ -1,0 +1,22 @@
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap");
+
+body {
+	color: #101828;
+	font-family: "Source Sans 3", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	font-size: 17px;
+	line-height: 1.7;
+}
+
+h1,
+h2,
+h3,
+h4 {
+	font-family: "Source Sans 3", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	font-weight: 600;
+	letter-spacing: -.018em;
+	line-height: 1.25;
+}
+
+a {
+	color: #087a59;
+}

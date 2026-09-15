@@ -1,0 +1,4 @@
+10 wp_validate_auth_cookie 
+20 wp_validate_logged_in_cookie wp_validate_application_password 
+100 Closure 
+bool(false)

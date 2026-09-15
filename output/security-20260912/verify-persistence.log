@@ -1,0 +1,19 @@
+
+PMPRO COMPARISON
+
+DB INDICATOR ROW NAMES
+Error: Query failed: --------------
+SELECT option_name FROM wp_options WHERE option_value REGEXP 'mrnewjibon|contack-us|zetgifari|eval\(|gzinflate\('
+--------------
+
+ERROR 1139 (42000) at line 1: Regex error 'missing closing parenthesis at offset 48'
+
+
+REGISTRATION SETTINGS
+subscriber
+1
+
+STALE CRON DEFINITION
+[{"hook":"action_scheduler_run_queue","args":["WP Cron"]},{"hook":"wp_privacy_delete_old_export_files","args":[]},{"hook":"clarity_collect_batch_cron","args":[]},{"hook":"litespeed_task_lqip","args":[]},{"hook":"wp_privacy_personal_data_cleanup_requests","args":[]},{"hook":"wp_site_health_scheduled_check","args":[]},{"hook":"recovery_mode_clean_expired_keys","args":[]},{"hook":"wp_scheduled_delete","args":[]},{"hook":"delete_expired_transients","args":[]},{"hook":"wp_update_user_counts","args":[]},{"hook":"wp_scheduled_auto_draft_delete","args":[]},{"hook":"mnx_daily_cron_event","args":[]},{"hook":"wp_version_check","args":[]},{"hook":"wp_update_plugins","args":[]},{"hook":"googlesitekit_cron_update_remote_features","args":[]},{"hook":"wp_update_themes","args":[]},{"hook":"wpseo-reindex","args":[]},{"hook":"wpseo_permalink_structure_check","args":[]},{"hook":"wpseo_detect_default_seo_data","args":[]},{"hook":"wp_delete_temp_updater_backups","args":[]},{"hook":"wpseo_expiring_store_cleanup","args":[]},{"hook":"wpseo_myyoast_key_rotation","args":[]}]
+THEME CHECKSUM
+Error: 'verify-checksums' is not a registered subcommand of 'theme'. See 'wp help theme' for available subcommands.

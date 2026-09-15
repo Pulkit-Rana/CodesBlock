@@ -1,0 +1,258 @@
+total 536
+drwxr-xr-x  8 u955006780 o1009953919  4096 Sep 12 10:17 .
+drwxr-xr-x  4 u955006780 o1009953919  4096 Sep 12 10:11 ..
+-rw-r--r--  1 u955006780 o1009953919 15528 Sep 12 10:12 archive-course.php
+drwxr-xr-x  5 u955006780 o1009953919  4096 Sep 12 10:12 assets
+-rw-r--r--  1 u955006780 o1009953919   558 Sep 12 10:12 comments.php
+-rw-r--r--  1 u955006780 o1009953919  2165 Sep 12 10:12 footer.php
+-rw-r--r--  1 u955006780 o1009953919 36030 Sep 12 10:12 front-page.php
+-rw-r--r--  1 u955006780 o1009953919 36810 Sep 12 10:12 functions.php
+drwxr-xr-x  8 u955006780 o1009953919  4096 Sep 12 10:12 .git
+-rw-r--r--  1 u955006780 o1009953919   316 Sep 12 10:12 .gitignore
+-rw-r--r--  1 u955006780 o1009953919  8504 Sep 12 10:12 header.php
+-rw-r--r--  1 u955006780 o1009953919  1219 Sep 12 10:12 inc.php
+-rw-r--r--  1 u955006780 o1009953919   871 Sep 12 10:12 index.php
+-rw-r--r--  1 u955006780 o1009953919  8497 Sep 12 10:12 page-articles.php
+-rw-r--r--  1 u955006780 o1009953919   499 Sep 12 10:12 page.php
+-rw-r--r--  1 u955006780 o1009953919 33545 Sep 12 10:12 single-course.php
+-rw-r--r--  1 u955006780 o1009953919  7963 Sep 12 10:12 single.php
+-rw-r--r--  1 u955006780 o1009953919   502 Sep 12 10:12 style.css
+drwxr-xr-x  2 u955006780 o1009953919  4096 Sep 12 10:12 template-parts
+-rw-r--r--  1 u955006780 o1009953919  7718 Sep  2 13:50 wp-activate.php
+drwxr-xr-x  9 u955006780 o1009953919  4096 Sep  9 08:54 wp-admin
+-rw-r--r--  1 u955006780 o1009953919   351 Sep  2 13:50 wp-blog-header.php
+-rw-r--r--  1 u955006780 o1009953919  2323 Sep  2 13:50 wp-comments-post.php
+-rw-r--r--  1 u955006780 o1009953919  3445 Sep  2 14:19 wp-config.php
+-rw-r--r--  1 u955006780 o1009953919  3339 Sep  2 13:50 wp-config-sample.php
+drwxr-xr-x  9 u955006780 o1009953919  4096 Sep  9 14:08 wp-content
+-rw-r--r--  1 u955006780 o1009953919  5617 Sep  2 13:50 wp-cron.php
+drwxr-xr-x 34 u955006780 o1009953919 16384 Sep  2 13:50 wp-includes
+-rw-r--r--  1 u955006780 o1009953919  2493 Sep  2 13:50 wp-links-opml.php
+-rw-r--r--  1 u955006780 o1009953919  3937 Sep  2 13:50 wp-load.php
+-rw-r--r--  1 u955006780 o1009953919 52536 Sep  2 13:50 wp-login.php
+-rw-r--r--  1 u955006780 o1009953919  8727 Sep  2 13:50 wp-mail.php
+-rw-r--r--  1 u955006780 o1009953919 33152 Sep  2 13:50 wp-settings.php
+-rw-r--r--  1 u955006780 o1009953919 35081 Sep  2 13:50 wp-signup.php
+-rw-r--r--  1 u955006780 o1009953919  5396 Sep  2 13:50 wp-trackback.php
+-rw-r--r--  1 u955006780 o1009953919  3205 Sep  2 13:50 xmlrpc.php
+
+CONFIG STRUCTURE (values redacted)
+<?php
+define( 'WP_CACHE', REDACTED);
+
+/**
+ * The base configuration for WordPress
+ *
+ * The wp-config.php creation script uses this file during the installation.
+ * You don't have to use the web site, you can copy this file to "wp-config.php"
+ * and fill in the values.
+ *
+ * This file contains the following configurations:
+ *
+ * * Database settings
+ * * Secret keys
+ * * Database table prefix
+ * * Localized language
+ * * ABSPATH
+ *
+ * @link https://wordpress.org/support/article/editing-wp-config-php/
+ *
+ * @package WordPress
+ */
+
+// ** Database settings - You can get this info from your web host ** //
+/** The name of the database for WordPress */
+define( 'DB_NAME', REDACTED);
+
+/** Database username */
+define( 'DB_USER', REDACTED);
+
+/** Database password */
+define( 'DB_PASSWORD', REDACTED);
+
+/** Database hostname */
+define( 'DB_HOST', REDACTED);
+
+/** Database charset to use in creating database tables. */
+define( 'DB_CHARSET', REDACTED);
+
+/** The database collate type. Don't change this if in doubt. */
+define( 'DB_COLLATE', REDACTED);
+
+/**#@+
+ * Authentication unique keys and salts.
+ *
+ * Change these to different unique phrases! You can generate these using
+ * the {@link https://api.wordpress.org/secret-key/1.1/salt/ WordPress.org secret-key service}.
+ *
+ * You can change these at any point in time to invalidate all existing cookies.
+ * This will force all users to have to log in again.
+ *
+ * @since 2.6.0
+ */
+define( 'AUTH_KEY', REDACTED);
+define( 'SECURE_AUTH_KEY', REDACTED);
+define( 'LOGGED_IN_KEY', REDACTED);
+define( 'NONCE_KEY', REDACTED);
+define( 'AUTH_SALT', REDACTED);
+define( 'SECURE_AUTH_SALT', REDACTED);
+define( 'LOGGED_IN_SALT', REDACTED);
+define( 'NONCE_SALT', REDACTED);
+define( 'WP_CACHE_KEY_SALT', REDACTED);
+/**#@-*/
+
+/**
+ * WordPress database table prefix.
+ *
+ * You can have multiple installations in one database if you give each
+ * a unique prefix. Only numbers, letters, and underscores please!
+ */
+$table_prefix = 'wp_';
+
+
+/* Add any custom values between this line and the "stop editing" line. */
+
+
+
+/**
+ * For developers: WordPress debugging mode.
+ *
+ * Change this to true to enable the display of notices during development.
+ * It is strongly recommended that plugin and theme developers use WP_DEBUG
+ * in their development environments.
+ *
+ * For information on other constants that can be used for debugging,
+ * visit the documentation.
+ *
+ * @link https://wordpress.org/support/article/debugging-in-wordpress/
+ */
+if ( ! defined( 'WP_DEBUG' ) ) {
+	define( 'WP_DEBUG', REDACTED);
+}
+
+define( 'WP_ENVIRONMENT_TYPE', REDACTED);
+/* That's all, stop editing! Happy publishing. */
+
+/** Absolute path to the WordPress directory. */
+if ( ! defined( 'ABSPATH' ) ) {
+	define( 'ABSPATH', REDACTED);
+}
+
+/** Sets up WordPress vars and included files. */
+require_once ABSPATH . 'wp-settings.php';
+
+CORE CHECKSUMS
+Warning: File doesn't exist: license.txt
+Warning: File doesn't exist: readme.html
+Warning: File doesn't exist: wp-includes/images/crystal/license.txt
+Warning: File doesn't exist: wp-includes/js/tinymce/license.txt
+Warning: File doesn't exist: wp-includes/js/plupload/license.txt
+Warning: File doesn't exist: wp-includes/js/swfupload/license.txt
+Warning: File doesn't exist: wp-includes/ID3/license.txt
+Warning: File doesn't verify against checksum: index.php
+Warning: File should not exist: comments.php
+Warning: File should not exist: single-course.php
+Warning: File should not exist: single.php
+Warning: File should not exist: header.php
+Warning: File should not exist: inc.php
+Warning: File should not exist: template-parts/content-card.php
+Warning: File should not exist: template-parts/paywall.php
+Warning: File should not exist: template-parts/content-article-featured.php
+Warning: File should not exist: functions.php
+Warning: File should not exist: footer.php
+Warning: File should not exist: page.php
+Warning: File should not exist: .git/packed-refs
+Warning: File should not exist: .git/shallow
+Warning: File should not exist: .git/index
+Warning: File should not exist: .git/config
+Warning: File should not exist: .git/logs/HEAD
+Warning: File should not exist: .git/logs/refs/heads/main
+Warning: File should not exist: .git/logs/refs/remotes/origin/HEAD
+Warning: File should not exist: .git/description
+Warning: File should not exist: .git/hooks/push-to-checkout.sample
+Warning: File should not exist: .git/hooks/sendemail-validate.sample
+Warning: File should not exist: .git/hooks/post-update.sample
+Warning: File should not exist: .git/hooks/prepare-commit-msg.sample
+Warning: File should not exist: .git/hooks/commit-msg.sample
+Warning: File should not exist: .git/hooks/pre-commit.sample
+Warning: File should not exist: .git/hooks/fsmonitor-watchman.sample
+Warning: File should not exist: .git/hooks/pre-receive.sample
+Warning: File should not exist: .git/hooks/applypatch-msg.sample
+Warning: File should not exist: .git/hooks/pre-rebase.sample
+Warning: File should not exist: .git/hooks/pre-push.sample
+Warning: File should not exist: .git/hooks/pre-merge-commit.sample
+Warning: File should not exist: .git/hooks/update.sample
+Warning: File should not exist: .git/hooks/pre-applypatch.sample
+Warning: File should not exist: .git/HEAD
+Warning: File should not exist: .git/refs/heads/main
+Warning: File should not exist: .git/refs/remotes/origin/HEAD
+Warning: File should not exist: .git/info/exclude
+Warning: File should not exist: .git/objects/pack/pack-0b86623e426eb5608061a1eed1773ee9f2a5fe9a.pack
+Warning: File should not exist: .git/objects/pack/pack-0b86623e426eb5608061a1eed1773ee9f2a5fe9a.idx
+Warning: File should not exist: .git/objects/pack/pack-0b86623e426eb5608061a1eed1773ee9f2a5fe9a.rev
+Warning: File should not exist: style.css
+Warning: File should not exist: front-page.php
+Warning: File should not exist: page-articles.php
+Warning: File should not exist: wp-admin/mediia 2.php
+Warning: File should not exist: assets/images/logo-cb-gloss-transparent.png
+Warning: File should not exist: assets/images/article-ai.svg
+Warning: File should not exist: assets/images/interview-coach.jpg
+Warning: File should not exist: assets/images/article-career.svg
+Warning: File should not exist: assets/images/favicon-cb-transparent.ico
+Warning: File should not exist: assets/images/system-design-interview-lab-cover.svg
+Warning: File should not exist: assets/images/favicon-cb-transparent-512.png
+Warning: File should not exist: assets/images/article-code.svg
+Warning: File should not exist: assets/images/favicon-cb-transparent-32.png
+Warning: File should not exist: assets/images/favicon-cb-transparent-16.png
+Warning: File should not exist: assets/images/favicon-cb-transparent-192.png
+Warning: File should not exist: assets/css/polish.css
+Warning: File should not exist: assets/css/course-portal.css
+Warning: File should not exist: assets/css/main.css
+Warning: File should not exist: assets/css/editor.css
+Warning: File should not exist: assets/css/member.css
+Warning: File should not exist: assets/js/member.js
+Warning: File should not exist: assets/js/course-portal.js
+Warning: File should not exist: assets/js/main.js
+Warning: File should not exist: archive-course.php
+Warning: File should not exist: .gitignore
+Error: WordPress installation doesn't verify against checksums.
+
+PHP IN UPLOADS
+wp-content/uploads/mailpoet/exports/index.php
+wp-content/uploads/mailpoet/index.php
+
+MU PLUGINS AND DROPINS
+wp-content/mu-plugins/hostinger-auto-updates.php
+wp-content/mu-plugins/hostinger-preview-domain.php
+wp-content/themes/index.php
+wp-content/index.php
+wp-content/plugins/index.php
+wp-content/litespeed/robots.txt
+wp-content/litespeed/qc.last.news
+wp-content/litespeed/qc.curr.news
+wp-content/litespeed/qc.last.vercheck
+wp-content/litespeed/qc.curr.vercheck
+wp-content/litespeed/.htaccess
+
+SERVER ERROR LOG
+[02-Sep-2026 14:41:23 UTC] WordPress database error Commands out of sync; you can't run this command now for query SELECT umeta_id FROM wp_usermeta WHERE meta_key = 'wp_yoast_notifications' AND user_id = 1 made by shutdown_action_hook, do_action('shutdown'), WP_Hook->do_action, WP_Hook->apply_filters, Yoast_Notification_Center->update_storage, array_walk, Yoast_Notification_Center->store_notifications_for_user, update_user_option, update_user_meta, update_metadata
+[02-Sep-2026 14:41:23 UTC] WordPress database error Commands out of sync; you can't run this command now for query INSERT INTO `wp_usermeta` (`user_id`, `meta_key`, `meta_value`) VALUES (1, 'wp_yoast_notifications', 'a:2:{i:0;a:2:{s:7:\"message\";s:422:\"Yoast indexables are disabled because your site is in a non-production environment or custom code is blocking them. This may affect your SEO features. <a href=\"https://yoa.st/indexables-disabled?php_version=8.5&#038;platform=wordpress&#038;platform_version=7.1&#038;software=free&#038;software_version=28.4&#038;days_active=47&#038;user_language=en_US&#038;screen=pronamic_ideal\" target=\"_blank\">Learn more about this</a>.\";s:7:\"options\";a:11:{s:4:\"type\";s:7:\"warning\";s:2:\"id\";s:25:\"wpseo-indexables-disabled\";s:7:\"user_id\";i:1;s:5:\"nonce\";N;s:8:\"priority\";d:0.5;s:9:\"data_json\";a:0:{}s:13:\"dismissal_key\";N;s:12:\"capabilities\";a:1:{i:0;s:20:\"wpseo_manage_options\";}s:16:\"capability_check\";s:3:\"all\";s:14:\"yoast_branding\";b:0;s:13:\"resolve_nonce\";s:0:\"\";}}i:1;a:2:{s:7:\"message\";s:218:\"<p>Looks like you’re new here. Yoast SEO makes it easy to optimize your website for search engines. Want to keep your site healthy and easier to find? Sign up below to receive practical emails to get you started!</p>\";s:7:\"options\";a:11:{s:4:\"type\";s:7:\"warning\";s:2:\"id\";s:23:\"wpseo-ping-other-admins\";s:7:\"user_id\";i:1;s:5:\"nonce\";N;s:8:\"priority\";i:1;s:9:\"data_json\";a:0:{}s:13:\"dismissal_key\";N;s:12:\"capabilities\";a:1:{i:0;s:20:\"wpseo_manage_options\";}s:16:\"capability_check\";s:3:\"all\";s:14:\"yoast_branding\";b:0;s:13:\"resolve_nonce\";s:10:\"99c1deed0e\";}}}') made by shutdown_action_hook, do_action('shutdown'), WP_Hook->do_action, WP_Hook->apply_filters, Yoast_Notification_Center->update_storage, array_walk, Yoast_Notification_Center->store_notifications_for_user, update_user_option, update_user_meta, update_metadata, add_metadata
+[02-Sep-2026 14:41:23 UTC] WordPress database error Commands out of sync; you can't run this command now for query SELECT option_value FROM wp_options WHERE option_name = 'action_scheduler_lock_async-request-runner' made by shutdown_action_hook, do_action('shutdown'), WP_Hook->do_action, WP_Hook->apply_filters, ActionScheduler_QueueRunner->maybe_dispatch_async_request, ActionScheduler_Lock->is_locked, ActionScheduler_OptionLock->get_expiration, ActionScheduler_OptionLock->get_existing_lock
+[02-Sep-2026 14:41:23 UTC] WordPress database error Commands out of sync; you can't run this command now for query SELECT option_value FROM wp_options WHERE option_name = 'action_scheduler_lock_async-request-runner' made by shutdown_action_hook, do_action('shutdown'), WP_Hook->do_action, WP_Hook->apply_filters, ActionScheduler_QueueRunner->maybe_dispatch_async_request, ActionScheduler_OptionLock->set, ActionScheduler_OptionLock->get_existing_lock
+[02-Sep-2026 14:41:23 UTC] WordPress database error Commands out of sync; you can't run this command now for query INSERT INTO `wp_options` (`option_name`, `option_value`, `autoload`) VALUES ('action_scheduler_lock_async-request-runner', '6a98359376df04.33009243|1788360143', 'no') made by shutdown_action_hook, do_action('shutdown'), WP_Hook->do_action, WP_Hook->apply_filters, ActionScheduler_QueueRunner->maybe_dispatch_async_request, ActionScheduler_OptionLock->set
+[09-Sep-2026 00:51:53 UTC] WordPress database error Commands out of sync; you can't run this command now for query SELECT option_value FROM wp_options WHERE option_name = 'litespeed.optimax._summary' LIMIT 1 made by shutdown_action_hook, do_action('shutdown'), WP_Hook->do_action, WP_Hook->apply_filters, wp_ob_end_flush_all, ob_end_flush, LiteSpeed\Core->send_headers_force, LiteSpeed\Root::cls, LiteSpeed\Optimax->__construct, LiteSpeed\Root::get_summary, LiteSpeed\Root::get_option, get_option
+[09-Sep-2026 00:51:53 UTC] WordPress database error Commands out of sync; you can't run this command now for query SELECT option_name, option_value FROM wp_options WHERE option_name IN ('_transient_doing_cron','_transient_timeout_doing_cron') made by shutdown_action_hook, do_action('shutdown'), WP_Hook->do_action, WP_Hook->apply_filters, _wp_cron, spawn_cron, get_transient, wp_prime_option_caches
+[09-Sep-2026 00:51:53 UTC] WordPress database error Commands out of sync; you can't run this command now for query INSERT INTO `wp_options` (`option_name`, `option_value`, `autoload`) VALUES ('_transient_doing_cron', '1788915113.6020600795745849609375', 'on') ON DUPLICATE KEY UPDATE `option_name` = VALUES(`option_name`), `option_value` = VALUES(`option_value`), `autoload` = VALUES(`autoload`) made by shutdown_action_hook, do_action('shutdown'), WP_Hook->do_action, WP_Hook->apply_filters, _wp_cron, spawn_cron, set_transient, add_option
+[09-Sep-2026 00:51:53 UTC] WordPress database error Commands out of sync; you can't run this command now for query SELECT option_value FROM wp_options WHERE option_name = 'litespeed.optimax._summary' LIMIT 1 made by shutdown_action_hook, do_action('shutdown'), WP_Hook->do_action, WP_Hook->apply_filters, wp_ob_end_flush_all, ob_end_flush, LiteSpeed\Core->send_headers_force, LiteSpeed\Root::cls, LiteSpeed\Optimax->__construct, LiteSpeed\Root::get_summary, LiteSpeed\Root::get_option, get_option
+[09-Sep-2026 00:51:53 UTC] WordPress database error Commands out of sync; you can't run this command now for query SELECT option_name, option_value FROM wp_options WHERE option_name IN ('_transient_doing_cron','_transient_timeout_doing_cron') made by shutdown_action_hook, do_action('shutdown'), WP_Hook->do_action, WP_Hook->apply_filters, _wp_cron, spawn_cron, get_transient, wp_prime_option_caches
+[09-Sep-2026 00:51:53 UTC] WordPress database error Commands out of sync; you can't run this command now for query INSERT INTO `wp_options` (`option_name`, `option_value`, `autoload`) VALUES ('_transient_doing_cron', '1788915113.9031960964202880859375', 'on') ON DUPLICATE KEY UPDATE `option_name` = VALUES(`option_name`), `option_value` = VALUES(`option_value`), `autoload` = VALUES(`autoload`) made by shutdown_action_hook, do_action('shutdown'), WP_Hook->do_action, WP_Hook->apply_filters, _wp_cron, spawn_cron, set_transient, add_option
+[09-Sep-2026 00:51:53 UTC] WordPress database error Commands out of sync; you can't run this command now for query SELECT option_value FROM wp_options WHERE option_name = 'litespeed.optimax._summary' LIMIT 1 made by shutdown_action_hook, do_action('shutdown'), WP_Hook->do_action, WP_Hook->apply_filters, wp_ob_end_flush_all, ob_end_flush, LiteSpeed\Core->send_headers_force, LiteSpeed\Root::cls, LiteSpeed\Optimax->__construct, LiteSpeed\Root::get_summary, LiteSpeed\Root::get_option, get_option
+[09-Sep-2026 00:51:53 UTC] WordPress database error Commands out of sync; you can't run this command now for query SELECT option_name, option_value FROM wp_options WHERE option_name IN ('_transient_doing_cron','_transient_timeout_doing_cron') made by shutdown_action_hook, do_action('shutdown'), WP_Hook->do_action, WP_Hook->apply_filters, _wp_cron, spawn_cron, get_transient, wp_prime_option_caches
+[09-Sep-2026 00:51:53 UTC] WordPress database error Commands out of sync; you can't run this command now for query INSERT INTO `wp_options` (`option_name`, `option_value`, `autoload`) VALUES ('_transient_doing_cron', '1788915113.9053769111633300781250', 'on') ON DUPLICATE KEY UPDATE `option_name` = VALUES(`option_name`), `option_value` = VALUES(`option_value`), `autoload` = VALUES(`autoload`) made by shutdown_action_hook, do_action('shutdown'), WP_Hook->do_action, WP_Hook->apply_filters, _wp_cron, spawn_cron, set_transient, add_option
+[09-Sep-2026 07:16:55 UTC] WordPress database error Commands out of sync; you can't run this command now for query INSERT INTO `wp_clarity_collect_events` (`payload`) VALUES ('{\"envelope\":{\"projectId\":\"xhcm944w0u\",\"sessionId\":\"\",\"version\":\"0.10.29\"},\"analytics\":{\"time\":1788938215,\"ip\":\"2409:40d0:2461:a05b:584f:2eff:feaa:30e\",\"ua\":\"Mozilla\\/5.0 (Linux; Android 10; K) AppleWebKit\\/537.36 (KHTML, like Gecko) Chrome\\/152.0.0.0 Mobile Safari\\/537.36\",\"url\":\"https:\\/\\/codesblock.io\\/\",\"method\":\"GET\",\"response_content_type\":\"text\\/html; charset=UTF-8\"}}') made by shutdown_action_hook, do_action('shutdown'), WP_Hook->do_action, WP_Hook->apply_filters, clarity_collect_event, clarity_insert_collect_event
+[09-Sep-2026 07:16:55 UTC] WordPress database error Commands out of sync; you can't run this command now for query SELECT option_name, option_value FROM wp_options WHERE option_name IN ('_transient_doing_cron','_transient_timeout_doing_cron') made by shutdown_action_hook, do_action('shutdown'), WP_Hook->do_action, WP_Hook->apply_filters, _wp_cron, spawn_cron, get_transient, wp_prime_option_caches
+[09-Sep-2026 07:16:55 UTC] WordPress database error Commands out of sync; you can't run this command now for query INSERT INTO `wp_options` (`option_name`, `option_value`, `autoload`) VALUES ('_transient_doing_cron', '1788938215.1943531036376953125000', 'on') ON DUPLICATE KEY UPDATE `option_name` = VALUES(`option_name`), `option_value` = VALUES(`option_value`), `autoload` = VALUES(`autoload`) made by shutdown_action_hook, do_action('shutdown'), WP_Hook->do_action, WP_Hook->apply_filters, _wp_cron, spawn_cron, set_transient, add_option
+[09-Sep-2026 16:30:07 UTC] Cron reschedule event error for hook: litespeed_task_lqip, Error code: invalid_schedule, Error message: Event schedule does not exist., Data: {"schedule":"litespeed_filter","args":[],"interval":900}
+[10-Sep-2026 16:18:41 UTC] WordPress database error Commands out of sync; you can't run this command now for query SHOW FULL COLUMNS FROM `wp_clarity_collect_events` made by shutdown_action_hook, do_action('shutdown'), WP_Hook->do_action, WP_Hook->apply_filters, clarity_collect_event, clarity_insert_collect_event
+[10-Sep-2026 16:18:41 UTC] WordPress database error Commands out of sync; you can't run this command now for query SELECT option_name, option_value FROM wp_options WHERE option_name IN ('_transient_doing_cron','_transient_timeout_doing_cron') made by shutdown_action_hook, do_action('shutdown'), WP_Hook->do_action, WP_Hook->apply_filters, _wp_cron, spawn_cron, get_transient, wp_prime_option_caches
+[10-Sep-2026 16:18:41 UTC] WordPress database error Commands out of sync; you can't run this command now for query INSERT INTO `wp_options` (`option_name`, `option_value`, `autoload`) VALUES ('_transient_doing_cron', '1789057121.1979360580444335937500', 'on') ON DUPLICATE KEY UPDATE `option_name` = VALUES(`option_name`), `option_value` = VALUES(`option_value`), `autoload` = VALUES(`autoload`) made by shutdown_action_hook, do_action('shutdown'), WP_Hook->do_action, WP_Hook->apply_filters, _wp_cron, spawn_cron, set_transient, add_option

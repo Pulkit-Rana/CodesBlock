@@ -1,0 +1,442 @@
+[
+  {
+    "path": "/",
+    "status": 200,
+    "type": "text/html; charset=UTF-8",
+    "bytes": 102053,
+    "headers": {
+      "Date": "Sat, 12 Sep 2026 10:33:48 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Transfer-Encoding": "chunked",
+      "Connection": "close",
+      "Vary": "Accept-Encoding",
+      "X-Powered-By": "PHP/8.5.6",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "SAMEORIGIN",
+      "Content-Security-Policy": "upgrade-insecure-requests",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+      "Link": "<https://codesblock.io/wp-json/>; rel=\"https://api.w.org/\"",
+      "Etag": "W/\"8-1789209228;gz\"",
+      "X-Litespeed-Cache": "miss",
+      "platform": "hostinger",
+      "panel": "hpanel",
+      "Server": "hcdn",
+      "alt-svc": "h3=\":443\"; ma=86400",
+      "x-hcdn-request-id": "f6a8bfffade8f5f0bcb1a7da6150f5f0-mum-edge9",
+      "x-hcdn-cache-status": "MISS",
+      "x-hcdn-upstream-rt": "0.284"
+    }
+  },
+  {
+    "path": "/articles/",
+    "status": 200,
+    "type": "text/html; charset=UTF-8",
+    "bytes": 87958
+  },
+  {
+    "path": "/courses/",
+    "status": 200,
+    "type": "text/html; charset=UTF-8",
+    "bytes": 93571
+  },
+  {
+    "path": "/wp-json/",
+    "status": 200,
+    "type": "application/json; charset=UTF-8",
+    "bytes": 374338
+  },
+  {
+    "path": "/.git/config",
+    "status": 403,
+    "type": "text/html",
+    "bytes": 787
+  },
+  {
+    "path": "/wp-config.php",
+    "status": 403,
+    "type": "text/html",
+    "bytes": 787
+  },
+  {
+    "path": "/codesblock-io-20260902-v2.sql",
+    "status": 404,
+    "type": "text/html; charset=UTF-8",
+    "bytes": 77033
+  },
+  {
+    "path": "/wp-content/uploads/mailpoet/index.php",
+    "status": 403,
+    "type": "text/html",
+    "bytes": 787
+  },
+  {
+    "path": "/wp-json/wp/v2/users",
+    "status": 200,
+    "type": "application/json; charset=UTF-8",
+    "bytes": 6857,
+    "body": [
+      {
+        "id": 1,
+        "name": "Pulkit Rana",
+        "url": "http://codesblock.io",
+        "description": "",
+        "link": "https://codesblock.io/author/p/",
+        "slug": "p",
+        "avatar_urls": {
+          "24": "https://secure.gravatar.com/avatar/1247ab076e50e4bf85858a4e1ae41306045b24e2d55547b0d08047f8ee16a4f4?s=24&d=mm&r=g",
+          "48": "https://secure.gravatar.com/avatar/1247ab076e50e4bf85858a4e1ae41306045b24e2d55547b0d08047f8ee16a4f4?s=48&d=mm&r=g",
+          "96": "https://secure.gravatar.com/avatar/1247ab076e50e4bf85858a4e1ae41306045b24e2d55547b0d08047f8ee16a4f4?s=96&d=mm&r=g"
+        },
+        "meta": [],
+        "yoast_head": "<!-- This site is optimized with the Yoast SEO plugin v28.4 - https://yoast.com/product/yoast-seo-wordpress/ -->\n<title>Pulkit Rana, Author at CodesBlock</title>\n<meta name=\"robots\" content=\"index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1\" />\n<link rel=\"canonical\" href=\"https://codesblock.io/author/p/\" />\n<meta property=\"og:locale\" content=\"en_US\" />\n<meta property=\"og:type\" content=\"profile\" />\n<meta property=\"og:title\" content=\"Pulkit Rana, Author at CodesBlock\" />\n<meta property=\"og:url\" content=\"https://codesblock.io/author/p/\" />\n<meta property=\"og:site_name\" content=\"CodesBlock\" />\n<meta property=\"og:image\" content=\"https://secure.gravatar.com/avatar/1247ab076e50e4bf85858a4e1ae41306045b24e2d55547b0d08047f8ee16a4f4?s=500&d=mm&r=g\" />\n<meta name=\"twitter:card\" content=\"summary_large_image\" />\n<script type=\"application/ld+json\" class=\"yoast-schema-graph\">{\"@context\":\"https:\\/\\/schema.org\",\"@graph\":[{\"@type\":\"ProfilePage\",\"@id\":\"https:\\/\\/codesblock.io\\/author\\/p\\/\",\"url\":\"https:\\/\\/codesblock.io\\/author\\/p\\/\",\"name\":\"Pulkit Rana, Author at CodesBlock\",\"isPartOf\":{\"@id\":\"https:\\/\\/codesblock.io\\/#website\"},\"breadcrumb\":{\"@id\":\"https:\\/\\/codesblock.io\\/author\\/p\\/#breadcrumb\"},\"inLanguage\":\"en-US\",\"potentialAction\":[{\"@type\":\"ReadAction\",\"target\":[\"https:\\/\\/codesblock.io\\/author\\/p\\/\"]}]},{\"@type\":\"BreadcrumbList\",\"@id\":\"https:\\/\\/codesblock.io\\/author\\/p\\/#breadcrumb\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https:\\/\\/codesblock.io\\/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Archives for Pulkit Rana\"}]},{\"@type\":\"WebSite\",\"@id\":\"https:\\/\\/codesblock.io\\/#website\",\"url\":\"https:\\/\\/codesblock.io\\/\",\"name\":\"codesblock\",\"description\":\"\",\"publisher\":{\"@id\":\"https:\\/\\/codesblock.io\\/#\\/schema\\/person\\/0c49430bb72a790fdd70a7f3e9cabb9f\"},\"potentialAction\":[{\"@type\":\"SearchAction\",\"target\":{\"@type\":\"EntryPoint\",\"urlTemplate\":\"https:\\/\\/codesblock.io\\/?s={search_term_string}\"},\"query-input\":{\"@type\":\"PropertyValueSpecification\",\"valueRequired\":true,\"valueName\":\"search_term_string\"}}],\"inLanguage\":\"en-US\"},{\"@type\":[\"Person\",\"Organization\"],\"@id\":\"https:\\/\\/codesblock.io\\/#\\/schema\\/person\\/0c49430bb72a790fdd70a7f3e9cabb9f\",\"name\":\"Pulkit Rana\",\"image\":{\"@type\":\"ImageObject\",\"inLanguage\":\"en-US\",\"@id\":\"https:\\/\\/secure.gravatar.com\\/avatar\\/1247ab076e50e4bf85858a4e1ae41306045b24e2d55547b0d08047f8ee16a4f4?s=96&d=mm&r=g\",\"url\":\"https:\\/\\/secure.gravatar.com\\/avatar\\/1247ab076e50e4bf85858a4e1ae41306045b24e2d55547b0d08047f8ee16a4f4?s=96&d=mm&r=g\",\"contentUrl\":\"https:\\/\\/secure.gravatar.com\\/avatar\\/1247ab076e50e4bf85858a4e1ae41306045b24e2d55547b0d08047f8ee16a4f4?s=96&d=mm&r=g\",\"caption\":\"Pulkit Rana\"},\"logo\":{\"@id\":\"https:\\/\\/secure.gravatar.com\\/avatar\\/1247ab076e50e4bf85858a4e1ae41306045b24e2d55547b0d08047f8ee16a4f4?s=96&d=mm&r=g\"},\"sameAs\":[\"http:\\/\\/codesblock.io\"],\"mainEntityOfPage\":{\"@id\":\"https:\\/\\/codesblock.io\\/author\\/p\\/\"}}]}</script>\n<!-- / Yoast SEO plugin. -->",
+        "yoast_head_json": {
+          "title": "Pulkit Rana, Author at CodesBlock",
+          "robots": {
+            "index": "index",
+            "follow": "follow",
+            "max-snippet": "max-snippet:-1",
+            "max-image-preview": "max-image-preview:large",
+            "max-video-preview": "max-video-preview:-1"
+          },
+          "canonical": "https://codesblock.io/author/p/",
+          "og_locale": "en_US",
+          "og_type": "profile",
+          "og_title": "Pulkit Rana, Author at CodesBlock",
+          "og_url": "https://codesblock.io/author/p/",
+          "og_site_name": "CodesBlock",
+          "og_image": [
+            {
+              "url": "https://secure.gravatar.com/avatar/1247ab076e50e4bf85858a4e1ae41306045b24e2d55547b0d08047f8ee16a4f4?s=500&d=mm&r=g",
+              "type": "",
+              "width": "",
+              "height": ""
+            }
+          ],
+          "twitter_card": "summary_large_image",
+          "schema": {
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "ProfilePage",
+                "@id": "https://codesblock.io/author/p/",
+                "url": "https://codesblock.io/author/p/",
+                "name": "Pulkit Rana, Author at CodesBlock",
+                "isPartOf": {
+                  "@id": "https://codesblock.io/#website"
+                },
+                "breadcrumb": {
+                  "@id": "https://codesblock.io/author/p/#breadcrumb"
+                },
+                "inLanguage": "en-US",
+                "potentialAction": [
+                  {
+                    "@type": "ReadAction",
+                    "target": [
+                      "https://codesblock.io/author/p/"
+                    ]
+                  }
+                ]
+              },
+              {
+                "@type": "BreadcrumbList",
+                "@id": "https://codesblock.io/author/p/#breadcrumb",
+                "itemListElement": [
+                  {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Home",
+                    "item": "https://codesblock.io/"
+                  },
+                  {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "Archives for Pulkit Rana"
+                  }
+                ]
+              },
+              {
+                "@type": "WebSite",
+                "@id": "https://codesblock.io/#website",
+                "url": "https://codesblock.io/",
+                "name": "codesblock",
+                "description": "",
+                "publisher": {
+                  "@id": "https://codesblock.io/#/schema/person/0c49430bb72a790fdd70a7f3e9cabb9f"
+                },
+                "potentialAction": [
+                  {
+                    "@type": "SearchAction",
+                    "target": {
+                      "@type": "EntryPoint",
+                      "urlTemplate": "https://codesblock.io/?s={search_term_string}"
+                    },
+                    "query-input": {
+                      "@type": "PropertyValueSpecification",
+                      "valueRequired": true,
+                      "valueName": "search_term_string"
+                    }
+                  }
+                ],
+                "inLanguage": "en-US"
+              },
+              {
+                "@type": [
+                  "Person",
+                  "Organization"
+                ],
+                "@id": "https://codesblock.io/#/schema/person/0c49430bb72a790fdd70a7f3e9cabb9f",
+                "name": "Pulkit Rana",
+                "image": {
+                  "@type": "ImageObject",
+                  "inLanguage": "en-US",
+                  "@id": "https://secure.gravatar.com/avatar/1247ab076e50e4bf85858a4e1ae41306045b24e2d55547b0d08047f8ee16a4f4?s=96&d=mm&r=g",
+                  "url": "https://secure.gravatar.com/avatar/1247ab076e50e4bf85858a4e1ae41306045b24e2d55547b0d08047f8ee16a4f4?s=96&d=mm&r=g",
+                  "contentUrl": "https://secure.gravatar.com/avatar/1247ab076e50e4bf85858a4e1ae41306045b24e2d55547b0d08047f8ee16a4f4?s=96&d=mm&r=g",
+                  "caption": "Pulkit Rana"
+                },
+                "logo": {
+                  "@id": "https://secure.gravatar.com/avatar/1247ab076e50e4bf85858a4e1ae41306045b24e2d55547b0d08047f8ee16a4f4?s=96&d=mm&r=g"
+                },
+                "sameAs": [
+                  "http://codesblock.io"
+                ],
+                "mainEntityOfPage": {
+                  "@id": "https://codesblock.io/author/p/"
+                }
+              }
+            ]
+          }
+        },
+        "_links": {
+          "self": [
+            {
+              "href": "https://codesblock.io/wp-json/wp/v2/users/1",
+              "targetHints": {
+                "allow": [
+                  "GET"
+                ]
+              }
+            }
+          ],
+          "collection": [
+            {
+              "href": "https://codesblock.io/wp-json/wp/v2/users"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "path": "/wp-json/wp/v2/course_lesson",
+    "status": 200,
+    "type": "application/json; charset=UTF-8",
+    "bytes": 8913,
+    "body": [
+      {
+        "id": 77,
+        "date": "2026-08-12T14:37:48",
+        "date_gmt": "2026-08-12T14:37:48",
+        "guid": {
+          "rendered": "https://codesblock.io/?post_type=course_lesson&#038;p=77"
+        },
+        "modified": "2026-08-13T17:53:15",
+        "modified_gmt": "2026-08-13T12:23:15",
+        "slug": "what-system-design-is-and-why-it-matters",
+        "status": "publish",
+        "type": "course_lesson",
+        "link": "https://codesblock.io/lessons/what-system-design-is-and-why-it-matters/",
+        "title": {
+          "rendered": "What System Design Is and Why It Matters"
+        },
+        "content": {
+          "rendered": "<p>Learn what system design covers, why interviewers care about it, and how to frame a design problem before choosing technology.</p>\n",
+          "protected": true
+        },
+        "excerpt": {
+          "rendered": "<p>Learn what system design covers, why interviewers care about it, and how to frame a design problem before choosing technology.</p>\n",
+          "protected": false
+        },
+        "author": 1,
+        "featured_media": 0,
+        "template": "",
+        "class_list": [
+          "post-77",
+          "course_lesson",
+          "type-course_lesson",
+          "status-publish",
+          "hentry",
+          "pmpro-has-access"
+        ],
+        "yoast_head": "<!-- This site is optimized with the Yoast SEO plugin v28.4 - https://yoast.com/product/yoast-seo-wordpress/ -->\n<title>What System Design Is and Why It Matters - CodesBlock</title>\n<meta name=\"robots\" content=\"index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1\" />\n<link rel=\"canonical\" href=\"https://codesblock.io/lessons/what-system-design-is-and-why-it-matters/\" />\n<meta property=\"og:locale\" content=\"en_US\" />\n<meta property=\"og:type\" content=\"article\" />\n<meta property=\"og:title\" content=\"What System Design Is and Why It Matters - CodesBlock\" />\n<meta property=\"og:description\" content=\"Learn what system design covers, why interviewers care about it, and how to frame a design problem before choosing technology.\" />\n<meta property=\"og:url\" content=\"https://codesblock.io/lessons/what-system-design-is-and-why-it-matters/\" />\n<meta property=\"og:site_name\" content=\"CodesBlock\" />\n<meta property=\"article:modified_time\" content=\"2026-08-13T12:23:15+00:00\" />\n<meta name=\"twitter:card\" content=\"summary_large_image\" />\n<meta name=\"twitter:label1\" content=\"Est. reading time\" />\n\t<meta name=\"twitter:data1\" content=\"1 minute\" />\n<script type=\"application/ld+json\" class=\"yoast-schema-graph\">{\"@context\":\"https:\\/\\/schema.org\",\"@graph\":[{\"@type\":\"WebPage\",\"@id\":\"https:\\/\\/codesblock.io\\/lessons\\/what-system-design-is-and-why-it-matters\\/\",\"url\":\"https:\\/\\/codesblock.io\\/lessons\\/what-system-design-is-and-why-it-matters\\/\",\"name\":\"What System Design Is and Why It Matters - CodesBlock\",\"isPartOf\":{\"@id\":\"https:\\/\\/codesblock.io\\/#website\"},\"datePublished\":\"2026-08-12T14:37:48+00:00\",\"dateModified\":\"2026-08-13T12:23:15+00:00\",\"breadcrumb\":{\"@id\":\"https:\\/\\/codesblock.io\\/lessons\\/what-system-design-is-and-why-it-matters\\/#breadcrumb\"},\"inLanguage\":\"en-US\",\"potentialAction\":[{\"@type\":\"ReadAction\",\"target\":[\"https:\\/\\/codesblock.io\\/lessons\\/what-system-design-is-and-why-it-matters\\/\"]}]},{\"@type\":\"BreadcrumbList\",\"@id\":\"https:\\/\\/codesblock.io\\/lessons\\/what-system-design-is-and-why-it-matters\\/#breadcrumb\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https:\\/\\/codesblock.io\\/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"What System Design Is and Why It Matters\"}]},{\"@type\":\"WebSite\",\"@id\":\"https:\\/\\/codesblock.io\\/#website\",\"url\":\"https:\\/\\/codesblock.io\\/\",\"name\":\"codesblock\",\"description\":\"\",\"publisher\":{\"@id\":\"https:\\/\\/codesblock.io\\/#\\/schema\\/person\\/0c49430bb72a790fdd70a7f3e9cabb9f\"},\"potentialAction\":[{\"@type\":\"SearchAction\",\"target\":{\"@type\":\"EntryPoint\",\"urlTemplate\":\"https:\\/\\/codesblock.io\\/?s={search_term_string}\"},\"query-input\":{\"@type\":\"PropertyValueSpecification\",\"valueRequired\":true,\"valueName\":\"search_term_string\"}}],\"inLanguage\":\"en-US\"},{\"@type\":[\"Person\",\"Organization\"],\"@id\":\"https:\\/\\/codesblock.io\\/#\\/schema\\/person\\/0c49430bb72a790fdd70a7f3e9cabb9f\",\"name\":\"Pulkit Rana\",\"image\":{\"@type\":\"ImageObject\",\"inLanguage\":\"en-US\",\"@id\":\"https:\\/\\/secure.gravatar.com\\/avatar\\/1247ab076e50e4bf85858a4e1ae41306045b24e2d55547b0d08047f8ee16a4f4?s=96&d=mm&r=g\",\"url\":\"https:\\/\\/secure.gravatar.com\\/avatar\\/1247ab076e50e4bf85858a4e1ae41306045b24e2d55547b0d08047f8ee16a4f4?s=96&d=mm&r=g\",\"contentUrl\":\"https:\\/\\/secure.gravatar.com\\/avatar\\/1247ab076e50e4bf85858a4e1ae41306045b24e2d55547b0d08047f8ee16a4f4?s=96&d=mm&r=g\",\"caption\":\"Pulkit Rana\"},\"logo\":{\"@id\":\"https:\\/\\/secure.gravatar.com\\/avatar\\/1247ab076e50e4bf85858a4e1ae41306045b24e2d55547b0d08047f8ee16a4f4?s=96&d=mm&r=g\"},\"sameAs\":[\"http:\\/\\/codesblock.io\"]}]}</script>\n<!-- / Yoast SEO plugin. -->",
+        "yoast_head_json": {
+          "title": "What System Design Is and Why It Matters - CodesBlock",
+          "robots": {
+            "index": "index",
+            "follow": "follow",
+            "max-snippet": "max-snippet:-1",
+            "max-image-preview": "max-image-preview:large",
+            "max-video-preview": "max-video-preview:-1"
+          },
+          "canonical": "https://codesblock.io/lessons/what-system-design-is-and-why-it-matters/",
+          "og_locale": "en_US",
+          "og_type": "article",
+          "og_title": "What System Design Is and Why It Matters - CodesBlock",
+          "og_description": "Learn what system design covers, why interviewers care about it, and how to frame a design problem before choosing technology.",
+          "og_url": "https://codesblock.io/lessons/what-system-design-is-and-why-it-matters/",
+          "og_site_name": "CodesBlock",
+          "article_modified_time": "2026-08-13T12:23:15+00:00",
+          "twitter_card": "summary_large_image",
+          "twitter_misc": {
+            "Est. reading time": "1 minute"
+          },
+          "schema": {
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "WebPage",
+                "@id": "https://codesblock.io/lessons/what-system-design-is-and-why-it-matters/",
+                "url": "https://codesblock.io/lessons/what-system-design-is-and-why-it-matters/",
+                "name": "What System Design Is and Why It Matters - CodesBlock",
+                "isPartOf": {
+                  "@id": "https://codesblock.io/#website"
+                },
+                "datePublished": "2026-08-12T14:37:48+00:00",
+                "dateModified": "2026-08-13T12:23:15+00:00",
+                "breadcrumb": {
+                  "@id": "https://codesblock.io/lessons/what-system-design-is-and-why-it-matters/#breadcrumb"
+                },
+                "inLanguage": "en-US",
+                "potentialAction": [
+                  {
+                    "@type": "ReadAction",
+                    "target": [
+                      "https://codesblock.io/lessons/what-system-design-is-and-why-it-matters/"
+                    ]
+                  }
+                ]
+              },
+              {
+                "@type": "BreadcrumbList",
+                "@id": "https://codesblock.io/lessons/what-system-design-is-and-why-it-matters/#breadcrumb",
+                "itemListElement": [
+                  {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Home",
+                    "item": "https://codesblock.io/"
+                  },
+                  {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "What System Design Is and Why It Matters"
+                  }
+                ]
+              },
+              {
+                "@type": "WebSite",
+                "@id": "https://codesblock.io/#website",
+                "url": "https://codesblock.io/",
+                "name": "codesblock",
+                "description": "",
+                "publisher": {
+                  "@id": "https://codesblock.io/#/schema/person/0c49430bb72a790fdd70a7f3e9cabb9f"
+                },
+                "potentialAction": [
+                  {
+                    "@type": "SearchAction",
+                    "target": {
+                      "@type": "EntryPoint",
+                      "urlTemplate": "https://codesblock.io/?s={search_term_string}"
+                    },
+                    "query-input": {
+                      "@type": "PropertyValueSpecification",
+                      "valueRequired": true,
+                      "valueName": "search_term_string"
+                    }
+                  }
+                ],
+                "inLanguage": "en-US"
+              },
+              {
+                "@type": [
+                  "Person",
+                  "Organization"
+                ],
+                "@id": "https://codesblock.io/#/schema/person/0c49430bb72a790fdd70a7f3e9cabb9f",
+                "name": "Pulkit Rana",
+                "image": {
+                  "@type": "ImageObject",
+                  "inLanguage": "en-US",
+                  "@id": "https://secure.gravatar.com/avatar/1247ab076e50e4bf85858a4e1ae41306045b24e2d55547b0d08047f8ee16a4f4?s=96&d=mm&r=g",
+                  "url": "https://secure.gravatar.com/avatar/1247ab076e50e4bf85858a4e1ae41306045b24e2d55547b0d08047f8ee16a4f4?s=96&d=mm&r=g",
+                  "contentUrl": "https://secure.gravatar.com/avatar/1247ab076e50e4bf85858a4e1ae41306045b24e2d55547b0d08047f8ee16a4f4?s=96&d=mm&r=g",
+                  "caption": "Pulkit Rana"
+                },
+                "logo": {
+                  "@id": "https://secure.gravatar.com/avatar/1247ab076e50e4bf85858a4e1ae41306045b24e2d55547b0d08047f8ee16a4f4?s=96&d=mm&r=g"
+                },
+                "sameAs": [
+                  "http://codesblock.io"
+                ]
+              }
+            ]
+          }
+        },
+        "_links": {
+          "self": [
+            {
+              "href": "https://codesblock.io/wp-json/wp/v2/course_lesson/77",
+              "targetHints": {
+                "allow": [
+                  "GET"
+                ]
+              }
+            }
+          ],
+          "collection": [
+            {
+              "href": "https://codesblock.io/wp-json/wp/v2/course_lesson"
+            }
+          ],
+          "about": [
+            {
+              "href": "https://codesblock.io/wp-json/wp/v2/types/course_lesson"
+            }
+          ],
+          "author": [
+            {
+              "embeddable": true,
+              "href": "https://codesblock.io/wp-json/wp/v2/users/1"
+            }
+          ],
+          "version-history": [
+            {
+              "count": 1,
+              "href": "https://codesblock.io/wp-json/wp/v2/course_lesson/77/revisions"
+            }
+          ],
+          "predecessor-version": [
+            {
+              "id": 79,
+              "href": "https://codesblock.io/wp-json/wp/v2/course_lesson/77/revisions/79"
+            }
+          ],
+          "wp:attachment": [
+            {
+              "href": "https://codesblock.io/wp-json/wp/v2/media?parent=77"
+            }
+          ],
+          "curies": [
+            {
+              "name": "wp",
+              "href": "https://api.w.org/{rel}",
+              "templated": true
+            }
+          ]
+        }
+      }
+    ]
+  }
+]
