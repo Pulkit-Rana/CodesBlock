@@ -402,6 +402,38 @@ if ( $is_system_design_course ) {
 				</section>
 				<?php endif; ?>
 
+				<?php if ( $is_system_design_course ) : ?>
+				<section class="course-section course-ai-era" aria-labelledby="ai-era-heading">
+					<div class="course-section-heading">
+						<p class="eyebrow"><?php esc_html_e( 'Beyond Web2', 'codesblock' ); ?></p>
+						<h2 id="ai-era-heading"><?php esc_html_e( 'Modern System Design for the AI Era', 'codesblock' ); ?></h2>
+						<p><?php esc_html_e( 'Traditional system design courses stop at load balancers and databases. We take you further into the architecture powering today’s most advanced AI applications.', 'codesblock' ); ?></p>
+					</div>
+					<div class="ai-era-grid">
+						<div class="ai-era-card">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+							<h3><?php esc_html_e( 'Vector Databases & Retrieval', 'codesblock' ); ?></h3>
+							<p><?php esc_html_e( 'Master embedding generation, semantic search, vector indexing (HNSW, FAISS), and chunking strategies for massive datasets.', 'codesblock' ); ?></p>
+						</div>
+						<div class="ai-era-card">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+							<h3><?php esc_html_e( 'Event-Driven Architectures', 'codesblock' ); ?></h3>
+							<p><?php esc_html_e( 'Design resilient, asynchronous systems using Kafka and message queues to handle spikes in AI inference workloads.', 'codesblock' ); ?></p>
+						</div>
+						<div class="ai-era-card">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+							<h3><?php esc_html_e( 'AI Agents & Tool Calling', 'codesblock' ); ?></h3>
+							<p><?php esc_html_e( 'Architect autonomous agents that can plan, reason, execute code, and query external APIs safely at scale.', 'codesblock' ); ?></p>
+						</div>
+						<div class="ai-era-card">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+							<h3><?php esc_html_e( 'Enterprise RAG Pipelines', 'codesblock' ); ?></h3>
+							<p><?php esc_html_e( 'Build production-ready Retrieval-Augmented Generation flows with hybrid search, re-ranking, and low-latency orchestration.', 'codesblock' ); ?></p>
+						</div>
+					</div>
+				</section>
+				<?php endif; ?>
+
 				<section class="course-section course-about-preview" aria-labelledby="about-heading">
 					<p class="eyebrow"><?php esc_html_e( 'About this course', 'codesblock' ); ?></p>
 					<h2 id="about-heading"><?php esc_html_e( 'Crack the interview. Build the system.', 'codesblock' ); ?></h2>

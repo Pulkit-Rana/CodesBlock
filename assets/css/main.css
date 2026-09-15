@@ -5413,3 +5413,16 @@ h3 {
 		min-height: 0;
 	}
 }
+
+
+/* Custom Sticky Nav for Course Pages */
+body.single-course .course-sticky-menu {
+	display: none;
+}
+body.single-course .site-header.is-scrolled .original-menu {
+	display: none !important;
+}
+body.single-course .site-header.is-scrolled .course-sticky-menu {
+	display: flex !important;
+}
+

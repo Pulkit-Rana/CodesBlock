@@ -800,3 +800,68 @@ body.single-course .course-jump-nav {
 @media (prefers-reduced-motion: reduce) {
 	.sd-case-grid { scroll-behavior: auto; }
 }
+
+/* AI Era Section Styles */
+.course-ai-era {
+	background: #0b1120;
+	border-radius: 24px;
+	padding: clamp(32px, 5vw, 64px);
+	color: #fff;
+	margin: 48px 0;
+	box-shadow: 0 24px 50px rgba(0,0,0,0.15);
+	position: relative;
+	overflow: hidden;
+}
+.course-ai-era::before {
+	content: '';
+	position: absolute;
+	top: 0; left: 0; right: 0; bottom: 0;
+	background: radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.2), transparent 50%),
+				radial-gradient(circle at 0% 100%, rgba(13, 155, 113, 0.15), transparent 50%);
+	pointer-events: none;
+}
+.course-ai-era .eyebrow {
+	color: #38bdf8;
+}
+.course-ai-era h2 {
+	color: #fff;
+}
+.course-ai-era > .course-section-heading > p {
+	color: #94a3b8;
+}
+.ai-era-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	gap: 24px;
+	margin-top: 36px;
+	position: relative;
+	z-index: 1;
+}
+.ai-era-card {
+	background: rgba(30, 41, 59, 0.5);
+	border: 1px solid rgba(71, 85, 105, 0.5);
+	border-radius: 16px;
+	padding: 24px;
+	transition: transform 0.2s ease, background 0.2s ease;
+}
+.ai-era-card:hover {
+	background: rgba(30, 41, 59, 0.8);
+	transform: translateY(-4px);
+	border-color: rgba(56, 189, 248, 0.5);
+}
+.ai-era-card svg {
+	color: #38bdf8;
+	margin-bottom: 16px;
+}
+.ai-era-card h3 {
+	color: #f1f5f9;
+	font-size: 1.05rem;
+	margin-bottom: 10px;
+}
+.ai-era-card p {
+	color: #94a3b8;
+	font-size: 0.85rem;
+	line-height: 1.6;
+	margin: 0;
+}
+

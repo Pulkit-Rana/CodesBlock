@@ -113,11 +113,17 @@
 				array(
 					'theme_location' => 'primary',
 					'container'      => false,
-					'menu_class'     => 'menu',
+					'menu_class'     => 'menu original-menu',
 					'fallback_cb'    => 'codesblock_default_menu',
 				)
 			);
 			?>
+			<?php if ( is_singular( 'course' ) ) : ?>
+				<ul class="menu course-sticky-menu">
+					<li><a href="#about-heading"><?php esc_html_e( 'Start Course', 'codesblock' ); ?></a></li>
+					<li><a href="#syllabus-heading"><?php esc_html_e( 'Content Table', 'codesblock' ); ?></a></li>
+				</ul>
+			<?php endif; ?>
 		</nav>
 		<div class="header-actions">
 			<?php if ( get_theme_mod( 'codesblock_support_url', 'https://www.buymeacoffee.com/codesblock' ) ) : ?>
