@@ -121,7 +121,7 @@
 			<?php if ( is_singular( 'course' ) ) : ?>
 				<ul class="menu course-sticky-menu">
 					<li><a href="#about-heading"><?php esc_html_e( 'Start Course', 'codesblock' ); ?></a></li>
-					<li><a href="#syllabus-heading"><?php esc_html_e( 'Content Table', 'codesblock' ); ?></a></li>
+					<li><a href="#syllabus-heading"><?php esc_html_e( 'Curriculum', 'codesblock' ); ?></a></li>
 				</ul>
 			<?php endif; ?>
 		</nav>
