@@ -15,34 +15,34 @@
 	</header>
 
 	<figure class="sd-request-board">
-		<div class="sd-board-toolbar" aria-hidden="true"><span></span><span></span><span></span><strong>whiteboard / photo-sharing-feed</strong><em>42 min</em></div>
+		<div class="sd-board-toolbar" aria-hidden="true"><span></span><span></span><span></span><strong>whiteboard / enterprise-rag-copilot</strong><em>42 min</em></div>
 		<div class="sd-board-canvas">
-			<div class="sd-board-note sd-note-requirement"><small>01 / REQUIREMENT</small><strong>Home feed under 200 ms</strong><span>10M daily users · read heavy</span></div>
-			<div class="sd-flow-row" aria-label="Photo sharing feed request path">
-				<div class="sd-node sd-node-client"><span class="sd-node-icon">UI</span><strong>Mobile client</strong><small>GET /feed</small></div>
+			<div class="sd-board-note sd-note-requirement"><small>01 / REQUIREMENT</small><strong>Retrieval under 300 ms</strong><span>1M daily active users · read heavy</span></div>
+			<div class="sd-flow-row" aria-label="RAG Copilot request path">
+				<div class="sd-node sd-node-client"><span class="sd-node-icon">UI</span><strong>Web client</strong><small>POST /chat</small></div>
 				<span class="sd-arrow" aria-hidden="true">→</span>
-				<div class="sd-node"><span class="sd-node-icon">LB</span><strong>Load balancer</strong><small>health + routing</small></div>
+				<div class="sd-node"><span class="sd-node-icon">AG</span><strong>API Gateway</strong><small>auth + rate limit</small></div>
 				<span class="sd-arrow" aria-hidden="true">→</span>
-				<div class="sd-node sd-node-primary"><span class="sd-node-icon">FS</span><strong>Feed service</strong><small>rank + paginate</small></div>
+				<div class="sd-node sd-node-primary"><span class="sd-node-icon">AI</span><strong>Orchestrator</strong><small>plan + tool call</small></div>
 				<span class="sd-arrow" aria-hidden="true">→</span>
-				<div class="sd-node sd-node-cache"><span class="sd-node-icon">C</span><strong>Feed cache</strong><small>precomputed IDs</small></div>
+				<div class="sd-node sd-node-cache"><span class="sd-node-icon">VD</span><strong>Vector DB</strong><small>semantic search</small></div>
 			</div>
 			<div class="sd-board-branches">
-				<div><b>↳</b><span><strong>Fan-out workers</strong><small>push updates asynchronously</small></span></div>
-				<div><b>↳</b><span><strong>Post store</strong><small>durable source of truth</small></span></div>
-				<div><b>↳</b><span><strong>Media CDN</strong><small>serve images near users</small></span></div>
+				<div><b>↳</b><span><strong>LLM Service</strong><small>generate final response</small></span></div>
+				<div><b>↳</b><span><strong>Session Store</strong><small>durable chat history</small></span></div>
+				<div><b>↳</b><span><strong>Tool Agents</strong><small>execute external APIs</small></span></div>
 			</div>
-			<div class="sd-board-note sd-note-tradeoff"><small>INTERVIEWER FOLLOW-UP</small><strong>What breaks when a celebrity posts?</strong><span>Compare push, pull, and a hybrid fan-out path.</span></div>
+			<div class="sd-board-note sd-note-tradeoff"><small>INTERVIEWER FOLLOW-UP</small><strong>What if the retrieved context is irrelevant?</strong><span>Compare cross-encoder reranking, hybrid search, and prompt injection filters.</span></div>
 		</div>
-		<figcaption><strong><?php esc_html_e( 'Worked diagram: a photo-sharing feed', 'codesblock' ); ?></strong><span><?php esc_html_e( 'Requirements → request path → storage → bottleneck → trade-off', 'codesblock' ); ?></span></figcaption>
+		<figcaption><strong><?php esc_html_e( 'Worked diagram: an enterprise RAG Copilot', 'codesblock' ); ?></strong><span><?php esc_html_e( 'Requirements → request path → retrieval → orchestration → trade-off', 'codesblock' ); ?></span></figcaption>
 	</figure>
 
 	<div class="sd-case-grid">
 		<article class="sd-case-card sd-case-blue">
-			<div class="sd-case-meta"><span>LAB 04</span><small>latency · caching</small></div>
-			<h3><?php esc_html_e( 'Design a URL shortener', 'codesblock' ); ?></h3>
-			<div class="sd-mini-diagram" aria-label="URL shortener request flow"><b>URL</b><i>→</i><b>API</b><i>→</i><b>Cache</b><i>→</i><b>DB</b></div>
-			<p><?php esc_html_e( 'Choose an ID strategy, estimate key space, and keep redirects fast at global scale.', 'codesblock' ); ?></p>
+			<div class="sd-case-meta"><span>LAB 04</span><small>scale · vector search</small></div>
+			<h3><?php esc_html_e( 'Design an AI Search Engine', 'codesblock' ); ?></h3>
+			<div class="sd-mini-diagram" aria-label="AI Search flow"><b>Query</b><i>→</i><b>Embed</b><i>→</i><b>Vector DB</b><i>→</i><b>Rerank</b></div>
+			<p><?php esc_html_e( 'Choose a chunking strategy, scale index partitioning, and minimize embedding latency.', 'codesblock' ); ?></p>
 			<footer><span>8 decisions</span><span>1 design drill</span></footer>
 		</article>
 		<article class="sd-case-card sd-case-green">
