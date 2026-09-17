@@ -29,9 +29,9 @@ if ( 'page' === get_option( 'show_on_front' ) && have_posts() ) {
 	rewind_posts();
 }
 
-$hero_eyebrow = get_theme_mod( 'codesblock_hero_eyebrow', 'Stay Relevant.Stay Curious' );
-$hero_title   = get_theme_mod( 'codesblock_hero_title', 'CodesBlock' );
-$hero_lede    = get_theme_mod( 'codesblock_hero_lede', 'Production AI engineering, system design, and interview practice for developers who want practical proof - not another passive tutorial catalog.' );
+$hero_eyebrow = get_theme_mod( 'codesblock_hero_eyebrow', 'System Design Mastery' );
+$hero_title   = get_theme_mod( 'codesblock_hero_title', 'Crack the System Design Interview' );
+$hero_lede    = get_theme_mod( 'codesblock_hero_lede', 'Classical distributed systems + the architecture behind modern AI products.' );
 $codesblock_published_course_count = (int) wp_count_posts( 'course' )->publish;
 $codesblock_published_post_count   = (int) wp_count_posts( 'post' )->publish;
 
@@ -122,24 +122,24 @@ $codesblock_member_learning_url = function_exists( 'cbcommerce_member_home_url' 
 				<div class="learning-search" aria-label="Search learning topics">
 					<form class="hero-search-form" action="<?php echo esc_url( home_url( '/' ) ); ?>" method="get">
 						<label class="screen-reader-text" for="hero-search">Search learning topics</label>
-						<input id="hero-search" name="s" type="search" placeholder="Search AI interviews, DSA, system design...">
+						<input id="hero-search" name="s" type="search" placeholder="Search distributed systems, AI architecture, load balancers...">
 						<button type="submit">Search</button>
 					</form>
 					<div class="keyword-picker" aria-label="Popular learning keywords">
 						<span>Popular:</span>
-						<a href="<?php echo esc_url( home_url( '/?s=AI%20interview%20coach' ) ); ?>">AI interview coach</a>
-						<a href="<?php echo esc_url( home_url( '/?s=DSA%20patterns' ) ); ?>">DSA patterns</a>
+						<a href="<?php echo esc_url( home_url( '/?s=distributed%20systems' ) ); ?>">distributed systems</a>
+						<a href="<?php echo esc_url( home_url( '/?s=AI%20architecture' ) ); ?>">AI architecture</a>
 						<a href="<?php echo esc_url( home_url( '/?s=system%20design' ) ); ?>">system design</a>
-						<a href="<?php echo esc_url( home_url( '/?s=mock%20interviews' ) ); ?>">mock interviews</a>
+						<a href="<?php echo esc_url( home_url( '/?s=microservices' ) ); ?>">microservices</a>
 					</div>
 				</div>
 			
 			</div>
 			<div class="hero-sketch" aria-label="CodesBlock learning preview">
-				<div class="sketch-label">CodesBlock Paths</div>
+				<div class="sketch-label">System Design Path</div>
 				<div class="sketch-card lesson-card">
 					<p>Step-by-step Guides</p>
-					<h2>Master System Design</h2>
+					<h2>Crack the System Design Interview</h2>
 					<div class="lesson-line long"></div>
 					<div class="lesson-line"></div>
 					<div class="lesson-line short"></div>
@@ -365,8 +365,8 @@ $codesblock_member_learning_url = function_exists( 'cbcommerce_member_home_url' 
 					</div>
 					<div class="practice-prompt">
 						<span>System design prompt</span>
-						<h3>Design a rate limiter for a high-traffic API.</h3>
-						<p>Talk through scale, consistency, failure modes, and the tradeoff you would ship.</p>
+						<h3>Design a distributed AI inference architecture.</h3>
+						<p>Talk through GPU load balancing, vector database scaling, latency, and AI model serving tradeoffs.</p>
 					</div>
 					<div class="practice-checkpoints">
 						<div><span>01</span><strong>Clarify</strong><small>Traffic, latency, limits</small></div>
