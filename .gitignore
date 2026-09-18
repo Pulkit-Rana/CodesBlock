@@ -25,6 +25,9 @@ dist/
 # Logs
 *.log
 
+# Local WordPress config
+app/public/wp-config.php
+
 # Temp files
 *.tmp
 *.temp
