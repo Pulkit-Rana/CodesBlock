@@ -6,6 +6,15 @@
  * @package CodesBlock
  */
 
+$course_slug = get_post_field( 'post_name', get_the_ID() );
+if ( 'crack-the-system-design-interview' === $course_slug ) {
+	$custom_landing = locate_template( 'single-course-crack-the-system-design-interview.php' );
+	if ( $custom_landing ) {
+		include $custom_landing;
+		return;
+	}
+}
+
 get_header();
 
 /* ── Course meta ─────────────────────────────────────────────── */
