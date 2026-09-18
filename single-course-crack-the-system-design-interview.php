@@ -79,7 +79,11 @@ $cb_render_course_cta = static function( $classes = '' ) use ( $cb_first_lesson,
 }
 
 #cb-landing-main {
-  background: var(--cb-bg);
+  background-color: var(--cb-bg);
+  background-image:
+    linear-gradient(90deg, rgba(37, 99, 235, 0.022) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(15, 23, 42, 0.018) 1px, transparent 1px);
+  background-size: 96px 96px;
   color: var(--cb-ink);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   line-height: 1.58;
@@ -718,7 +722,8 @@ $cb_render_course_cta = static function( $classes = '' ) use ( $cb_first_lesson,
   position: relative;
 }
 #cb-landing-main .surface {
-  background: #ffffff;
+  background-color: #ffffff;
+  background-image: linear-gradient(115deg, transparent 0 42%, rgba(37, 99, 235, 0.028) 42% 42.12%, transparent 42.12% 100%);
   border-top: 1px solid var(--cb-line);
   border-bottom: 1px solid var(--cb-line);
 }
@@ -1158,6 +1163,26 @@ $cb_render_course_cta = static function( $classes = '' ) use ( $cb_first_lesson,
 }
 
 /* Section: Curriculum Learning Path (#curriculum) */
+#cb-landing-main #curriculum {
+  background-color: #f7faff;
+  background-image:
+    linear-gradient(90deg, rgba(37, 99, 235, 0.07) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(37, 99, 235, 0.055) 1px, transparent 1px),
+    linear-gradient(118deg, transparent 0 32%, rgba(96, 165, 250, 0.075) 32% 32.12%, transparent 32.12% 100%),
+    radial-gradient(ellipse 48% 34% at 96% 8%, rgba(125, 211, 252, 0.19), transparent 70%);
+  background-size: 42px 42px, 42px 42px, 100% 100%, 100% 100%;
+  border-top: 1px solid #dbeafe;
+  border-bottom: 1px solid #dbeafe;
+  overflow: hidden;
+}
+#cb-landing-main #curriculum .wrap {
+  position: relative;
+  z-index: 1;
+}
+#cb-landing-main #curriculum .section-head {
+  padding-left: 22px;
+  border-left: 3px solid var(--cb-blue);
+}
 #cb-landing-main .curriculum-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
@@ -1167,6 +1192,17 @@ $cb_render_course_cta = static function( $classes = '' ) use ( $cb_first_lesson,
 #cb-landing-main .phases {
   display: grid;
   gap: 12px;
+  position: relative;
+  padding: 8px 0 8px 12px;
+}
+#cb-landing-main .phases:before {
+  content: "";
+  position: absolute;
+  top: 24px;
+  bottom: 24px;
+  left: 27px;
+  width: 1px;
+  background: linear-gradient(180deg, #93c5fd, rgba(147, 197, 253, 0.18));
 }
 #cb-landing-main .phase {
   border: 1px solid var(--cb-line);
@@ -1174,11 +1210,33 @@ $cb_render_course_cta = static function( $classes = '' ) use ( $cb_first_lesson,
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+#cb-landing-main .phase:before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: #60a5fa;
+}
+#cb-landing-main .phase:nth-child(2):before { background: #38bdf8; }
+#cb-landing-main .phase:nth-child(3):before { background: #2dd4bf; }
+#cb-landing-main .phase:nth-child(4):before { background: #34d399; }
+#cb-landing-main .phase:nth-child(5):before { background: #818cf8; }
+#cb-landing-main .phase:nth-child(6):before { background: #a78bfa; }
+#cb-landing-main .phase:nth-child(7):before { background: #c084fc; }
+#cb-landing-main .phase:nth-child(8):before { background: #f59e0b; }
+#cb-landing-main .phase:nth-child(9):before { background: #fb7185; }
+#cb-landing-main .phase:nth-child(10):before { background: #2563eb; }
+#cb-landing-main .phase:hover {
+  border-color: #bfdbfe;
+  box-shadow: 0 12px 28px -14px rgba(37, 99, 235, 0.22);
+  transform: translateX(3px);
 }
 #cb-landing-main .phase[open] {
   border-color: #93c5fd;
-  box-shadow: 0 8px 24px -6px rgba(37, 99, 235, 0.12);
+  box-shadow: 0 14px 30px -14px rgba(37, 99, 235, 0.23);
 }
 #cb-landing-main .phase summary {
   list-style: none;
@@ -1197,9 +1255,9 @@ $cb_render_course_cta = static function( $classes = '' ) use ( $cb_first_lesson,
   font-size: 11px;
   font-weight: 900;
   color: #2563eb;
-  background: #eff6ff;
+  background: linear-gradient(145deg, #ffffff, #dbeafe);
   border: 1px solid #bfdbfe;
-  border-radius: 8px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
   width: 32px;
@@ -1234,7 +1292,9 @@ $cb_render_course_cta = static function( $classes = '' ) use ( $cb_first_lesson,
 #cb-landing-main .phase-content {
   border-top: 1px solid #f1f5f9;
   padding: 20px 20px 24px 70px;
-  background: #fbfcfe;
+  background-color: #fbfdff;
+  background-image: linear-gradient(90deg, rgba(96, 165, 250, 0.055) 1px, transparent 1px);
+  background-size: 18px 18px;
 }
 #cb-landing-main .phase-content p {
   font-size: 13px;
@@ -1247,14 +1307,14 @@ $cb_render_course_cta = static function( $classes = '' ) use ( $cb_first_lesson,
   gap: 8px;
 }
 #cb-landing-main .topic {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, #ffffff, #f8fbff);
+  border: 1px solid #dbeafe;
   border-radius: 8px;
   padding: 9px 12px;
   font-size: 11.5px;
   font-weight: 600;
   color: #334155;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.025);
 }
 
 /* Curriculum Sidebar Card (#start) */
