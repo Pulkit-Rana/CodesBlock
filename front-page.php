@@ -34,6 +34,8 @@ $hero_title   = get_theme_mod( 'codesblock_hero_title', 'CodesBlock' );
 $hero_lede    = get_theme_mod( 'codesblock_hero_lede', 'Production AI engineering, system design, and interview practice for developers who want practical proof - not another passive tutorial catalog.' );
 $codesblock_published_course_count = (int) wp_count_posts( 'course' )->publish;
 $codesblock_published_post_count   = (int) wp_count_posts( 'post' )->publish;
+$codesblock_user_counts           = count_users();
+$codesblock_learner_count         = (int) $codesblock_user_counts['total_users'];
 
 $codesblock_recommended_articles = new WP_Query(
 	array(
@@ -122,7 +124,7 @@ $codesblock_member_learning_url = function_exists( 'cbcommerce_member_home_url' 
 				<div class="learning-search" aria-label="Search learning topics">
 					<form class="hero-search-form" action="<?php echo esc_url( home_url( '/' ) ); ?>" method="get">
 						<label class="screen-reader-text" for="hero-search">Search learning topics</label>
-						<input id="hero-search" name="s" type="search" placeholder="Search distributed systems, AI architecture, load balancers...">
+						<input id="hero-search" name="s" type="search" placeholder="<?php esc_attr_e( 'Search topics', 'codesblock' ); ?>">
 						<button type="submit">Search</button>
 					</form>
 					<div class="keyword-picker" aria-label="Popular learning keywords">
@@ -155,7 +157,11 @@ $codesblock_member_learning_url = function_exists( 'cbcommerce_member_home_url' 
 				</div>
 				<div class="sketch-card extra-card">
 					<span>CodesBlock Community</span>
-					<strong><span id="cb-course-counter"><?php echo esc_html( $codesblock_published_course_count ); ?></span> courses &middot; <span id="cb-article-counter"><?php echo esc_html( $codesblock_published_post_count ); ?></span> articles &middot; <span id="cb-learner-counter"><?php $u_count = count_users(); echo esc_html( $u_count['total_users'] ); ?></span> learners</strong>
+					<strong>
+						<span id="cb-course-counter"><?php echo esc_html( $codesblock_published_course_count ); ?></span> <span id="cb-course-counter-label" data-singular="<?php esc_attr_e( 'course', 'codesblock' ); ?>" data-plural="<?php esc_attr_e( 'courses', 'codesblock' ); ?>"><?php echo esc_html( _n( 'course', 'courses', $codesblock_published_course_count, 'codesblock' ) ); ?></span> &middot;
+						<span id="cb-article-counter"><?php echo esc_html( $codesblock_published_post_count ); ?></span> <span id="cb-article-counter-label" data-singular="<?php esc_attr_e( 'article', 'codesblock' ); ?>" data-plural="<?php esc_attr_e( 'articles', 'codesblock' ); ?>"><?php echo esc_html( _n( 'article', 'articles', $codesblock_published_post_count, 'codesblock' ) ); ?></span> &middot;
+						<span id="cb-learner-counter"><?php echo esc_html( $codesblock_learner_count ); ?></span> <span id="cb-learner-counter-label" data-singular="<?php esc_attr_e( 'learner', 'codesblock' ); ?>" data-plural="<?php esc_attr_e( 'learners', 'codesblock' ); ?>"><?php echo esc_html( _n( 'learner', 'learners', $codesblock_learner_count, 'codesblock' ) ); ?></span>
+					</strong>
 					<p style="font-size: 0.8rem; color: #66788a; margin-top: 6px;"><?php esc_html_e( 'Join our growing community of developers.', 'codesblock' ); ?></p>
 				</div>
 			</div>

@@ -80,6 +80,14 @@
 	</div>
 <?php endif; ?>
 <header class="site-header" data-site-header>
+	<?php
+	$codesblock_is_admin_session = function_exists( 'cbcommerce_user_can_access_admin' )
+		? cbcommerce_user_can_access_admin()
+		: current_user_can( 'manage_options' );
+	$codesblock_is_frontend_member = function_exists( 'cbcommerce_is_frontend_member' )
+		? cbcommerce_is_frontend_member()
+		: ( is_user_logged_in() && ! $codesblock_is_admin_session );
+	?>
 	<div class="header-inner header-inner-full">
 		<?php if ( has_custom_logo() ) : ?>
 			<div class="brand">
@@ -107,7 +115,7 @@
 			<span></span>
 			<span></span>
 		</button>
-		<nav class="primary-nav" id="primary-menu" data-primary-nav>
+		<nav class="primary-nav" id="primary-menu" aria-label="<?php esc_attr_e( 'Main navigation', 'codesblock' ); ?>" data-primary-nav>
 			<?php
 			wp_nav_menu(
 				array(
@@ -124,6 +132,17 @@
 					<li><a href="#syllabus-heading"><?php esc_html_e( 'Curriculum', 'codesblock' ); ?></a></li>
 				</ul>
 			<?php endif; ?>
+			<div class="mobile-menu-account">
+				<?php if ( $codesblock_is_admin_session ) : ?>
+					<a href="<?php echo esc_url( admin_url() ); ?>"><?php esc_html_e( 'WP Admin', 'codesblock' ); ?></a>
+				<?php endif; ?>
+				<?php if ( is_user_logged_in() ) : ?>
+					<a href="<?php echo esc_url( home_url( '/my-learning/' ) ); ?>"><?php esc_html_e( 'My learning', 'codesblock' ); ?></a>
+				<?php else : ?>
+					<a class="js-open-member" data-member-view="register" href="#member-overlay" aria-haspopup="dialog" aria-controls="member-overlay"><?php esc_html_e( 'Create free account', 'codesblock' ); ?></a>
+				<?php endif; ?>
+				<a class="js-open-paywall" href="#paywall-overlay" aria-haspopup="dialog" aria-controls="paywall-overlay"><?php esc_html_e( 'View membership', 'codesblock' ); ?></a>
+			</div>
 		</nav>
 		<div class="header-actions">
 			<?php if ( get_theme_mod( 'codesblock_support_url', 'https://www.buymeacoffee.com/codesblock' ) ) : ?>
@@ -131,14 +150,6 @@
 					<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1-2H7L6 7z" fill="#ffffff" stroke="#1e293b"/><path d="M6.5 9l1.2 10.5a2 2 0 0 0 2 1.8h4.6a2 2 0 0 0 2-1.8L17.5 9H6.5z" fill="#ffdd00" stroke="#1e293b"/><rect x="5.5" y="7" width="13" height="2" rx="1" fill="#ffffff" stroke="#1e293b"/></svg>
 				</a>
 			<?php endif; ?>
-			<?php
-			$codesblock_is_admin_session = function_exists( 'cbcommerce_user_can_access_admin' )
-				? cbcommerce_user_can_access_admin()
-				: current_user_can( 'manage_options' );
-			$codesblock_is_frontend_member = function_exists( 'cbcommerce_is_frontend_member' )
-				? cbcommerce_is_frontend_member()
-				: ( is_user_logged_in() && ! $codesblock_is_admin_session );
-			?>
 			<?php if ( $codesblock_is_frontend_member ) : ?>
 				<?php
 					$current_user = wp_get_current_user();
@@ -151,7 +162,7 @@
 				</a>
 				<a class="header-button header-learning-button" href="<?php echo esc_url( $learning_url ); ?>"><span aria-hidden="true">&#9654;</span><?php esc_html_e( 'My learning', 'codesblock' ); ?></a>
 			<?php elseif ( $codesblock_is_admin_session ) : ?>
-				<a class="header-link" href="<?php echo esc_url( admin_url() ); ?>"><?php esc_html_e( 'WP Admin', 'codesblock' ); ?></a>
+				<a class="header-link header-admin-link" href="<?php echo esc_url( admin_url() ); ?>"><?php esc_html_e( 'WP Admin', 'codesblock' ); ?></a>
 			<?php else : ?>
 				<a class="header-link header-signin-button js-open-member" data-member-view="signin" href="#member-overlay" aria-haspopup="dialog" aria-controls="member-overlay"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg><?php esc_html_e( 'Sign in', 'codesblock' ); ?></a>
 				<a class="header-button js-open-paywall" href="#paywall-overlay" aria-haspopup="dialog" aria-controls="paywall-overlay"><?php esc_html_e( 'Become a member', 'codesblock' ); ?></a>

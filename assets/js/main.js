@@ -221,6 +221,11 @@
 }());
 
 	/* ── Live Counters Animation ── */
+	function updateCounterLabel(el, count) {
+		var label = document.getElementById(el.id + '-label');
+		if (label) label.textContent = count === 1 ? label.dataset.singular : label.dataset.plural;
+	}
+
 	function animateCounter(el, start, end, duration) {
 		var range = end - start;
 		var current = start;
@@ -230,6 +235,7 @@
 		var timer = setInterval(function() {
 			current += increment;
 			el.textContent = current;
+			updateCounterLabel(el, current);
 			if (current == end) {
 				clearInterval(timer);
 			}
