@@ -46,6 +46,11 @@
 		padding: 0;
 	}
 
+	/* This element carries both classes: preserve the intended edge gutter. */
+	.header-inner.header-inner-full {
+		padding-inline: var(--cb-mobile-gutter);
+	}
+
 	.brand,
 	.site-header.is-scrolled .brand {
 		flex: 1 1 auto;
@@ -163,7 +168,7 @@
 	.site-header.is-scrolled .primary-nav .menu {
 		display: grid !important;
 		gap: 4px !important;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
+		grid-template-columns: minmax(0, 1fr);
 		overflow: visible;
 		padding: 0;
 	}
@@ -836,10 +841,6 @@
 }
 
 @media (max-width: 380px) {
-	.brand-copy {
-		display: none;
-	}
-
 	.articles-dashboard-page .dashboard-search button {
 		font-size: 0;
 		width: 42px;
@@ -854,6 +855,183 @@
 	.articles-dashboard-page :where(.bento-card, .bento-hero, .bento-wide) .bento-card-link {
 		grid-template-columns: minmax(0, 1fr) 92px;
 	}
+}
+
+.cb-mobile-contents,
+.mobile-menu-account {
+	display: none;
+}
+
+/* Phone reading: a compact scale and controls, with room for the content. */
+@media (max-width: 980px) {
+	html { font-size: 100%; scroll-padding-top: 80px; }
+	:root {
+		--type-page-title: clamp(1.65rem, 4vw, 2rem);
+		--type-section-title: 1.5rem;
+		--type-content-title: 1.3rem;
+	}
+	.brand { min-width: 0; }
+	.brand-copy strong { white-space: nowrap; }
+	.custom-logo-link img { max-width: 150px; max-height: 38px; width: auto; }
+	.primary-nav,
+	.site-header.is-scrolled .primary-nav {
+		inset-inline: var(--cb-mobile-gutter) !important;
+		max-height: calc(100dvh - 140px);
+		overflow-y: auto;
+		overscroll-behavior: contain;
+	}
+	.mobile-menu-account {
+		display: grid;
+		gap: 8px;
+		margin-top: 12px;
+	}
+	.primary-nav .mobile-menu-account a,
+	.site-header.is-scrolled .primary-nav .mobile-menu-account a {
+		background: #eef4ff !important;
+		border: 1px solid #d9e3ed !important;
+		color: #1849a9;
+		font-weight: 600;
+		justify-content: center;
+	}
+	.primary-nav .mobile-menu-account a:hover,
+	.primary-nav .mobile-menu-account a:focus-visible {
+		background: #dbeafe !important;
+	}
+	.header-actions .header-admin-link { display: none; }
+	main :where(.article-main-column, .cb-lesson-content, .course-main-content) { min-width: 0; }
+	:where(.article-content, .cb-lesson-content) { overflow-wrap: anywhere; }
+	:where(.article-content, .cb-lesson-content) pre {
+		max-width: 100%; overflow-x: auto; white-space: pre; overflow-wrap: normal;
+		font-size: .85rem; border-radius: 8px;
+	}
+	:where(.article-content, .cb-lesson-content) :where(table, .wp-block-table) {
+		display: block; max-width: 100%; overflow-x: auto;
+	}
+	:where(.article-content, .cb-lesson-content) :where(p, li) {
+		font-size: 1rem !important; line-height: 1.75;
+	}
+	.cb-mobile-contents {
+		display: block; border-block: 1px solid #dbe4ee;
+		margin-bottom: 24px; padding-block: 4px;
+	}
+	.cb-mobile-contents summary {
+		cursor: pointer; padding: 12px 2px; font-size: .9rem; font-weight: 600;
+	}
+	.cb-mobile-contents nav { padding-bottom: 10px; }
+	.cb-mobile-contents a {
+		display: block; padding: 11px 4px; font-size: .94rem; line-height: 1.4;
+		color: #334155;
+	}
+	.cb-mobile-contents .toc-level-3 { padding-left: 16px; }
+	:where(a, button, summary, input):focus-visible {
+		outline: 2px solid #2563eb; outline-offset: 3px;
+	}
+	input:not([type="checkbox"]):not([type="radio"]), textarea, select {
+		font-size: 16px !important;
+	}
+}
+
+@media (max-width: 640px) {
+	.site-header, .site-header.is-scrolled { box-shadow: none; background: #fff; }
+	.header-inner { min-height: 68px; gap: 12px; column-gap: 12px; }
+	.nav-toggle, .site-header.is-scrolled .nav-toggle { width: 44px; height: 44px; flex-basis: 44px; }
+	.header-link { min-height: 44px; }
+	.brand-mark { width: 32px; height: 32px; }
+	.brand-copy strong { font-size: 1rem; }
+	.top-promo-inner {
+		grid-template-columns: minmax(0, 1fr);
+		gap: 10px;
+		padding: 12px 68px 12px 16px;
+	}
+	.promo-badge, .promo-countdown, .promo-icon { display: none; }
+	.promo-message { min-width: 0; }
+	.top-promo-inner p {
+		display: block;
+		font-size: .8125rem;
+		line-height: 1.5;
+		overflow: visible;
+		-webkit-line-clamp: unset;
+	}
+	.top-promo-inner .promo-cta {
+		grid-column: 1;
+		grid-row: auto;
+		justify-self: start;
+		min-height: 44px;
+		font-size: .8125rem;
+		padding: 10px 14px;
+	}
+	.promo-dismiss {
+		right: 12px;
+		top: 10px;
+		transform: none;
+		width: 44px;
+		height: 44px;
+	}
+	body.home .hero {
+		padding-block: 28px; background: #f8fafc; animation: none;
+	}
+	body.home .hero::before { display: none; }
+	.cb-motion-ready .cb-reveal-item { opacity: 1; transform: none; transition: none; }
+	body.home .hero-copy h1 { font-size: 2rem !important; line-height: 1.12 !important; }
+	body.home .hero-lede { font-size: 1rem !important; line-height: 1.65; margin-block: 14px 20px; }
+	body.home .hero-actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+	body.home .hero-actions .button { padding: 14px 16px; font-size: 1rem; min-height: 48px; }
+	body.home .keyword-picker { flex-wrap: wrap; gap: 8px; overflow: visible; }
+	body.home .hero-sketch { display: none; }
+	body.home .learning-strip .strip-grid {
+		display: grid; grid-template-columns: 1fr; gap: 0; overflow: visible;
+	}
+	body.home .learning-strip .strip-item {
+		width: auto; min-width: 0; min-height: 64px; padding: 14px 16px;
+		border-radius: 0; border: 0; border-bottom: 1px solid #e2e8f0; box-shadow: none;
+		display: grid; align-items: center; gap: 8px 12px;
+		grid-template-columns: auto minmax(0, 1fr) auto;
+	}
+	body.home .learning-strip .strip-item:last-child { border-bottom: 0; }
+	body.home .learning-strip .strip-item h2 { margin: 0; font-size: 1rem; }
+	body.home .learning-strip .strip-arrow { grid-column: 3; grid-row: 1; opacity: 1; margin: 0; transform: none; }
+	body.home .learning-strip .strip-item p { display: block; grid-column: 2 / -1; margin: 0; }
+	body.home .courses-title-row { display: flex; align-items: flex-start; flex-direction: column; gap: 16px; }
+	body.home .explore-courses-btn { align-self: flex-start; margin-left: 0; min-height: 44px; }
+	body.home .courses-title-row > div { width: 100%; }
+	body.home .course-desk { display: grid; grid-template-columns: 1fr; margin: 0; padding: 0; overflow: visible; }
+	body.home .course-card, body.home .course-card:nth-child(n) { width: 100%; transform: none; }
+	body.home .course-card img, .course-card-v2 .system-design-cover {
+		object-fit: contain; background: #eef2f7;
+	}
+	.section, body.home .section.courses { padding-block: 32px; }
+	.article-reading-header h1,
+	body.single-course .course-hero-content h1,
+	.cb-lesson-hero h1 { font-size: 1.75rem !important; line-height: 1.18 !important; }
+	.article-reading-header { padding-block: 24px 12px; }
+	.article-reading-layout { padding-top: 12px; gap: 20px; }
+	.article-reading-layout .article-content :where(p, li) { font-size: 1rem !important; line-height: 1.75; }
+	.article-meta { font-size: .8rem; line-height: 1.5; }
+	.cb-breadcrumbs { font-size: .75rem; line-height: 1.5; }
+	.article-featured-media { margin-inline: 0; }
+	.article-featured-media img { border-radius: 8px; }
+	body.single-course .course-hero, body.single-course .course-hero-banner { padding-block: 28px 24px; }
+	.course-jump-nav { overflow-x: auto; flex-wrap: nowrap; scrollbar-width: thin; }
+	.course-jump-nav a { flex-shrink: 0; min-height: 44px; }
+	.cb-lesson-shell { padding-inline: 16px; padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
+	.cb-lesson-content { padding: 0; background: transparent; border: 0; box-shadow: none; }
+	.cb-lesson-nav a { min-height: 48px; }
+	.practice-board { grid-template-columns: minmax(0, 1fr); }
+	.practice-prompt, .practice-feedback { padding: 18px; }
+	.practice-checkpoints { grid-template-columns: 1fr; padding: 0 18px 18px; }
+	.practice-checkpoints div { padding: 12px; }
+	.practice-prompt h3 { font-size: 1.25rem !important; }
+	.practice-window-bar { flex-wrap: wrap; gap: 8px; padding: 12px 16px; }
+	body.home .practice-track-list { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: none; overflow: visible; }
+	body.home .practice-track-card { min-width: 0; width: 100%; flex-basis: auto; }
+	.member-modal, .paywall-modal { max-height: calc(100dvh - 24px); overflow-y: auto; }
+	.cb-smap-trigger-btn { bottom: calc(16px + env(safe-area-inset-bottom)); }
+	.site-footer { padding-block: 32px; }
+}
+
+@media (max-width: 380px) {
+	.header-inner { gap: 10px; column-gap: 10px; }
+	.header-signin-button svg { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
