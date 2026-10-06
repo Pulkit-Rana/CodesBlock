@@ -53,9 +53,9 @@
             ),
         ),
         'league/flysystem' => array(
-            'pretty_version' => '3.35.2',
-            'version' => '3.35.2.0',
-            'reference' => 'b277b5dc3d56650b68904117124e79c851e12376',
+            'pretty_version' => '3.35.3',
+            'version' => '3.35.3.0',
+            'reference' => '5fc8404762179ae514678487b23494fd69b2309c',
             'type' => 'library',
             'install_path' => __DIR__ . '/../league/flysystem',
             'aliases' => array(),

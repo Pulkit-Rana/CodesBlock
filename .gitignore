@@ -38,3 +38,29 @@ logs/
 tmp/
 .codex-tmp/
 cloudflared-searxng.log
+
+# Database exports and migration/deployment bundles can contain credentials,
+# authentication cookies, password hashes, and private customer data.
+.codex-migration/
+migration-staging/
+deploy-packages/
+app/sql/
+*.sql
+*.sql.gz
+*.sql.zip
+*.sql.bz2
+*.sql.xz
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+*.rar
+
+# Private environment configuration and keys
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
