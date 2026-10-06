@@ -1,4 +1,4 @@
-﻿# OS files
+# OS files
 .DS_Store
 Thumbs.db
 
@@ -31,6 +31,8 @@ app/public/wp-config.php
 # Temp files
 *.tmp
 *.temp
+*.original-backup
+*.bak
 
 logs/
 tmp/
