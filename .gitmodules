@@ -1,0 +1,4 @@
+[submodule "app/public/wp-content/themes/codesblock"]
+	path = app/public/wp-content/themes/codesblock
+	url = https://github.com/Pulkit-Rana/CodesBlock.git
+	ignore = all

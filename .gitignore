@@ -38,6 +38,9 @@ logs/
 tmp/
 .codex-tmp/
 cloudflared-searxng.log
+outputs/
+output/mobile-fixes-*/
+output/mobile-responsive-*/
 
 # Database exports and migration/deployment bundles can contain credentials,
 # authentication cookies, password hashes, and private customer data.
