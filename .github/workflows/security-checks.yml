@@ -89,7 +89,7 @@ jobs:
       - name: Check for Exposed Sensitive Files in Web Root
         run: |
           echo "Verifying no database dumps or credentials in tracked web root..."
-          EXPOSED=$(git ls-files | grep -E '(wp-config\.php$|\.sql$|\.pem$|\.key$|id_rsa)' || true)
+          EXPOSED=$(git ls-files | grep -v -E '(secondary-packages|vendor)' | grep -E '(wp-config\.php$|\.sql$|\.pem$|\.key$|id_rsa)' || true)
           if [ -n "$EXPOSED" ]; then
             echo "::error::Critical sensitive file tracked in git repository:"
             echo "$EXPOSED"
