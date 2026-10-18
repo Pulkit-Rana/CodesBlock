@@ -1759,7 +1759,8 @@ $cb_render_course_cta = static function( $classes = '' ) use ( $cb_first_lesson,
     padding-top: 40px;
   }
   #cb-landing-main .hero h1 {
-    font-size: 42px;
+    font-size: 30px;
+    line-height: 1.18;
   }
   #cb-landing-main .hero .lead {
     font-size: 16px;
@@ -1833,14 +1834,40 @@ $cb_render_course_cta = static function( $classes = '' ) use ( $cb_first_lesson,
     font-size: 12px;
     color: #0f172a;
   }
-  #cb-landing-main .sticky-mobile span {
+  #cb-landing-main .sticky-mobile > div > span {
     font-size: 10px;
     color: var(--cb-muted);
   }
   #cb-landing-main .sticky-mobile .btn {
     padding: 9px 14px;
-    font-size: 12px;
+    font-size: 13px;
+    min-height: 44px;
+    flex-shrink: 0;
   }
+  #cb-landing-main .sticky-mobile .btn span { color: inherit; font-size: inherit; }
+  #cb-landing-main .sticky-mobile { bottom: calc(10px + env(safe-area-inset-bottom)); }
+  #cb-landing-main { padding-bottom: calc(90px + env(safe-area-inset-bottom)); background: #f8fafc; }
+  #cb-landing-main .hero { padding-block: 28px; }
+  #cb-landing-main .hero-grid { gap: 24px; }
+  #cb-landing-main .hero .lead { line-height: 1.7; }
+  #cb-landing-main .hero h1 { letter-spacing: -.025em; }
+  #cb-landing-main .hero-cta { display: grid; grid-template-columns: 1fr; gap: 8px; }
+  #cb-landing-main .btn { min-height: 44px; box-shadow: none; }
+  #cb-landing-main .promise { font-size: 14px; padding: 12px 14px; }
+  #cb-landing-main section { padding-block: 32px; }
+  #cb-landing-main .course-window { display: none; }
+  #cb-landing-main h2 { font-size: 24px; line-height: 1.25; }
+  #cb-landing-main h3 { font-size: 19px; line-height: 1.3; }
+  #cb-landing-main .anchor { top: 60px; overflow-x: auto; }
+  #cb-landing-main .anchor a { min-height: 44px; display: inline-flex; align-items: center; }
+  #cb-landing-main :where(.course-window, .demo, .phase, .topic, .tutor, .board) { min-width: 0; }
+  #cb-landing-main .topic { padding: 14px; }
+  #cb-landing-main :where(.topic p, .outcome-card li, .lab-card p) { font-size: 15px; line-height: 1.65; }
+  #cb-landing-main .phase summary { padding: 16px; }
+  #cb-landing-main .phase-content { padding: 16px; }
+  #cb-landing-main .topic { font-size: 14px; line-height: 1.6; }
+  #cb-landing-main .final-card { padding: 24px 18px; border-radius: 12px; }
+  #cb-landing-main .final-card h2 { font-size: 26px; }
 }
 </style>
 

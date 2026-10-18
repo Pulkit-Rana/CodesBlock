@@ -217,9 +217,6 @@
 			item.style.removeProperty('--ripple-y');
 		});
 	});
-
-}());
-
 	/* ── Live Counters Animation ── */
 	function updateCounterLabel(el, count) {
 		var label = document.getElementById(el.id + '-label');
@@ -227,18 +224,23 @@
 	}
 
 	function animateCounter(el, start, end, duration) {
-		var range = end - start;
+		if (start === end) {
+			el.textContent = end;
+			updateCounterLabel(el, end);
+			return;
+		}
+		var range = Math.abs(end - start);
 		var current = start;
 		var increment = end > start ? 1 : -1;
-		var stepTime = Math.abs(Math.floor(duration / range));
-		if (stepTime < 10) stepTime = 10;
+		var stepTime = Math.max(10, Math.floor(duration / range));
 		var timer = setInterval(function() {
 			current += increment;
-			el.textContent = current;
-			updateCounterLabel(el, current);
-			if (current == end) {
+			if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+				current = end;
 				clearInterval(timer);
 			}
+			el.textContent = current;
+			updateCounterLabel(el, current);
 		}, stepTime);
 	}
 
@@ -250,11 +252,11 @@
 		if (!courseCounter || !articleCounter || !learnerCounter) return;
 
 		fetch('/wp-json/codesblock/v1/stats')
-			.then(response => response.json())
-			.then(data => {
-				var courses = parseInt(data.courses, 10);
-				var articles = parseInt(data.articles, 10);
-				var learners = parseInt(data.learners, 10);
+			.then(function(response) { return response.json(); })
+			.then(function(data) {
+				var courses = parseInt(data.courses, 10) || 0;
+				var articles = parseInt(data.articles, 10) || 0;
+				var learners = parseInt(data.learners, 10) || 0;
 
 				var currentCourses = parseInt(courseCounter.textContent, 10) || 0;
 				var currentArticles = parseInt(articleCounter.textContent, 10) || 0;
@@ -264,7 +266,7 @@
 				if (articles !== currentArticles) animateCounter(articleCounter, currentArticles, articles, 1500);
 				if (learners !== currentLearners) animateCounter(learnerCounter, currentLearners, learners, 1500);
 			})
-			.catch(err => console.error('Error fetching live stats:', err));
+			.catch(function(err) { console.error('Error fetching live stats:', err); });
 	}
 
 	// Fetch on load and set interval for live updates every 30 seconds
@@ -273,3 +275,4 @@
 		setInterval(fetchLiveCounters, 30000);
 	}
 
+}());

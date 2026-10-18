@@ -159,6 +159,16 @@ function codesblock_prepare_article_content( $content ) {
 				</aside>
 
 				<div class="article-main-column">
+					<?php if ( ! empty( $prepared['toc'] ) ) : ?>
+						<details class="cb-mobile-contents">
+							<summary><?php esc_html_e( 'On this page', 'codesblock' ); ?></summary>
+							<nav aria-label="<?php esc_attr_e( 'Article sections', 'codesblock' ); ?>">
+								<?php foreach ( $prepared['toc'] as $toc_item ) : ?>
+									<a class="toc-level-<?php echo esc_attr( $toc_item['level'] ); ?>" href="#<?php echo esc_attr( $toc_item['id'] ); ?>"><?php echo esc_html( $toc_item['text'] ); ?></a>
+								<?php endforeach; ?>
+							</nav>
+						</details>
+					<?php endif; ?>
 					<?php if ( has_post_thumbnail() ) : ?>
 						<div class="featured-image-wrap article-featured-media">
 							<?php the_post_thumbnail( 'large' ); ?>
