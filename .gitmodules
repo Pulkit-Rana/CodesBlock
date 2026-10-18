@@ -2,3 +2,7 @@
 	path = app/public/wp-content/themes/codesblock
 	url = https://github.com/Pulkit-Rana/CodesBlock.git
 	ignore = all
+[submodule "output/security-20260912/deploy-repo"]
+	path = output/security-20260912/deploy-repo
+	url = https://github.com/Pulkit-Rana/CodesBlock.git
+	ignore = all
