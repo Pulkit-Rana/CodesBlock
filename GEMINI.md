@@ -6,3 +6,9 @@
 - **Planning Mode Overrides**: If planning mode is active, do not block or halt execution waiting for user approval. Treat implementation plans as self-approved execution guides and continue directly into implementation. Set `requestFeedback: false` on all artifacts.
 - **Independent Decision Making**: Resolve technical ambiguities and choose optimal implementations directly based on best practices rather than interrupting the user with trivial questions or multiple-choice modals.
 - **Report on Completion**: Only report back with what was accomplished and verified after completing the task.
+
+## Strict AI Quality & Verification Policy
+- **Adhere to STRICT_AI_CHECKS.md**: Follow all 5 gates defined in `STRICT_AI_CHECKS.md` (Code Quality, Hygiene, Security Hardening, Unit Testing, and Git Conventions).
+- **Mandatory Verification**: Always run `php tests/run-tests.php` and verify zero failures before reporting completion.
+- **Security First**: Guard direct execution with `defined('ABSPATH') || exit;`, sanitize all inputs, escape all outputs, and enforce nonces.
+
