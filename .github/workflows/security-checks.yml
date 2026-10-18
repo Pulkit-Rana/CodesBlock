@@ -1,0 +1,98 @@
+name: Security Checks
+
+on:
+  push:
+    branches: [main, prod_setup]
+  pull_request:
+    branches: [main, prod_setup]
+  schedule:
+    - cron: '0 4 * * 1' # Every Monday at 04:00 UTC
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  secret-scan:
+    name: Secret & Credential Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks Secret Scanner
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Custom High-Risk Credential Pattern Scan
+        run: |
+          echo "Scanning for high-risk hardcoded credential patterns..."
+          SUSPECTS=$(git grep -I -i -E '(aws_secret_access_key|api_key[[:space:]]*=[[:space:]]*["\x27][0-9a-zA-Z]{16,}["\x27]|password[[:space:]]*=[[:space:]]*["\x27][^"\x27]{6,}["\x27]|bearer[[:space:]]+[a-zA-Z0-9_\-\.]{20,})' -- ':!tests' ':!.github' || true)
+          if [ -n "$SUSPECTS" ]; then
+            echo "::warning::Potential hardcoded secrets detected:"
+            echo "$SUSPECTS"
+          else
+            echo "No obvious hardcoded credentials identified."
+          fi
+
+  sast-analysis:
+    name: SAST Vulnerability Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Scan for OWASP Top 10 PHP Anti-Patterns
+        run: |
+          echo "Scanning for unsafe PHP anti-patterns (raw \$_GET/\$_POST without sanitization, unescaped echoes)..."
+          php scripts/sast-scan.php
+
+  dependency-audit:
+    name: Dependency Vulnerability Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Audit NPM Packages
+        run: |
+          echo "Auditing npm dependencies..."
+          find . -name "package.json" -not -path "*/node_modules/*" | while read -r pkg; do
+            dir=$(dirname "$pkg")
+            echo "Checking $dir..."
+            if [ -f "$dir/package-lock.json" ]; then
+              (cd "$dir" && npm audit --audit-level=high || true)
+            fi
+          done
+
+  wp-hardening-audit:
+    name: WordPress Hardening & Privacy Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for Exposed Sensitive Files in Web Root
+        run: |
+          echo "Verifying no database dumps or credentials in tracked web root..."
+          EXPOSED=$(git ls-files | grep -E '(wp-config\.php$|\.sql$|\.pem$|\.key$|id_rsa)' || true)
+          if [ -n "$EXPOSED" ]; then
+            echo "::error::Critical sensitive file tracked in git repository:"
+            echo "$EXPOSED"
+            exit 1
+          fi
+          echo "No sensitive configuration or key files tracked."

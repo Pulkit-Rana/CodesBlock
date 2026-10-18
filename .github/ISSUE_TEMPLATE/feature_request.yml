@@ -1,0 +1,32 @@
+name: ✨ Feature Request
+description: Suggest an idea or architectural improvement for CodesBlock
+title: "feat: [Short feature summary]"
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please outline the proposed feature or improvement and its motivation.
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Feature Description
+      description: Explain the problem this feature solves and the user benefit.
+      placeholder: As a developer / learner, I want ... so that ...
+    validations:
+      required: true
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Implementation / Architecture
+      description: Detail how this feature should be implemented.
+      placeholder: Proposed files, PHP functions, or UI components
+    validations:
+      required: false
+  - type: textarea
+    id: alternatives-considered
+    attributes:
+      label: Alternatives Considered
+      description: Any alternative solutions or workarounds you considered.
+    validations:
+      required: false

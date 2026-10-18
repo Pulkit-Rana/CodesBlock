@@ -1,0 +1,32 @@
+name: 🔒 Security Vulnerability Report
+description: Report a security vulnerability privately
+title: "security: [Brief vulnerability summary]"
+labels: ["security", "critical"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### ⚠️ Important Notice
+        If you have discovered a critical security vulnerability, please do NOT disclose it publicly.
+        Use this template or contact the repository administrators privately.
+  - type: textarea
+    id: vulnerability-details
+    attributes:
+      label: Vulnerability Details
+      description: Describe the vulnerability type (e.g. XSS, SQLi, SSRF, IDOR, Path Traversal, Auth Bypass).
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: Proof of Concept / Reproduction Steps
+      description: Step-by-step instructions or payloads used to verify the issue.
+    validations:
+      required: true
+  - type: textarea
+    id: mitigation-recommendation
+    attributes:
+      label: Recommended Remediation / Mitigation
+      description: Specific code fixes, functions, or patches to mitigate the vulnerability.
+    validations:
+      required: false
