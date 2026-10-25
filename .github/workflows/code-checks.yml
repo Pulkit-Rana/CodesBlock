@@ -1,10 +1,14 @@
 name: Code Checks
 
 on:
+  workflow_dispatch:
   push:
     branches: [main, prod_setup]
   pull_request:
     branches: [main, prod_setup]
+
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -44,33 +48,49 @@ jobs:
           echo "All theme and test PHP files passed syntax check on PHP ${{ matrix.php-version }}."
 
   php-code-standards:
-    name: PHP Code Standards & Structure
+    name: WordPress PHP Coding Standards
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          tools: phpcs
+          tools: composer
 
-      - name: Check Theme Coding Conventions
+      - name: Install WordPress Coding Standards
         run: |
-          echo "Checking direct access guard on theme files..."
-          php -r '
-          $files = array_merge(glob("*.php") ?: [], glob("template-parts/*.php") ?: []);
-          $skip = ["index.php", "comments.php", "footer.php", "header.php", "inc.php"];
-          $failed = 0;
-          foreach ($files as $file) {
-              if (in_array(basename($file), $skip, true)) continue;
-              $code = file_get_contents($file);
-              if (strpos($code, "ABSPATH") === false) {
-                  echo "WARNING: $file missing direct ABSPATH check\n";
-              }
-          }
-          '
+          composer global config --no-interaction allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
+          composer global require --no-interaction --prefer-dist squizlabs/php_codesniffer:3.13.6 wp-coding-standards/wpcs:3.4.1
+
+      - name: Collect changed first-party theme PHP files
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          if [[ -z "$BASE_SHA" || "$BASE_SHA" =~ ^0+$ ]]; then
+            BASE_SHA=$(git rev-parse "$HEAD_SHA^" 2>/dev/null || echo "$HEAD_SHA")
+          fi
+          git diff --name-only --diff-filter=ACMR "$BASE_SHA...$HEAD_SHA" -- '*.php' > changed-php-all.txt
+          grep -E '^(archive-course|comments|footer|front-page|functions|header|inc|index|page[^/]*|single[^/]*)\.php$|^template-parts/.*\.php$|^tests/(unit|fixtures)/.*\.php$' changed-php-all.txt > changed-php.txt || true
+          if [ ! -s changed-php.txt ]; then
+            echo "No first-party theme PHP files changed; skipping PHPCS."
+          else
+            cat changed-php.txt
+          fi
+
+      - name: Run PHPCS with WordPress standards
+        run: |
+          if [ -s changed-php.txt ]; then
+            PHPCS_BIN="$(composer global config bin-dir --absolute)/phpcs"
+            "$PHPCS_BIN" --standard=WordPress --report=summary --file-list=changed-php.txt
+          else
+            echo "No theme PHP files to scan."
+          fi
 
   frontend-checks:
     name: Frontend Assets & Script Syntax
