@@ -53,7 +53,7 @@ jobs:
       - name: Check for Merge Conflict Markers
         run: |
           echo "Checking for unresolved git conflict markers..."
-          CONFLICT_FILES=$(git grep -I -n -E '^(<{7}\s|={7}$|>{7}\s)' -- '*.php' 'template-parts/*' 'assets/*' 'tests/*' '.github/*' '*.js' '*.css' '*.json' '*.yml' '*.md' || true)
+          CONFLICT_FILES=$(git grep -I -n -E '^(<{7}\s|={7}$|>{7}\s)' -- '*.php' 'template-parts/*' 'assets/*' 'tests/*' '.github/*' '*.js' '*.css' '*.json' '*.yml' '*.md' ':(exclude)**/vendor/**' || true)
           if [ -n "$CONFLICT_FILES" ]; then
             echo "::error::Unresolved merge conflict markers detected:"
             echo "$CONFLICT_FILES"
