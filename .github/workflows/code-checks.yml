@@ -1,0 +1,135 @@
+name: Code Checks
+
+on:
+  push:
+    branches: [main, prod_setup]
+  pull_request:
+    branches: [main, prod_setup]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  php-lint:
+    name: PHP Syntax & Linting (php -l)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.1', '8.2', '8.3']
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: none
+
+      - name: Run PHP Syntax Check on Theme Files
+        run: |
+          echo "Linting PHP files in theme root..."
+          ERRORS=0
+          for file in *.php template-parts/*.php tests/*.php tests/**/*.php; do
+            if [ -f "$file" ]; then
+              php -l "$file" || ERRORS=$((ERRORS + 1))
+            fi
+          done
+          if [ $ERRORS -gt 0 ]; then
+            echo "::error::PHP syntax errors found: $ERRORS"
+            exit 1
+          fi
+          echo "All theme and test PHP files passed syntax check on PHP ${{ matrix.php-version }}."
+
+  php-code-standards:
+    name: PHP Code Standards & Structure
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: phpcs
+
+      - name: Check Theme Coding Conventions
+        run: |
+          echo "Checking direct access guard on theme files..."
+          php -r '
+          $files = array_merge(glob("*.php") ?: [], glob("template-parts/*.php") ?: []);
+          $skip = ["index.php", "comments.php", "footer.php", "header.php", "inc.php"];
+          $failed = 0;
+          foreach ($files as $file) {
+              if (in_array(basename($file), $skip, true)) continue;
+              $code = file_get_contents($file);
+              if (strpos($code, "ABSPATH") === false) {
+                  echo "WARNING: $file missing direct ABSPATH check\n";
+              }
+          }
+          '
+
+  frontend-checks:
+    name: Frontend Assets & Script Syntax
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Verify JavaScript Syntax
+        run: |
+          echo "Validating JavaScript files syntax..."
+          node -e '
+          const fs = require("fs");
+          const vm = require("vm");
+          const glob = require("path");
+          const jsFiles = ["assets/js/main.js", "assets/js/member.js", "assets/js/course-portal.js", "assets/js/course-learning.js"];
+          let errors = 0;
+          for (const file of jsFiles) {
+            if (fs.existsSync(file)) {
+              try {
+                const code = fs.readFileSync(file, "utf8");
+                new vm.Script(code);
+                console.log(`[PASS] ${file}`);
+              } catch (e) {
+                console.error(`[FAIL] ${file}: ${e.message}`);
+                errors++;
+              }
+            }
+          }
+          if (errors > 0) process.exit(1);
+          '
+
+  scripts-lint:
+    name: Python & Shell Scripts Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Compile and Lint Python Scripts
+        run: |
+          echo "Compiling Python scripts..."
+          python3 -m py_compile Configure-SearXNG-Engines.py
+          echo "Python scripts compiled successfully."
+
+      - name: Check Shell Script Syntax
+        run: |
+          echo "Validating Bash scripts..."
+          if [ -f "Run-SearXNG-Manually.sh" ]; then
+            bash -n Run-SearXNG-Manually.sh
+            echo "[PASS] Run-SearXNG-Manually.sh syntax OK"
+          fi
