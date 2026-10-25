@@ -7,7 +7,7 @@
 		"currency",
 		"amount",
 		"tax_value",
-		"tax_percentage",
+		"tax_percentage"
 	],
 	"properties": {
 		"currency": {

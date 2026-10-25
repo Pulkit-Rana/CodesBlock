@@ -1,0 +1,24 @@
+# CodesBlock Repository Codeowners
+# Critical security, CI/CD, and architecture review assignments
+
+# Default owners for entire repository
+* @pulkit
+
+# CI/CD and Automation
+/.github/ @pulkit
+/scripts/ @pulkit
+
+# Tests and Test Suites
+/tests/ @pulkit
+
+# Core WordPress Theme Logic & Security
+/functions.php @pulkit
+/inc.php @pulkit
+/template-parts/ @pulkit
+/conf/ @pulkit
+
+# AI Guidelines and Rules
+/docs/ai/ @pulkit
+/.agents/ @pulkit
+/GEMINI.md @pulkit
+/STRICT_AI_CHECKS.md @pulkit

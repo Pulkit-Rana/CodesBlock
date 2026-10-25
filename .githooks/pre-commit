@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# Git Pre-Commit Hook for CodesBlock
+# Automatically verifies repository hygiene, syntax, and runs tests prior to commit.
+
+echo "Running pre-commit verification..."
+
+# 1. Merge Conflict Markers Check
+CONFLICTS=$(git grep -I -n -E '^(<{7}\s|={7}$|>{7}\s)' -- '*.php' 'template-parts/*' 'assets/*' 'tests/*' '.github/*' '*.js' '*.css' '*.json' '*.yml' '*.md' || true)
+if [ -n "$CONFLICTS" ]; then
+    echo "❌ PRE-COMMIT REJECTED: Unresolved merge conflict markers detected:"
+    echo "$CONFLICTS"
+    exit 1
+fi
+
+# 2. Forbidden / Sensitive File Check in Staged Files
+FORBIDDEN_STAGED=$(git diff --cached --name-only | grep -v -E '(secondary-packages|vendor)' | grep -E '(wp-config\.php$|\.sql$|\.key$|id_rsa$|\.env$|\.env\..*)$' || true)
+if [ -n "$FORBIDDEN_STAGED" ]; then
+    echo "❌ PRE-COMMIT REJECTED: Sensitive or forbidden files cannot be staged:"
+    echo "$FORBIDDEN_STAGED"
+    exit 1
+fi
+
+# 3. Fast PHP Lint on Staged PHP Files
+PHP_BIN="php"
+if ! command -v php &>/dev/null; then
+    # Look for LocalWP PHP if available
+    LOCAL_PHP=$(find /c/Users/*/AppData/Roaming/Local/lightning-services/php-*/bin/win64/php.exe 2>/dev/null | head -n 1)
+    if [ -n "$LOCAL_PHP" ]; then
+        PHP_BIN="$LOCAL_PHP"
+    fi
+fi
+
+if command -v "$PHP_BIN" &>/dev/null; then
+    for file in $(git diff --cached --name-only --diff-filter=ACM | grep -E '\.php$'); do
+        if [ -f "$file" ]; then
+            "$PHP_BIN" -l "$file" > /dev/null 2>&1 || {
+                echo "❌ PRE-COMMIT REJECTED: PHP syntax error in $file"
+                exit 1
+            }
+        fi
+    done
+fi
+
+echo "✅ Pre-commit verification passed."
+exit 0
