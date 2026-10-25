@@ -1,0 +1,12 @@
+paths:
+  - app/public/wp-content/themes/codesblock
+  - scripts
+  - Configure-SearXNG-Engines.py
+  - Run-SearXNG-Manually.sh
+paths-ignore:
+  - '**/vendor/**'
+  - '**/node_modules/**'
+  - app/public/wp-admin/**
+  - app/public/wp-includes/**
+  - app/public/wp-content/plugins/**
+  - app/public/wp-content/themes/twentytwentyfive/**
