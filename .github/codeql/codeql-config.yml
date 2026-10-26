@@ -1,7 +1,3 @@
 paths-ignore:
   - '**/vendor/**'
   - '**/node_modules/**'
-  - app/public/wp-admin/**
-  - app/public/wp-includes/**
-  - app/public/wp-content/plugins/**
-  - app/public/wp-content/themes/twentytwentyfive/**

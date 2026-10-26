@@ -34,6 +34,9 @@ dist/
 # Local WordPress config
 app/public/wp-config.php
 
+# Local WordPress installation; this repository contains only the CodesBlock theme.
+/app/
+
 # Temp files
 *.tmp
 *.temp
@@ -45,6 +48,9 @@ tmp/
 .codex-tmp/
 cloudflared-searxng.log
 outputs/
+
+# Local security-audit snapshots, logs, and deployed plugin/theme copies.
+/output/security-20260912/
 output/mobile-fixes-*/
 output/mobile-responsive-*/
 

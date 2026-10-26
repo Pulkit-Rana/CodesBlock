@@ -72,23 +72,40 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Discover tracked dependency lockfiles
+        id: dependencies
+        run: |
+          composer_count=$(git ls-files | awk '/(^|\/)composer\.lock$/ { count++ } END { print count + 0 }')
+          npm_count=$(git ls-files | awk '/(^|\/)package-lock\.json$/ { count++ } END { print count + 0 }')
+          echo "composer=$composer_count" >> "$GITHUB_OUTPUT"
+          echo "npm=$npm_count" >> "$GITHUB_OUTPUT"
+
       - name: Setup PHP and Composer
+        if: steps.dependencies.outputs.composer != '0'
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
           tools: composer
 
       - name: Setup Node.js
+        if: steps.dependencies.outputs.npm != '0'
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Audit tracked Composer dependencies
+        if: steps.dependencies.outputs.composer != '0'
         run: |
-          composer --working-dir=app/public/wp-content/plugins/knit-pay audit --locked --no-dev
+          while IFS= read -r lockfile; do
+            composer --working-dir="$(dirname "$lockfile")" audit --locked --no-dev
+          done < <(git ls-files | grep -E '(^|/)composer\.lock$')
 
       - name: Audit tracked npm dependencies
-        run: npm audit --audit-level=moderate --package-lock-only --prefix app/public/wp-content/themes/twentytwentyfive
+        if: steps.dependencies.outputs.npm != '0'
+        run: |
+          while IFS= read -r lockfile; do
+            npm audit --audit-level=moderate --package-lock-only --prefix "$(dirname "$lockfile")"
+          done < <(git ls-files | grep -E '(^|/)package-lock\.json$')
 
   wp-hardening-audit:
     name: WordPress Hardening & Privacy Audit
