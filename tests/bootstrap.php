@@ -37,6 +37,39 @@ $GLOBALS['_cb_mock_context'] = array(
 );
 
 // WordPress Core Mock Functions
+if ( ! function_exists( 'get_option' ) ) {
+	function get_option( $option, $default = false ) {
+		return array_key_exists( $option, $GLOBALS['_cb_mock_options'] ) ? $GLOBALS['_cb_mock_options'][ $option ] : $default;
+	}
+}
+
+if ( ! function_exists( 'add_option' ) ) {
+	function add_option( $option, $value = '', $deprecated = '', $autoload = 'yes' ) {
+		if ( array_key_exists( $option, $GLOBALS['_cb_mock_options'] ) ) {
+			return false;
+		}
+		$GLOBALS['_cb_mock_options'][ $option ] = $value;
+		return true;
+	}
+}
+
+if ( ! function_exists( 'update_option' ) ) {
+	function update_option( $option, $value, $autoload = null ) {
+		$GLOBALS['_cb_mock_options'][ $option ] = $value;
+		return true;
+	}
+}
+
+if ( ! function_exists( 'delete_option' ) ) {
+	function delete_option( $option ) {
+		if ( ! array_key_exists( $option, $GLOBALS['_cb_mock_options'] ) ) {
+			return false;
+		}
+		unset( $GLOBALS['_cb_mock_options'][ $option ] );
+		return true;
+	}
+}
+
 if ( ! function_exists( 'add_action' ) ) {
 	function add_action( $hook_name, $callback, $priority = 10, $accepted_args = 1 ) {
 		$GLOBALS['_cb_mock_actions'][ $hook_name ][] = array(
@@ -94,6 +127,12 @@ if ( ! function_exists( '__' ) ) {
 	}
 }
 
+if ( ! function_exists( 'absint' ) ) {
+	function absint( $maybeint ) {
+		return abs( (int) $maybeint );
+	}
+}
+
 if ( ! function_exists( 'esc_html' ) ) {
 	function esc_html( $text ) {
 		return htmlspecialchars( (string) $text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8' );
@@ -120,6 +159,12 @@ if ( ! function_exists( 'esc_url' ) ) {
 if ( ! function_exists( 'sanitize_text_field' ) ) {
 	function sanitize_text_field( $str ) {
 		return wp_strip_all_tags( (string) $str, true );
+	}
+}
+
+if ( ! function_exists( 'sanitize_key' ) ) {
+	function sanitize_key( $key ) {
+		return strtolower( preg_replace( '/[^a-z0-9_\-]/', '', (string) $key ) );
 	}
 }
 

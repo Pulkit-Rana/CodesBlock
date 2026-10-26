@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 require_once get_template_directory() . '/inc.php';
+require_once get_template_directory() . '/inc-interview.php';
 
 function codesblock_setup() {
 	add_theme_support( 'title-tag' );

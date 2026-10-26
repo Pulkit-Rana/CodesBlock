@@ -189,26 +189,26 @@ $providers      = array(
 					<strong><?php esc_html_e( 'CodesBlock learning access', 'codesblock' ); ?></strong>
 				</div>
 				<div class="cb-plan-heading">
-					<span><?php esc_html_e( 'Course access', 'codesblock' ); ?></span>
+					<span><?php esc_html_e( 'Courses & interview practice', 'codesblock' ); ?></span>
 					<h2 id="paywall-title"><?php esc_html_e( 'Choose your learning runway.', 'codesblock' ); ?></h2>
-					<p id="paywall-description"><?php esc_html_e( 'Unlock the full course library, learning tools, and saved progress for a fixed term. Renew only when you decide.', 'codesblock' ); ?></p>
+					<p id="paywall-description"><?php esc_html_e( 'Unlock the full course library, interview practice sessions, learning tools, and saved progress for a fixed term. Renew only when you decide.', 'codesblock' ); ?></p>
 				</div>
 
 				<div class="cb-free-plan">
 					<div><span><?php esc_html_e( 'Starter', 'codesblock' ); ?></span><strong><?php esc_html_e( 'Free forever', 'codesblock' ); ?></strong></div>
-					<ul role="list"><li><?php esc_html_e( 'Free courses', 'codesblock' ); ?></li><li><?php esc_html_e( 'Saved progress', 'codesblock' ); ?></li><li><?php esc_html_e( 'Member library', 'codesblock' ); ?></li></ul>
+					<ul role="list"><li><?php esc_html_e( 'Free courses', 'codesblock' ); ?></li><li><?php esc_html_e( 'One free interview session', 'codesblock' ); ?></li><li><?php esc_html_e( 'Saved progress', 'codesblock' ); ?></li></ul>
 				</div>
 
 				<div class="cb-plan-list">
 					<article class="cb-plan-option">
 						<div class="cb-plan-option-top"><span><?php esc_html_e( '30-day pass', 'codesblock' ); ?></span><strong><?php echo wp_kses_post( $pro_price ); ?></strong></div>
-						<p><?php esc_html_e( 'Unlock every paid course for 30 days. Renew manually if you need more time.', 'codesblock' ); ?></p>
+						<p><?php esc_html_e( 'Unlock every paid course and interview sessions for 30 days. Renew manually if you need more time.', 'codesblock' ); ?></p>
 						<a href="<?php echo esc_url( function_exists( 'cbcommerce_checkout_url' ) ? cbcommerce_checkout_url( 'pro' ) : wp_registration_url() ); ?>"><?php echo esc_html( $payments_ready ? __( 'Choose 30 days', 'codesblock' ) : __( 'Get launch update', 'codesblock' ) ); ?></a>
 					</article>
 					<article class="cb-plan-option is-featured">
 						<div class="cb-plan-badge"><?php echo esc_html( $annual_saving ? sprintf( __( 'Save %d%%', 'codesblock' ), $annual_saving ) : __( 'Best value', 'codesblock' ) ); ?></div>
 						<div class="cb-plan-option-top"><span><?php esc_html_e( '1-year pass', 'codesblock' ); ?></span><strong><?php echo wp_kses_post( $annual_price ); ?></strong></div>
-					<p><?php esc_html_e( 'A full year of paid courses, practical resources, learning tools, and saved progress.', 'codesblock' ); ?></p>
+					<p><?php esc_html_e( 'A full year of paid courses, interview sessions, practical resources, learning tools, and saved progress.', 'codesblock' ); ?></p>
 						<a href="<?php echo esc_url( function_exists( 'cbcommerce_checkout_url' ) ? cbcommerce_checkout_url( 'pro_annual' ) : wp_registration_url() ); ?>"><?php echo esc_html( $payments_ready ? __( 'Choose 1 year', 'codesblock' ) : __( 'Get launch update', 'codesblock' ) ); ?></a>
 					</article>
 				</div>

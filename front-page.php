@@ -108,6 +108,14 @@ $codesblock_is_frontend_member = function_exists( 'cbcommerce_is_frontend_member
 	: ( is_user_logged_in() && ! $codesblock_is_admin_session );
 $codesblock_member_profile_url = function_exists( 'cbcommerce_member_profile_url' ) ? cbcommerce_member_profile_url() : home_url( '/my-learning/#profile' );
 $codesblock_member_learning_url = function_exists( 'cbcommerce_member_home_url' ) ? cbcommerce_member_home_url() : home_url( '/my-learning/' );
+$codesblock_interview_paid      = is_user_logged_in() && codesblock_interview_user_has_paid_access( get_current_user_id() );
+$codesblock_interview_free_used = is_user_logged_in() && codesblock_interview_free_session_used( get_current_user_id() );
+$codesblock_interview_free_session_id = is_user_logged_in() ? codesblock_interview_free_session_id( get_current_user_id() ) : 0;
+$codesblock_interview_access    = codesblock_interview_access_state( is_user_logged_in(), $codesblock_interview_paid, $codesblock_interview_free_used );
+$codesblock_interview_url       = home_url( '/interview/' );
+$codesblock_interview_can_resume = 'membership_required' === $codesblock_interview_access && $codesblock_interview_free_session_id > 0;
+$codesblock_interview_cta_label = $codesblock_interview_can_resume ? __( 'Resume your free session', 'codesblock' ) : ( 'membership_required' === $codesblock_interview_access ? __( 'Get more sessions', 'codesblock' ) : ( 'login_required' === $codesblock_interview_access ? __( 'Sign in to start your free session', 'codesblock' ) : __( 'Start an interview session', 'codesblock' ) ) );
+$codesblock_interview_cta_url   = $codesblock_interview_can_resume ? add_query_arg( 'session', $codesblock_interview_free_session_id, $codesblock_interview_url ) : ( 'membership_required' === $codesblock_interview_access ? '#paywall-overlay' : ( 'login_required' === $codesblock_interview_access ? wp_login_url( $codesblock_interview_url ) : $codesblock_interview_url ) );
 ?>
 
 <main id="main">
@@ -359,6 +367,8 @@ $codesblock_member_learning_url = function_exists( 'cbcommerce_member_home_url' 
 				<div>
 					<p class="eyebrow">Interview Practice</p>
 					<h2>Practice the decisions interviewers actually score.</h2>
+					<a class="practice-start-link<?php echo 'membership_required' === $codesblock_interview_access && ! $codesblock_interview_can_resume ? ' js-open-paywall' : ''; ?>" href="<?php echo esc_url( $codesblock_interview_cta_url ); ?>"<?php echo 'membership_required' === $codesblock_interview_access && ! $codesblock_interview_can_resume ? ' aria-haspopup="dialog" aria-controls="paywall-overlay"' : ''; ?>><?php echo esc_html( $codesblock_interview_cta_label ); ?><span aria-hidden="true">&rarr;</span></a>
+					<?php if ( $codesblock_interview_can_resume ) : ?><a class="practice-start-link practice-plan-link js-open-paywall" href="#paywall-overlay" aria-haspopup="dialog" aria-controls="paywall-overlay"><?php esc_html_e( 'See membership plans', 'codesblock' ); ?></a><?php endif; ?>
 				</div>
 				<p class="practice-lede">Work through a realistic prompt, make your reasoning visible, and use focused review notes to improve the next attempt.</p>
 			</div>
@@ -366,8 +376,8 @@ $codesblock_member_learning_url = function_exists( 'cbcommerce_member_home_url' 
 			<div class="practice-board">
 				<div class="practice-workspace" aria-label="Example system design interview workspace">
 					<div class="practice-window-bar">
-						<span><i></i><i></i><i></i> Mock interview workspace</span>
-						<strong>Guided mode</strong>
+						<span><i></i><i></i><i></i> Interview workspace preview</span>
+						<strong>First phase</strong>
 					</div>
 					<div class="practice-prompt">
 						<span>System design prompt</span>
@@ -380,8 +390,8 @@ $codesblock_member_learning_url = function_exists( 'cbcommerce_member_home_url' 
 						<div><span>03</span><strong>Defend</strong><small>Tradeoffs and failure modes</small></div>
 					</div>
 					<div class="practice-feedback">
-						<span>Review note</span>
-						<p><strong>Good:</strong> clear bottleneck analysis. <strong>Next:</strong> explain the recovery path when the shared store is unavailable.</p>
+						<span>Example coaching note</span>
+						<p><strong>Sample:</strong> make the bottleneck explicit, then explain what happens when the shared store is unavailable. Live AI coaching is coming next.</p>
 					</div>
 				</div>
 
