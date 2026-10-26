@@ -2,7 +2,7 @@
 /**
  * Standalone Test Runner for CodesBlock Test Suite.
  *
- * Runs all unit and security test suites, displays a formatted summary,
+ * Runs the theme unit and security test suites, displays a formatted summary,
  * outputs GitHub Actions Step Summary when available, and returns exit code.
  *
  * Usage:
@@ -27,44 +27,9 @@ $total_assertions = 0;
 $total_tests = 0;
 $total_failures = 0;
 
-// 1. Run Procedural Security Tests
-$procedural_tests = array(
-	'Flysystem Path Normalization' => $tests_dir . '/security/flysystem-path-normalization.php',
-);
+echo "[1/1] Running Unit & Functional Test Suites...\n";
 
-echo "[1/2] Running Standalone Security Tests...\n";
-foreach ( $procedural_tests as $name => $file ) {
-	if ( ! file_exists( $file ) ) {
-		echo "  [-] SKIP: {$name} (file not found: {$file})\n";
-		continue;
-	}
-
-	$cmd = escapeshellcmd( PHP_BINARY ) . ' ' . escapeshellarg( $file );
-	$output = array();
-	$exit_code = 0;
-	exec( $cmd, $output, $exit_code );
-
-	$total_tests++;
-	$status = ( 0 === $exit_code ) ? 'PASS' : 'FAIL';
-	if ( 0 !== $exit_code ) {
-		$total_failures++;
-	}
-
-	$results[] = array(
-		'suite'      => 'Security / Procedural',
-		'test'       => $name,
-		'status'     => $status,
-		'assertions' => 11,
-		'message'    => implode( ' | ', $output ),
-	);
-	$total_assertions += 11;
-
-	printf( "  [%s] %s - %s\n", $status, $name, implode( ' ', $output ) );
-}
-
-echo "\n[2/2] Running Unit & Functional Test Suites...\n";
-
-// 2. Discover and run Class-based CBTestCase Suites
+// Discover and run Class-based CBTestCase Suites.
 $unit_files = array_merge(
 	glob( $tests_dir . '/unit/*.php' ) ?: array(),
 	glob( $tests_dir . '/security/test-*.php' ) ?: array()

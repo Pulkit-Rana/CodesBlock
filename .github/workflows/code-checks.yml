@@ -72,7 +72,7 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
-          if [[ -z "$BASE_SHA" || "$BASE_SHA" =~ ^0+$ ]]; then
+          if [[ -z "$BASE_SHA" || "$BASE_SHA" =~ ^0+$ ]] || ! git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
             BASE_SHA=$(git rev-parse "$HEAD_SHA^" 2>/dev/null || echo "$HEAD_SHA")
           fi
           git diff --name-only --diff-filter=ACMR "$BASE_SHA...$HEAD_SHA" -- '*.php' > changed-php-all.txt
