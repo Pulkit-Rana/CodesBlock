@@ -24,14 +24,15 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: Gitleaks Secret Scanner
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_CONFIG: gitleaks.toml
 
       - name: Custom High-Risk Credential Pattern Scan
         run: |
@@ -51,10 +52,10 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: '8.2'
 
@@ -70,7 +71,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Discover tracked dependency lockfiles
         id: dependencies
@@ -82,14 +83,14 @@ jobs:
 
       - name: Setup PHP and Composer
         if: steps.dependencies.outputs.composer != '0'
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: '8.2'
           tools: composer
 
       - name: Setup Node.js
         if: steps.dependencies.outputs.npm != '0'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 20
 
@@ -114,12 +115,12 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Check for Exposed Sensitive Files in Web Root
         run: |
           echo "Verifying no database dumps or credentials in tracked web root..."
-          EXPOSED=$(git ls-files | grep -v -E '(secondary-packages|vendor)' | grep -E '(wp-config\.php$|\.sql$|\.pem$|\.key$|id_rsa)' || true)
+          EXPOSED=$(git ls-files | grep -v -E '(secondary-packages|vendor)' | grep -E '(^|/)(wp-admin|wp-includes)/|(^|/)wp-config\.php$|(^|/)wp-login\.php$|(^|/)\.envrc$|(^|/)(GEMINI\.md|SECURITY-REMEDIATION\.md)$|^output/security-20260912/|\.sql$|\.pem$|\.key$|id_rsa' || true)
           if [ -n "$EXPOSED" ]; then
             echo "::error::Critical sensitive file tracked in git repository:"
             echo "$EXPOSED"

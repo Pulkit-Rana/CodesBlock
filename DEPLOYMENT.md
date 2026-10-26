@@ -7,12 +7,16 @@ Hostinger deploys `Pulkit-Rana/CodesBlock`, branch `main`, into:
 `public_html/wp-content/themes/codesblock`
 
 Never set this repository's deployment directory to `public_html`. Its `index.php`
-is a theme template, not the WordPress front controller, and Hostinger replaces
-the target directory during deployment.
+is a theme template, not the WordPress front controller. Hostinger updates files
+in the selected directory but can leave ignored or untracked files behind.
 
 Pushes and merges to `main` are deployed by Hostinger's existing GitHub
-integration. Check Advanced > Git > Deployments in hPanel for the result, then
-check the homepage, `/articles/`, `/courses/`, and `/wp-json/`.
+integration. The integration updates tracked files but may leave ignored or
+untracked files from earlier deployments in the target folder. Keep the public
+theme directory limited to the tracked theme files and remove stale files from
+the Hostinger File Manager after cleanup or history rewrites. Check Advanced >
+Git > Deployments in hPanel for the result, then check the homepage,
+`/articles/`, `/courses/`, and `/wp-json/`.
 
 Automatic deployment enabled on September 12, 2026. The follow-up documentation
 commit is used to verify a real push-triggered deployment without changing UI.

@@ -3,7 +3,9 @@
 RewriteEngine On
 RewriteRule (^|/)\.git(/|$) - [F,L]
 RewriteRule (^|/)\.github(/|$) - [F,L]
+RewriteRule ^(?:app|output|outputs|logs|tmp|docs|scripts|tests|conf|deploy-packages|migration-staging|unused-theme-assets-backup-[^/]+|\.agents|\.githooks|\.codex[^/]*)(?:/|$) - [F,L,NC]
+RewriteRule (^|/)\.[^/]+(?:/|$) - [F,L]
 </IfModule>
-<FilesMatch "(?i)^(DEPLOYMENT\.md|.*\.(sql|log|bak))$">
+<FilesMatch "(?i)\.(md|sql|log|bak|env|envrc|pem|key|toml|ya?ml|py|sh|ps1|cmd)$">
 Require all denied
 </FilesMatch>

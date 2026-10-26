@@ -2,23 +2,22 @@
 # Critical security, CI/CD, and architecture review assignments
 
 # Default owners for entire repository
-* @pulkit
+* @Pulkit-Rana
 
 # CI/CD and Automation
-/.github/ @pulkit
-/scripts/ @pulkit
+/.github/ @Pulkit-Rana
+/scripts/ @Pulkit-Rana
 
 # Tests and Test Suites
-/tests/ @pulkit
+/tests/ @Pulkit-Rana
 
 # Core WordPress Theme Logic & Security
-/functions.php @pulkit
-/inc.php @pulkit
-/template-parts/ @pulkit
-/conf/ @pulkit
+/functions.php @Pulkit-Rana
+/inc.php @Pulkit-Rana
+/template-parts/ @Pulkit-Rana
+/conf/ @Pulkit-Rana
 
 # AI Guidelines and Rules
-/docs/ai/ @pulkit
-/.agents/ @pulkit
-/GEMINI.md @pulkit
-/STRICT_AI_CHECKS.md @pulkit
+/docs/ai/ @Pulkit-Rana
+/.agents/ @Pulkit-Rana
+/STRICT_AI_CHECKS.md @Pulkit-Rana

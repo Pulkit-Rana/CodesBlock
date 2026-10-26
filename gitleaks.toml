@@ -1,0 +1,4 @@
+title = "CodesBlock secret scanning"
+
+[extend]
+useDefault = true

@@ -33,6 +33,12 @@ dist/
 
 # Local WordPress config
 app/public/wp-config.php
+/.envrc
+*.envrc
+/wp-admin/
+/wp-includes/
+/wp-config.php
+/wp-login.php
 
 # Local WordPress installation; this repository contains only the CodesBlock theme.
 /app/
@@ -77,6 +83,8 @@ app/sql/
 .env.*
 !.env.example
 !.env.sample
+GEMINI.md
+SECURITY-REMEDIATION.md
 *.pem
 *.key
 
