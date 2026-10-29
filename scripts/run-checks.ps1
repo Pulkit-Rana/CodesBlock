@@ -3,7 +3,7 @@
     Runs all local checks, security audits, and unit tests for CodesBlock.
 .DESCRIPTION
     Replicates the GitHub Actions CI pipeline locally.
-    Enforces the 5 gates defined in STRICT_AI_CHECKS.md.
+    Runs the four local theme hygiene, syntax, security, and unit-test checks.
 #>
 
 $ErrorActionPreference = "Stop"
@@ -31,7 +31,7 @@ Set-Location $repoRoot
 $failed = $false
 
 # 1. Essential Hygiene Check
-Write-Host "`n[1/5] Checking Repository Hygiene..." -ForegroundColor Yellow
+Write-Host "`n[1/4] Checking Repository Hygiene..." -ForegroundColor Yellow
 $conflictMarkers = git grep -I -n -E '^(<{7}\s|={7}$|>{7}\s)' -- '*.php' 'template-parts/*' 'assets/*' 'tests/*' '.github/*' '*.js' '*.css' '*.json' '*.yml' '*.md' 2>$null
 if ($conflictMarkers) {
     Write-Host "[-] Merge conflict markers detected:" -ForegroundColor Red
@@ -51,7 +51,7 @@ if ($forbiddenFiles) {
 }
 
 # 2. PHP Syntax Check
-Write-Host "`n[2/5] Linting Theme PHP Syntax (php -l)..." -ForegroundColor Yellow
+Write-Host "`n[2/4] Linting Theme PHP Syntax (php -l)..." -ForegroundColor Yellow
 $themePhpFiles = @(
     Get-ChildItem -Path . -Filter "*.php" -File
     Get-ChildItem -Path "template-parts" -Filter "*.php" -File -ErrorAction SilentlyContinue
@@ -74,22 +74,8 @@ if ($syntaxErrors -eq 0) {
     $failed = $true
 }
 
-# 3. Python & Script Compilation Check
-Write-Host "`n[3/5] Validating Scripts..." -ForegroundColor Yellow
-if (Get-Command "python" -ErrorAction SilentlyContinue) {
-    if (Test-Path "Configure-SearXNG-Engines.py") {
-        python -m py_compile Configure-SearXNG-Engines.py
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "[+] Python scripts compiled cleanly." -ForegroundColor Green
-        } else {
-            Write-Host "[-] Python syntax error in Configure-SearXNG-Engines.py" -ForegroundColor Red
-            $failed = $true
-        }
-    }
-}
-
-# 4. Security SAST Scan
-Write-Host "`n[4/5] Running Security Anti-Pattern Checks..." -ForegroundColor Yellow
+# 3. Security SAST Scan
+Write-Host "`n[3/4] Running Security Anti-Pattern Checks..." -ForegroundColor Yellow
 & $phpCmd scripts/sast-scan.php
 if ($LASTEXITCODE -eq 0) {
     Write-Host "[+] Security SAST scan clean: No OWASP anti-patterns found in theme templates." -ForegroundColor Green
@@ -98,8 +84,8 @@ if ($LASTEXITCODE -eq 0) {
     $failed = $true
 }
 
-# 5. Unit Tests Runner
-Write-Host "`n[5/5] Executing CodesBlock Test Suite..." -ForegroundColor Yellow
+# 4. Unit Tests Runner
+Write-Host "`n[4/4] Executing CodesBlock Test Suite..." -ForegroundColor Yellow
 & $phpCmd tests/run-tests.php
 if ($LASTEXITCODE -ne 0) {
     $failed = $true

@@ -52,7 +52,6 @@ app/public/wp-config.php
 logs/
 tmp/
 .codex-tmp/
-cloudflared-searxng.log
 outputs/
 
 # Local security-audit snapshots, logs, and deployed plugin/theme copies.

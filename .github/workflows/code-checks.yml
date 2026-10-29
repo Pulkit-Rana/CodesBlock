@@ -127,29 +127,3 @@ jobs:
           }
           if (errors > 0) process.exit(1);
           '
-
-  scripts-lint:
-    name: Python & Shell Scripts Lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Setup Python
-        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
-        with:
-          python-version: '3.12'
-
-      - name: Compile and Lint Python Scripts
-        run: |
-          echo "Compiling Python scripts..."
-          python3 -m py_compile Configure-SearXNG-Engines.py
-          echo "Python scripts compiled successfully."
-
-      - name: Check Shell Script Syntax
-        run: |
-          echo "Validating Bash scripts..."
-          if [ -f "Run-SearXNG-Manually.sh" ]; then
-            bash -n Run-SearXNG-Manually.sh
-            echo "[PASS] Run-SearXNG-Manually.sh syntax OK"
-          fi
