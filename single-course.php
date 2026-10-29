@@ -6,15 +6,6 @@
  * @package CodesBlock
  */
 
-$course_slug = get_post_field( 'post_name', get_the_ID() );
-if ( 'crack-the-system-design-interview' === $course_slug ) {
-	$custom_landing = locate_template( 'single-course-crack-the-system-design-interview.php' );
-	if ( $custom_landing ) {
-		include $custom_landing;
-		return;
-	}
-}
-
 get_header();
 
 /* ── Course meta ─────────────────────────────────────────────── */
@@ -29,11 +20,9 @@ $what_you_learn = get_post_meta( $post_id, '_course_what_you_learn', true );
 $syllabus       = get_post_meta( $post_id, '_course_syllabus', true );
 $ai_summary     = get_post_meta( $post_id, '_course_ai_summary', true ) ?: get_the_excerpt();
 $is_free        = ( 'free' === strtolower( (string) $price ) || '' === trim( (string) $price ) );
-$is_system_design_course = in_array( get_post_field( 'post_name', $post_id ), array( 'system-design-interview-sprint', 'system-design-interview-lab', 'crack-the-system-design-interview' ), true );
 
 $lessons_array   = function_exists( 'cbcore_get_course_lessons' ) ? cbcore_get_course_lessons( $post_id ) : array();
-$lesson_count    = count( $lessons_array ) > 0 ? count( $lessons_array ) : 206;
-$mock_interviews = get_post_meta( $post_id, '_course_mock_interviews', true ) ?: 8;
+$lesson_count    = count( $lessons_array );
 $course_metrics  = function_exists( 'cbcore_get_engagement_metrics' ) ? cbcore_get_engagement_metrics( $post_id ) : array( 'views' => 0, 'rating_average' => 0, 'rating_count' => 0 );
 $course_rating   = ! empty( $course_metrics['rating_count'] ) ? number_format_i18n( $course_metrics['rating_average'], 1 ) : __( 'New', 'codesblock' );
 $users_learning  = function_exists( 'cbcore_get_course_learners_count' ) ? cbcore_get_course_learners_count( $post_id ) : 0;
@@ -67,16 +56,6 @@ $ai_suggestions = array(
 	__( 'What\'s the price?', 'codesblock' ),
 	__( 'What are the prerequisites?', 'codesblock' ),
 );
-
-if ( $is_system_design_course ) {
-	$ai_suggestions = array(
-		__( 'Explain this trade-off simply', 'codesblock' ),
-		__( 'Research the stronger alternative', 'codesblock' ),
-		__( 'Challenge my architecture', 'codesblock' ),
-		__( 'Ask me an interviewer follow-up', 'codesblock' ),
-		__( 'Turn this lesson into a drill', 'codesblock' ),
-	);
-}
 ?>
 
 <main id="main" class="single-course-wrap">
@@ -109,9 +88,7 @@ if ( $is_system_design_course ) {
 					<?php endif; ?>
 
 					<h1><?php the_title(); ?></h1>
-					<?php if ( $is_system_design_course ) : ?>
-						<p class="course-subtitle"><?php esc_html_e( 'Prepare for the System Design Interview by learning how to design scalable, reliable, and high-performance systems from the ground up. Master the frameworks and patterns behind real-world architectures, practice common system design interview questions, and learn to reason through trade-offs with confidence. Then take it further with modern system design—from distributed systems and event-driven architectures to RAG, AI agents, tool calling, vector databases, and the infrastructure powering today’s AI applications.', 'codesblock' ); ?></p>
-					<?php else : ?>
+					<?php if ( has_excerpt() ) : ?>
 						<p class="course-subtitle"><?php echo esc_html( get_the_excerpt() ); ?></p>
 					<?php endif; ?>
 
@@ -129,19 +106,15 @@ if ( $is_system_design_course ) {
 							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
 							<span><?php echo esc_html( number_format_i18n( $course_metrics['views'] ) ); ?> <?php esc_html_e( 'views', 'codesblock' ); ?></span>
 						</span>
+						<?php if ( $lesson_count > 0 ) : ?>
 						<span class="meta-lessons">
 							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
 							<span><?php echo esc_html( $lesson_count ); ?> Lessons</span>
 						</span>
-						<?php if ( $is_system_design_course || $mock_interviews > 0 ) : ?>
-							<span class="meta-interviews">
-								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-								<span><?php echo esc_html( $mock_interviews ); ?> Mock Interviews</span>
-							</span>
 						<?php endif; ?>
 						<span class="meta-updated">
 							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-							<span><?php esc_html_e( 'Updated this week', 'codesblock' ); ?></span>
+							<span><?php echo esc_html( sprintf( __( 'Updated %s', 'codesblock' ), get_the_modified_date() ) ); ?></span>
 						</span>
 						<?php if ( $duration ) : ?>
 							<span class="meta-duration">
@@ -161,9 +134,7 @@ if ( $is_system_design_course ) {
 					<div class="course-sticky-card">
 						<!-- Thumbnail -->
 						<div class="sticky-card-thumb">
-							<?php if ( $is_system_design_course ) : ?>
-								<?php get_template_part( 'template-parts/system-design-hero-visual' ); ?>
-							<?php elseif ( has_post_thumbnail() ) : ?>
+							<?php if ( has_post_thumbnail() ) : ?>
 								<?php the_post_thumbnail( 'large' ); ?>
 							<?php else : ?>
 								<div class="sticky-card-placeholder" aria-hidden="true">
@@ -280,17 +251,7 @@ if ( $is_system_design_course ) {
 		</div>
 	<?php endif; ?>
 
-	<?php if ( $is_system_design_course ) : ?>
-	<section class="course-value-rail" aria-label="<?php esc_attr_e( 'How this course helps you learn', 'codesblock' ); ?>">
-		<div class="container">
-			<div class="course-value-rail-inner">
-				<div><span>01</span><strong><?php esc_html_e( 'Read for understanding', 'codesblock' ); ?></strong><small><?php esc_html_e( 'Clear lessons, diagrams, and worked decisions.', 'codesblock' ); ?></small></div>
-				<div><span>02</span><strong><?php esc_html_e( 'Ask at the point of confusion', 'codesblock' ); ?></strong><small><?php esc_html_e( 'Select a line, request an explanation, and go deeper.', 'codesblock' ); ?></small></div>
-				<div><span>03</span><strong><?php esc_html_e( 'Defend the trade-off', 'codesblock' ); ?></strong><small><?php esc_html_e( 'Turn understanding into interview-ready reasoning.', 'codesblock' ); ?></small></div>
-			</div>
-		</div>
-	</section>
-	<?php endif; ?>
+
 
 	<!-- ══════════════════════════════════════════════════
 	     MAIN CONTENT LAYOUT
@@ -302,9 +263,6 @@ if ( $is_system_design_course ) {
 				<?php if ( $what_you_learn ) : ?>
 					<a href="#learn-heading"><?php esc_html_e( 'Outcomes', 'codesblock' ); ?></a>
 				<?php endif; ?>
-				<?php if ( $is_system_design_course ) : ?>
-					<a href="#design-labs"><?php esc_html_e( 'Design labs', 'codesblock' ); ?></a>
-				<?php endif; ?>
 				<a href="#material-heading"><?php echo esc_html( $user_has_access ? __( 'Course material', 'codesblock' ) : __( 'Access', 'codesblock' ) ); ?></a>
 				<?php if ( $syllabus ) : ?>
 					<a href="#syllabus-heading"><?php esc_html_e( 'Curriculum', 'codesblock' ); ?></a>
@@ -312,9 +270,6 @@ if ( $is_system_design_course ) {
 				<a href="<?php echo esc_url( get_post_type_archive_link( 'course' ) ?: home_url( '/courses/' ) ); ?>"><?php esc_html_e( 'All courses', 'codesblock' ); ?> &rarr;</a>
 			</div>
 		</nav>
-		<?php if ( $is_system_design_course ) : ?>
-			<?php get_template_part( 'template-parts/system-design-course-visuals' ); ?>
-		<?php endif; ?>
 		<div class="course-content-layout">
 
 			<!-- ── Left: course details ─────────────────────── -->
@@ -345,39 +300,7 @@ if ( $is_system_design_course ) {
 					</section>
 				<?php endif; ?>
 
-				<?php if ( $is_system_design_course ) : ?>
-				<section class="course-section course-ai-spotlight" aria-labelledby="ai-learning-heading">
-					<div class="course-section-heading">
-						<p class="eyebrow"><?php esc_html_e( 'The CodesBlock difference', 'codesblock' ); ?></p>
-						<h2 id="ai-learning-heading"><?php esc_html_e( 'Keep the learning method that works. Add an AI thinking partner.', 'codesblock' ); ?></h2>
-						<p><?php esc_html_e( 'Read carefully, sketch the system, and form your own answer first. When a sentence or trade-off slows you down, ask in context—without leaving the lesson or losing your train of thought.', 'codesblock' ); ?></p>
-					</div>
 
-					<div class="ai-learning-demo" aria-label="<?php esc_attr_e( 'Example AI-assisted learning flow', 'codesblock' ); ?>">
-						<div class="ai-learning-selection">
-							<span><?php esc_html_e( 'Selected from the lesson', 'codesblock' ); ?></span>
-							<blockquote><?php esc_html_e( 'A cache reduces read latency, but it also creates a second place where data can become stale.', 'codesblock' ); ?></blockquote>
-							<div class="ai-learning-actions" aria-hidden="true">
-								<span><?php esc_html_e( 'Explain simply', 'codesblock' ); ?></span>
-								<span><?php esc_html_e( 'Research trade-offs', 'codesblock' ); ?></span>
-								<span><?php esc_html_e( 'Ask a follow-up', 'codesblock' ); ?></span>
-							</div>
-						</div>
-						<div class="ai-learning-answer">
-							<div class="ai-learning-answer-label"><span>AI</span><strong><?php esc_html_e( 'Study companion', 'codesblock' ); ?></strong><small><?php esc_html_e( 'Example learning flow', 'codesblock' ); ?></small></div>
-							<p><?php esc_html_e( 'Caching makes repeated reads faster, but the cached copy may lag behind the database. In an interview, name the acceptable staleness, choose an invalidation strategy, and explain what happens during a cache miss.', 'codesblock' ); ?></p>
-							<p class="ai-learning-followup"><?php esc_html_e( 'Follow-up: what would change if the product required read-your-own-writes consistency?', 'codesblock' ); ?></p>
-						</div>
-					</div>
-					<p class="ai-integration-note"><strong><?php esc_html_e( 'Product preview:', 'codesblock' ); ?></strong> <?php esc_html_e( 'This shows the intended in-lesson experience. Live model answers and web research require the AI service to be connected and verified.', 'codesblock' ); ?></p>
-
-					<ul class="ai-learning-benefits" role="list">
-						<li><strong><?php esc_html_e( 'Explain', 'codesblock' ); ?></strong><span><?php esc_html_e( 'Turn dense architecture language into a mental model you can repeat.', 'codesblock' ); ?></span></li>
-						<li><strong><?php esc_html_e( 'Research', 'codesblock' ); ?></strong><span><?php esc_html_e( 'Explore alternatives, caveats, and real-world context from the lesson.', 'codesblock' ); ?></span></li>
-						<li><strong><?php esc_html_e( 'Go deeper', 'codesblock' ); ?></strong><span><?php esc_html_e( 'Keep asking until you can defend the decision without the assistant.', 'codesblock' ); ?></span></li>
-					</ul>
-				</section>
-				<?php endif; ?>
 
 				<!-- What You'll Learn -->
 				<?php if ( $what_you_learn ) : ?>
@@ -396,68 +319,12 @@ if ( $is_system_design_course ) {
 					</section>
 				<?php endif; ?>
 
-				<?php if ( $is_system_design_course ) : ?>
-				<section class="course-section course-level-path" aria-labelledby="level-path-heading">
-					<div class="course-section-heading">
-						<p class="eyebrow"><?php esc_html_e( 'One course, three depths', 'codesblock' ); ?></p>
-						<h2 id="level-path-heading"><?php esc_html_e( 'Start at your level. Grow into the next one.', 'codesblock' ); ?></h2>
-						<p><?php esc_html_e( 'The core interview method stays the same; the expected depth, vocabulary, and trade-off pressure increase as you progress.', 'codesblock' ); ?></p>
-					</div>
-					<div class="course-level-grid">
-						<article><span><?php esc_html_e( 'Intern / early career', 'codesblock' ); ?></span><h3><?php esc_html_e( 'Build the vocabulary', 'codesblock' ); ?></h3><p><?php esc_html_e( 'Learn requirements, APIs, databases, caching, queues, and how a complete system fits together.', 'codesblock' ); ?></p></article>
-						<article><span><?php esc_html_e( 'Intermediate', 'codesblock' ); ?></span><h3><?php esc_html_e( 'Build the method', 'codesblock' ); ?></h3><p><?php esc_html_e( 'Use a repeatable 45-minute framework, estimate scale, and make choices from constraints instead of habit.', 'codesblock' ); ?></p></article>
-						<article><span><?php esc_html_e( 'Advanced / senior', 'codesblock' ); ?></span><h3><?php esc_html_e( 'Defend the trade-offs', 'codesblock' ); ?></h3><p><?php esc_html_e( 'Stress-test reliability, consistency, cost, operations, and the deeper follow-ups that separate senior answers.', 'codesblock' ); ?></p></article>
-					</div>
-				</section>
-				<?php endif; ?>
-
-				<?php if ( $is_system_design_course ) : ?>
-				<section class="course-section course-ai-era" aria-labelledby="ai-era-heading">
-					<div class="course-section-heading">
-						<p class="eyebrow"><?php esc_html_e( 'Beyond Web2', 'codesblock' ); ?></p>
-						<h2 id="ai-era-heading"><?php esc_html_e( 'Modern System Design for the AI Era', 'codesblock' ); ?></h2>
-						<p><?php esc_html_e( 'Traditional system design courses stop at load balancers and databases. We take you further into the architecture powering today’s most advanced AI applications.', 'codesblock' ); ?></p>
-					</div>
-					<div class="ai-era-grid">
-						<div class="ai-era-card">
-							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
-							<h3><?php esc_html_e( 'Vector Databases & Retrieval', 'codesblock' ); ?></h3>
-							<p><?php esc_html_e( 'Master embedding generation, semantic search, vector indexing (HNSW, FAISS), and chunking strategies for massive datasets.', 'codesblock' ); ?></p>
-						</div>
-						<div class="ai-era-card">
-							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-							<h3><?php esc_html_e( 'Event-Driven Architectures', 'codesblock' ); ?></h3>
-							<p><?php esc_html_e( 'Design resilient, asynchronous systems using Kafka and message queues to handle spikes in AI inference workloads.', 'codesblock' ); ?></p>
-						</div>
-						<div class="ai-era-card">
-							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-							<h3><?php esc_html_e( 'AI Agents & Tool Calling', 'codesblock' ); ?></h3>
-							<p><?php esc_html_e( 'Architect autonomous agents that can plan, reason, execute code, and query external APIs safely at scale.', 'codesblock' ); ?></p>
-						</div>
-						<div class="ai-era-card">
-							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-							<h3><?php esc_html_e( 'Enterprise RAG Pipelines', 'codesblock' ); ?></h3>
-							<p><?php esc_html_e( 'Build production-ready Retrieval-Augmented Generation flows with hybrid search, re-ranking, and low-latency orchestration.', 'codesblock' ); ?></p>
-						</div>
-					</div>
-				</section>
-				<?php endif; ?>
 
 				<section class="course-section course-about-preview" aria-labelledby="about-heading">
 					<p class="eyebrow"><?php esc_html_e( 'About this course', 'codesblock' ); ?></p>
-					<h2 id="about-heading"><?php esc_html_e( 'Crack the interview. Build the system.', 'codesblock' ); ?></h2>
-					<?php if ( $is_system_design_course ) : ?>
-						<p><?php esc_html_e( 'Prepare for the System Design Interview by learning how to design scalable, reliable, and high-performance systems from the ground up. Master the frameworks and patterns behind real-world architectures, practice common system design interview questions, and learn to reason through trade-offs with confidence. Then take it further with modern system design—from distributed systems and event-driven architectures to RAG, AI agents, tool calling, vector databases, and the infrastructure powering today’s AI applications.', 'codesblock' ); ?></p>
-					<?php else : ?>
+					<h2 id="about-heading"><?php esc_html_e( 'Course overview', 'codesblock' ); ?></h2>
+					<?php if ( $ai_summary ) : ?>
 						<p><?php echo esc_html( $ai_summary ); ?></p>
-					<?php endif; ?>
-					<?php if ( $is_system_design_course ) : ?>
-						<div class="course-lab-stats" aria-label="<?php esc_attr_e( 'Course at a glance', 'codesblock' ); ?>">
-							<span><strong>12</strong><?php esc_html_e( 'modules', 'codesblock' ); ?></span>
-							<span><strong>60+</strong><?php esc_html_e( 'guided lessons', 'codesblock' ); ?></span>
-							<span><strong>12</strong><?php esc_html_e( 'design labs', 'codesblock' ); ?></span>
-							<span><strong>1</strong><?php esc_html_e( 'capstone review', 'codesblock' ); ?></span>
-						</div>
 					<?php endif; ?>
 				</section>
 
@@ -572,16 +439,6 @@ if ( $is_system_design_course ) {
 
 			<!-- ── Right: secondary sidebar ─────────────────── -->
 			<aside class="course-details-sidebar" aria-label="<?php esc_attr_e( 'Course extras', 'codesblock' ); ?>">
-
-				<?php if ( $is_system_design_course && ! is_user_logged_in() ) : ?>
-				<div class="course-section course-start-card">
-					<p class="eyebrow"><?php esc_html_e( 'Start free', 'codesblock' ); ?></p>
-					<h2><?php esc_html_e( 'Create your learning workspace', 'codesblock' ); ?></h2>
-					<p><?php esc_html_e( 'Save progress, personalize your path, and preview CodesBlock before choosing a paid access pass.', 'codesblock' ); ?></p>
-					<button class="button button-primary js-open-course-auth" type="button" aria-haspopup="dialog" aria-controls="course-auth-overlay"><?php esc_html_e( 'Continue with Google', 'codesblock' ); ?></button>
-					<small><?php esc_html_e( 'No password or card required. Course purchase stays separate.', 'codesblock' ); ?></small>
-				</div>
-				<?php endif; ?>
 
 				<!-- Useful secondary actions; the previous unconnected newsletter form was removed. -->
 				<div class="course-section course-utility-card">

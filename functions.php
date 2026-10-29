@@ -10,7 +10,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 require_once get_template_directory() . '/inc.php';
-require_once get_template_directory() . '/inc-interview.php';
 
 function codesblock_setup() {
 	add_theme_support( 'title-tag' );
@@ -64,7 +63,6 @@ function codesblock_course_portal_assets() {
 	$is_course = is_singular( 'course' ) || is_post_type_archive( 'course' );
 	$is_premium_post = is_singular( 'post' ) && (bool) get_post_meta( get_the_ID(), '_codesblock_premium', true );
 	$course_css_path = get_template_directory() . '/assets/css/course-portal.css';
-	$system_design_css_path = get_template_directory() . '/assets/css/system-design-course.css';
 	$course_js_path  = get_template_directory() . '/assets/js/course-portal.js';
 
 	if ( ! $is_course && ! $is_premium_post ) {
@@ -77,15 +75,6 @@ function codesblock_course_portal_assets() {
 		array( 'codesblock-main' ),
 		file_exists( $course_css_path ) ? (string) filemtime( $course_css_path ) : '2.0.0'
 	);
-
-	if ( is_singular( 'course' ) && in_array( get_post_field( 'post_name', get_the_ID() ), array( 'system-design-interview-sprint', 'system-design-interview-lab', 'crack-the-system-design-interview' ), true ) ) {
-		wp_enqueue_style(
-			'codesblock-system-design-course',
-			get_template_directory_uri() . '/assets/css/system-design-course.css',
-			array( 'codesblock-course-portal', 'codesblock-polish' ),
-			file_exists( $system_design_css_path ) ? (string) filemtime( $system_design_css_path ) : '1.0.0'
-		);
-	}
 
 	wp_enqueue_script(
 		'codesblock-course-portal',
@@ -153,7 +142,7 @@ function codesblock_typography_assets() {
 	$responsive_css_path = get_template_directory() . '/assets/css/responsive.css';
 	$dependencies        = array( 'codesblock-polish' );
 
-	foreach ( array( 'codesblock-course-portal', 'codesblock-system-design-course', 'codesblock-course-learning' ) as $style_handle ) {
+	foreach ( array( 'codesblock-course-portal', 'codesblock-course-learning' ) as $style_handle ) {
 		if ( wp_style_is( $style_handle, 'enqueued' ) ) {
 			$dependencies[] = $style_handle;
 		}
@@ -965,7 +954,6 @@ function codesblock_seed_navigation() {
 			array( 'title' => 'Home', 'url' => home_url( '/' ) ),
 			array( 'title' => 'Courses', 'url' => home_url( '/courses/' ) ),
 			array( 'title' => 'Articles', 'url' => home_url( '/articles/' ) ),
-			array( 'title' => 'Interview Guides', 'url' => home_url( '/#practice' ) ),
 			array( 'title' => 'Start Here', 'url' => home_url( '/#start' ) ),
 		);
 

@@ -793,8 +793,7 @@
 	}
 
 	body.single-course .course-sticky-card .sticky-card-thumb,
-	body.single-course .course-includes-list,
-	body.single-course .course-value-rail {
+	body.single-course .course-includes-list {
 		display: none;
 	}
 
@@ -996,7 +995,7 @@
 	body.home .courses-title-row > div { width: 100%; }
 	body.home .course-desk { display: grid; grid-template-columns: 1fr; margin: 0; padding: 0; overflow: visible; }
 	body.home .course-card, body.home .course-card:nth-child(n) { width: 100%; transform: none; }
-	body.home .course-card img, .course-card-v2 .system-design-cover {
+	body.home .course-card img {
 		object-fit: contain; background: #eef2f7;
 	}
 	.section, body.home .section.courses { padding-block: 32px; }
@@ -1016,14 +1015,6 @@
 	.cb-lesson-shell { padding-inline: 16px; padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
 	.cb-lesson-content { padding: 0; background: transparent; border: 0; box-shadow: none; }
 	.cb-lesson-nav a { min-height: 48px; }
-	.practice-board { grid-template-columns: minmax(0, 1fr); }
-	.practice-prompt, .practice-feedback { padding: 18px; }
-	.practice-checkpoints { grid-template-columns: 1fr; padding: 0 18px 18px; }
-	.practice-checkpoints div { padding: 12px; }
-	.practice-prompt h3 { font-size: 1.25rem !important; }
-	.practice-window-bar { flex-wrap: wrap; gap: 8px; padding: 12px 16px; }
-	body.home .practice-track-list { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: none; overflow: visible; }
-	body.home .practice-track-card { min-width: 0; width: 100%; flex-basis: auto; }
 	.member-modal, .paywall-modal { max-height: calc(100dvh - 24px); overflow-y: auto; }
 	.cb-smap-trigger-btn { bottom: calc(16px + env(safe-area-inset-bottom)); }
 	.site-footer { padding-block: 32px; }

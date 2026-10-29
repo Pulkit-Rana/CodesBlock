@@ -78,7 +78,6 @@ li {
 /* Primary section headings share one restrained level. */
 .section-heading h2,
 .article-section h2,
-.practice-header h2,
 .course-pricing-heading h2,
 .sd-showcase-heading h2,
 .cb-learning-heading h2,
@@ -89,7 +88,6 @@ li {
 
 .courses-h2,
 .course-section h2,
-.course-section-heading h2,
 .article-content h2,
 .article-reading-layout .article-content h2,
 .cb-lesson-content h2,
@@ -108,15 +106,9 @@ li {
 	line-height: 1.2 !important;
 }
 
-.practice-prompt h3 {
-	font-size: clamp(1.25rem, 1.8vw, 1.5rem) !important;
-	line-height: 1.25 !important;
-}
-
 .course-card h3,
 .course-card-v2 h2,
 .post-card h3,
-.practice-track-card h3,
 .sd-case-card h3,
 .cb-lesson-content h3,
 .article-reading-layout .article-content h3 {
@@ -153,8 +145,7 @@ li {
 .archive-hero p,
 .course-subtitle,
 .cb-lesson-intro,
-.section-heading p:not(.eyebrow),
-.practice-lede {
+.section-heading p:not(.eyebrow) {
 	font-size: clamp(1rem, 1.2vw, 1.08rem) !important;
 	line-height: 1.65 !important;
 }
@@ -191,14 +182,12 @@ li {
 }
 
 .strip-grid p,
-.practice-track-card p,
 .course-card .card-desc {
 	font-size: .875rem !important;
 	line-height: 1.55 !important;
 }
 
 .strip-grid > * > span,
-.practice-track-card > span,
 .course-card .tag,
 .course-card .course-meta span,
 .course-card .card-enrolled,
@@ -207,13 +196,9 @@ li {
 	font-size: .75rem !important;
 	line-height: 1.4 !important;
 }
-
-.practice-track-card strong,
 .course-card .course-card-cta {
 	font-size: .8125rem !important;
 }
-
-.course-section-heading > p:not(.eyebrow),
 .sd-showcase-heading > p {
 	font-size: 1rem !important;
 	line-height: 1.65 !important;
@@ -222,18 +207,9 @@ li {
 .course-jump-nav a {
 	font-size: .8125rem !important;
 }
-
-.ai-learning-answer p,
-.course-level-grid article p,
-.course-start-card > p,
 .course-utility-card > p {
 	font-size: .9375rem !important;
 	line-height: 1.6 !important;
-}
-
-.ai-integration-note {
-	font-size: .8125rem !important;
-	line-height: 1.55 !important;
 }
 
 /* Diagram labels stay compact, but no longer read like fine print. */
@@ -278,8 +254,7 @@ li {
 	.archive-hero p,
 	.course-subtitle,
 	.cb-lesson-intro,
-	.section-heading p:not(.eyebrow),
-	.practice-lede {
+	.section-heading p:not(.eyebrow) {
 		font-size: 1rem !important;
 	}
 }

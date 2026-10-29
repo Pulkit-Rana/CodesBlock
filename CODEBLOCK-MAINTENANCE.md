@@ -1,43 +1,29 @@
-# CodesBlock maintenance map
+# CodesBlock site maintenance
 
-The site is split into small layers so everyday publishing does not require code changes.
+## Manage the site in WordPress Admin
 
-## What to edit in WordPress
+- **Articles:** **Posts → Add New**. Write the title and article in the editor; set the excerpt, categories, tags, and featured image there.
+- **Courses:** **Courses → Add New Course**. CodesBlock Core provides the course editor and course fields. The theme displays the saved course title, excerpt, thumbnail, metadata, syllabus, and lessons for every course; there are no course-specific landing pages to edit in code.
+- **Lessons:** **Courses → Course Lessons**. Add and edit lesson content in WordPress.
+- **Navigation and site identity:** **Appearance → Menus** and **Appearance → Customize**.
+- **Memberships and orders:** **Memberships** (Paid Memberships Pro).
+- **Payments:** **Knit Pay** and the configured gateway settings.
+- **Newsletter:** **MailPoet**.
+- **Social sign-in:** **Settings → Nextend Social Login**.
+- **Analytics and SEO:** use the installed Site Kit, Clarity, and Yoast screens.
 
-- **Articles:** Posts -> Add New. Use categories, tags, excerpt, featured image, and the CodesBlock visibility box.
-- **Courses:** Courses -> Add New. Lessons use the normal editor; price, level, duration, outcomes, and curriculum use the Course setup box.
-- **Homepage message and buttons:** Appearance -> Customize -> CodesBlock Homepage.
-- **Logo and site name:** Appearance -> Customize -> Site Identity.
-- **Footer copy and social links:** Appearance -> Customize -> CodesBlock Footer & Social.
-- **Navigation:** Appearance -> Menus.
-- **Membership plans, checkout, and Stripe:** Memberships in WordPress admin.
-- **Newsletter subscribers:** MailPoet.
-- **Google sign-in:** Settings -> Nextend Social Login.
+WordPress stores this content and configuration in its database. Uploaded images and other media live under `wp-content/uploads`. Back these up and migrate them separately from the GitHub theme repository.
 
-## Custom code responsibilities
+## What belongs in GitHub
 
-- `wp-content/plugins/codesblock-core`: Courses, editable course fields, featured/premium flags, and server-side protected previews. This remains active even if the theme changes.
-- `wp-content/plugins/codesblock-commerce`: Connects PMPro, membership access, member login, newsletter consent, and learning progress.
-- `wp-content/themes/codesblock`: Site templates, styling, and front-end interactions, including the course and member experiences. It calls CodesBlock Core and Commerce for course data, access, and progress rather than replacing those plugins. The interview practice feature also registers its own REST endpoints and private session records in `inc-interview.php`. `assets/css/polish.css` is the small final brand layer; the larger layout rules remain in `assets/css/main.css`.
+The repository contains the CodesBlock theme: templates that display WordPress-authored content, styles, images used by the theme, and front-end interactions. `archive-course.php`, `single-course.php`, `single-course_lesson.php`, `page-articles.php`, and `single.php` shape how WordPress content appears; they do not create or store course and article records.
 
-## Lean, low-cost plugin stack
+The separately installed CodesBlock Core and CodesBlock Commerce plugins provide course data entry and membership/progress integrations. Their source and settings do not belong in this theme repository. Other plugins are installed and configured through WordPress Admin or Hostinger.
 
-Keep the plugin list short and give every plugin one job:
+Use GitHub for occasional UI and layout changes. Edit the theme, review the change, and push to `main`; Hostinger deploys the tracked theme files. Use WordPress Admin for ordinary content publishing and site configuration.
 
-1. Paid Memberships Pro: memberships, Stripe checkout, renewals, and account pages.
-2. MailPoet: newsletters and subscriber management.
-3. Nextend Social Login: optional Google member sign-in.
-4. Highlighting Code Block: readable code examples in articles and course lessons.
+## Migration reminders
 
-Avoid adding a page builder unless a page genuinely cannot be built with the WordPress block editor. The CodesBlock homepage will also render a chosen static front page, so a block-built landing page can replace the theme homepage later without rebuilding the rest of the site.
+For a new WordPress site, follow [DEPLOYMENT.md](DEPLOYMENT.md). When migrating an existing site, restore its database and uploads, install/activate its plugins, and restore plugin credentials/settings separately. Connecting GitHub deploys the theme; it does not copy that site data.
 
-## Before launch
-
-1. Use HTTPS and connect Stripe in test mode.
-2. Complete successful, failed, cancelled, and refunded checkout tests.
-3. Verify a logged-out visitor receives only excerpts for paid courses and premium articles.
-4. Configure email delivery and send a real test newsletter.
-5. Configure Google sign-in only after the final domain is known.
-6. Add a backup plugin or host-level daily backup before accepting payments.
-7. Update WordPress and plugins on staging first, then take a fresh backup before production updates.
-
+After the interview-session theme feature was retired, remove any saved `/interview/` page or menu link in WordPress Admin and save **Settings → Permalinks** once. Existing WordPress data is managed separately from theme files.

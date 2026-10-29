@@ -1,10 +1,8 @@
 <?php
 /**
- * Sticky Collapsible Course Map & 10-Phase Curriculum for CodesBlock.
+ * Sticky Collapsible Course Map for CodesBlock courses.
  *
- * ALL CHANGES FOR THE COURSE MAP ARE CONTAINED IN THIS SINGLE FILE.
- * TO REVERT: Replace this file with template-parts/course-map.php.original-backup
- * or run: git checkout template-parts/course-map.php
+ * Curriculum data comes from the course syllabus and lesson records in WordPress.
  *
  * @package CodesBlock
  */
@@ -16,164 +14,7 @@ if ( ! $course_id ) {
 	return;
 }
 
-$course_post = get_post( $course_id );
-$course_slug = $course_post ? $course_post->post_name : '';
-
-// 10-Phase Curriculum as published on https://codesblock.io/courses/crack-the-system-design-interview/
-$crack_system_design_curriculum = array(
-	array(
-		'number'   => '01',
-		'title'    => __( 'Think like a system designer', 'codesblock' ),
-		'subtitle' => __( 'interview structure · requirements · estimation · APIs · trade-offs', 'codesblock' ),
-		'summary'  => __( 'Build the interview operating system before memorizing architecture.', 'codesblock' ),
-		'lessons'  => array(
-			__( 'What system design interviews actually test', 'codesblock' ),
-			__( 'Functional vs non-functional requirements', 'codesblock' ),
-			__( 'QPS, storage, bandwidth and latency estimates', 'codesblock' ),
-			__( 'API contracts and core entities', 'codesblock' ),
-			__( 'Critical-path thinking', 'codesblock' ),
-			__( 'SCALE-45 framework', 'codesblock' ),
-		),
-	),
-	array(
-		'number'   => '02',
-		'title'    => __( 'Scale — from one server to millions', 'codesblock' ),
-		'subtitle' => __( 'networking · load balancing · caching · databases · queues', 'codesblock' ),
-		'summary'  => __( 'Learn each building block as an answer to a specific bottleneck.', 'codesblock' ),
-		'lessons'  => array(
-			__( 'HTTP, TCP/UDP, DNS, WebSockets and gRPC', 'codesblock' ),
-			__( 'Load balancers, gateways and stateless services', 'codesblock' ),
-			__( 'Redis, cache-aside, TTL, invalidation and stampede', 'codesblock' ),
-			__( 'SQL/NoSQL, indexes, replication and sharding', 'codesblock' ),
-			__( 'Kafka, queues, pub/sub, workers and backpressure', 'codesblock' ),
-			__( 'CDNs, object storage and media delivery', 'codesblock' ),
-		),
-	),
-	array(
-		'number'   => '03',
-		'title'    => __( 'Distributed reality', 'codesblock' ),
-		'subtitle' => __( 'consistency · failure · concurrency · reliability · operations', 'codesblock' ),
-		'summary'  => __( 'Move beyond diagrams into the problems production systems actually have.', 'codesblock' ),
-		'lessons'  => array(
-			__( 'CAP, consistency models and replication lag', 'codesblock' ),
-			__( 'Quorums, leader election and consensus intuition', 'codesblock' ),
-			__( 'Retries, timeouts, circuit breakers and bulkheads', 'codesblock' ),
-			__( 'Idempotency, duplicate delivery and saga workflows', 'codesblock' ),
-			__( 'Hot keys, partitions, skew and rate limiting', 'codesblock' ),
-			__( 'Metrics, logs, traces, SLIs/SLOs and recovery', 'codesblock' ),
-		),
-	),
-	array(
-		'number'   => '04',
-		'title'    => __( 'Classic architecture labs', 'codesblock' ),
-		'subtitle' => __( 'feeds · chat · booking · payments · video · collaboration', 'codesblock' ),
-		'summary'  => __( 'Apply the same interview framework repeatedly until it becomes automatic.', 'codesblock' ),
-		'lessons'  => array(
-			__( 'URL shortener + rate limiter', 'codesblock' ),
-			__( 'Chat, presence and notifications', 'codesblock' ),
-			__( 'News feed and fan-out', 'codesblock' ),
-			__( 'Ticket booking and concurrency', 'codesblock' ),
-			__( 'Payments and idempotent workflows', 'codesblock' ),
-			__( 'File sync, video streaming and nearby search', 'codesblock' ),
-		),
-	),
-	array(
-		'number'   => '05',
-		'title'    => __( 'AI becomes a backend dependency', 'codesblock' ),
-		'subtitle' => __( 'models · gateways · context · routing · cost · fallbacks', 'codesblock' ),
-		'summary'  => __( 'Understand why an LLM behaves differently from a normal service dependency.', 'codesblock' ),
-		'lessons'  => array(
-			__( 'Tokens, context windows and streaming', 'codesblock' ),
-			__( 'Structured output and tool calling', 'codesblock' ),
-			__( 'AI gateways, provider routing and fallback', 'codesblock' ),
-			__( 'Token-based rate limits and cost budgets', 'codesblock' ),
-			__( 'Prompt/context versioning and state', 'codesblock' ),
-			__( 'Semantic caching and graceful degradation', 'codesblock' ),
-		),
-	),
-	array(
-		'number'   => '06',
-		'title'    => __( 'Production RAG & semantic search', 'codesblock' ),
-		'subtitle' => __( 'ingestion · embeddings · vector indexes · reranking · permissions', 'codesblock' ),
-		'summary'  => __( 'Go far beyond “vector DB + LLM”. Design the complete information pipeline.', 'codesblock' ),
-		'lessons'  => array(
-			__( 'Parsing, chunking and embedding pipelines', 'codesblock' ),
-			__( 'HNSW and ANN intuition', 'codesblock' ),
-			__( 'Vector vs lexical vs hybrid retrieval', 'codesblock' ),
-			__( 'Reranking and context assembly', 'codesblock' ),
-			__( 'Freshness, access control and multitenancy', 'codesblock' ),
-			__( 'RAG quality, latency and failure modes', 'codesblock' ),
-		),
-	),
-	array(
-		'number'   => '07',
-		'title'    => __( 'Agents meet microservices', 'codesblock' ),
-		'subtitle' => __( 'tools · MCP · memory · workflows · safety · durability', 'codesblock' ),
-		'summary'  => __( 'Keep deterministic services deterministic; let the agent operate through controlled interfaces.', 'codesblock' ),
-		'lessons'  => array(
-			__( 'Workflow vs agent: when not to use autonomy', 'codesblock' ),
-			__( 'Tool schemas, registries and discovery', 'codesblock' ),
-			__( 'Short-term memory, long-term memory and checkpoints', 'codesblock' ),
-			__( 'Retries, idempotent tool calls and durable execution', 'codesblock' ),
-			__( 'MCP architecture and service integration', 'codesblock' ),
-			__( 'Human approval, permissions and agent budgets', 'codesblock' ),
-		),
-	),
-	array(
-		'number'   => '08',
-		'title'    => __( 'Production AI reliability', 'codesblock' ),
-		'subtitle' => __( 'evals · tracing · security · cost · observability', 'codesblock' ),
-		'summary'  => __( 'The chapter that turns an AI demo into an operable production system.', 'codesblock' ),
-		'lessons'  => array(
-			__( 'Golden sets, offline/online evals and regression tests', 'codesblock' ),
-			__( 'Prompt, retrieval and tool-call tracing', 'codesblock' ),
-			__( 'Hallucination and quality failure handling', 'codesblock' ),
-			__( 'Prompt injection and poisoned retrieval', 'codesblock' ),
-			__( 'Cost-per-request, routing and caching', 'codesblock' ),
-			__( 'Provider outages, queues and degradation', 'codesblock' ),
-		),
-	),
-	array(
-		'number'   => '09',
-		'title'    => __( 'Realtime voice architecture', 'codesblock' ),
-		'subtitle' => __( 'WebRTC · streaming · interruption · latency · sessions', 'codesblock' ),
-		'summary'  => __( 'Use CodesBlock\'s own voice tutor as a system-design case study.', 'codesblock' ),
-		'lessons'  => array(
-			__( 'STT → LLM → TTS vs speech-to-speech', 'codesblock' ),
-			__( 'WebRTC and WebSockets', 'codesblock' ),
-			__( 'Voice activity detection and barge-in', 'codesblock' ),
-			__( 'Conversation/session state', 'codesblock' ),
-			__( 'Tool use during voice conversations', 'codesblock' ),
-			__( 'Latency budgets and concurrent-call scaling', 'codesblock' ),
-		),
-	),
-	array(
-		'number'   => '10',
-		'title'    => __( 'Pressure test & capstone', 'codesblock' ),
-		'subtitle' => __( 'constraint ladders · architecture report · guided review path', 'codesblock' ),
-		'summary'  => __( 'Finish by designing systems from a blank canvas and defending them under changing requirements.', 'codesblock' ),
-		'lessons'  => array(
-			__( 'Classic architecture mock', 'codesblock' ),
-			__( 'Senior reliability mock', 'codesblock' ),
-			__( 'RAG architecture mock', 'codesblock' ),
-			__( 'Agent architecture mock', 'codesblock' ),
-			__( 'Voice architecture mock', 'codesblock' ),
-			__( 'Capstone: design, break and defend', 'codesblock' ),
-		),
-	),
-);
-
-// Determine if this course is the System Design course or general
-$is_system_design = in_array( $course_slug, array( 'crack-the-system-design-interview', 'system-design', 'system-design-interview-sprint' ), true )
-	|| false !== stripos( get_the_title( $course_id ), 'system design' )
-	|| 34 === $course_id;
-
-if ( $is_system_design ) {
-	$outline = $crack_system_design_curriculum;
-} else {
-	$fallback_outline = function_exists( 'codesblock_get_course_outline' ) ? codesblock_get_course_outline( $course_id ) : array();
-	$outline = ! empty( $fallback_outline ) ? $fallback_outline : $crack_system_design_curriculum;
-}
+$outline = function_exists( 'codesblock_get_course_outline' ) ? codesblock_get_course_outline( $course_id ) : array();
 
 if ( empty( $outline ) ) {
 	return;
@@ -184,7 +25,6 @@ $published_lessons = function_exists( 'cbcore_get_course_lessons' ) ? cbcore_get
 // Map published lesson posts to module/position and slug
 $lesson_lookup_by_pos = array();
 $lesson_lookup_by_id  = array();
-$lesson_lookup_by_slug = array();
 
 foreach ( $published_lessons as $published_lesson ) {
 	$mod = absint( get_post_meta( $published_lesson->ID, '_cbcore_lesson_module', true ) );
@@ -193,11 +33,9 @@ foreach ( $published_lessons as $published_lesson ) {
 		$lesson_lookup_by_pos[ $mod ][ $pos ] = $published_lesson;
 	}
 	$lesson_lookup_by_id[ $published_lesson->ID ] = $published_lesson;
-	$lesson_lookup_by_slug[ $published_lesson->post_name ] = $published_lesson;
 }
 
 $current_lesson_post = $lesson_id ? get_post( $lesson_id ) : null;
-$current_lesson_slug = $current_lesson_post ? $current_lesson_post->post_name : '';
 
 $planned_total     = 0;
 $current_step      = 0;
@@ -217,8 +55,6 @@ foreach ( $outline as $phase_idx => $phase ) {
 		$matched = false;
 		if ( isset( $lesson_lookup_by_pos[ $phase_idx ][ $pos ] ) && $lesson_lookup_by_pos[ $phase_idx ][ $pos ]->ID === $lesson_id ) {
 			$matched = true;
-		} elseif ( 0 === $phase_idx && 0 === $lesson_idx && 'what-system-design-is-and-why-it-matters' === $current_lesson_slug ) {
-			$matched = true;
 		} elseif ( $lesson_id && isset( $lesson_lookup_by_id[ $lesson_id ] ) ) {
 			$mod = absint( get_post_meta( $lesson_id, '_cbcore_lesson_module', true ) );
 			$lpos = max( 1, absint( get_post_meta( $lesson_id, '_cbcore_lesson_position', true ) ) );
@@ -233,13 +69,6 @@ foreach ( $outline as $phase_idx => $phase ) {
 			$active_lesson_idx = $lesson_idx;
 		}
 	}
-}
-
-// Fallback to step 1 if current lesson is the first lesson
-if ( ! $current_step && $lesson_id && ( 'what-system-design-is-and-why-it-matters' === $current_lesson_slug || 77 === $lesson_id ) ) {
-	$current_step      = 1;
-	$active_phase_idx  = 0;
-	$active_lesson_idx = 0;
 }
 
 $progress_percent = $planned_total && $current_step ? max( 2, round( ( $current_step / $planned_total ) * 100 ) ) : 2;
@@ -997,14 +826,10 @@ body:not(.cb-smap-open) .cb-smap-trigger-btn {
 						// Try matching published lesson
 						if ( isset( $lesson_lookup_by_pos[ $phase_index ][ $position ] ) ) {
 							$lesson_post = $lesson_lookup_by_pos[ $phase_index ][ $position ];
-						} elseif ( 0 === $phase_index && 0 === $lesson_index && isset( $lesson_lookup_by_slug['what-system-design-is-and-why-it-matters'] ) ) {
-							$lesson_post = $lesson_lookup_by_slug['what-system-design-is-and-why-it-matters'];
 						}
 
 						$is_current = false;
 						if ( $lesson_id && $lesson_post && $lesson_post->ID === $lesson_id ) {
-							$is_current = true;
-						} elseif ( 0 === $phase_index && 0 === $lesson_index && 'what-system-design-is-and-why-it-matters' === $current_lesson_slug ) {
 							$is_current = true;
 						}
 

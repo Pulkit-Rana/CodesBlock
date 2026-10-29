@@ -1479,157 +1479,6 @@ h3 {
 	line-height: 1.18;
 }
 
-/* ── Practice / Interview Guides bento ───────────────── */
-.practice {
-	background:
-		radial-gradient(circle at 10% 20%, rgba(37, 99, 235, .1), transparent 28%),
-		radial-gradient(circle at 90% 80%, rgba(19, 185, 129, .1), transparent 28%),
-		linear-gradient(135deg, #eef8ff, #f6fffb);
-	border-block: 1px solid var(--line);
-}
-
-.practice-header {
-	align-items: flex-end;
-	display: flex;
-	justify-content: space-between;
-	margin-bottom: 28px;
-	gap: 20px;
-	flex-wrap: wrap;
-}
-
-.practice-header h2 {
-	margin-bottom: 0;
-	font-size: clamp(1.6rem, 2.8vw, 2.4rem);
-}
-
-.practice-lede {
-	color: var(--muted);
-	font-size: .95rem;
-	line-height: 1.55;
-	margin: 0;
-	max-width: 430px;
-}
-
-.practice-board {
-	align-items: stretch;
-	display: grid;
-	gap: 18px;
-	grid-template-columns: minmax(0, 1.08fr) minmax(320px, .92fr);
-}
-
-.practice-track-grid {
-	display: grid;
-	gap: 12px;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.practice-track-card {
-	background:
-		linear-gradient(145deg, rgba(255,255,255,.96), rgba(247,251,255,.86));
-	border: 1px solid rgba(219, 231, 243, .92);
-	border-radius: 8px;
-	box-shadow: 0 12px 30px rgba(16, 24, 40, .07);
-	color: var(--ink);
-	display: grid;
-	min-height: 214px;
-	padding: 18px;
-	transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
-}
-
-.practice-track-card:hover,
-.practice-track-card:focus {
-	border-color: rgba(19,185,129,.36);
-	box-shadow: 0 18px 38px rgba(16, 24, 40, .1);
-	transform: translateY(-3px);
-}
-
-.practice-track-card span {
-	color: var(--pink);
-	font-size: .72rem;
-	font-weight: 900;
-	margin-bottom: 10px;
-}
-
-.practice-track-card h3 {
-	font-size: 1.08rem;
-	line-height: 1.18;
-	margin-bottom: 8px;
-}
-
-.practice-track-card p {
-	color: var(--muted);
-	font-size: .84rem;
-	line-height: 1.48;
-	margin: 0 0 14px;
-}
-
-.practice-track-card strong {
-	align-self: end;
-	color: var(--green-dark);
-	font-size: .78rem;
-	font-weight: 900;
-}
-
-.practice-track-card.is-featured {
-	background:
-		linear-gradient(145deg, rgba(232, 251, 242, .96), rgba(255,255,255,.9));
-	border-color: rgba(19,185,129,.32);
-}
-
-.practice-dashboard {
-	border: 1px solid rgba(219, 231, 243, .92);
-	border-radius: 8px;
-	box-shadow: 0 18px 42px rgba(16, 24, 40, .11);
-	min-height: 214px;
-	overflow: hidden;
-	position: relative;
-}
-
-.practice-dashboard img {
-	height: 100%;
-	min-height: 214px;
-	object-fit: cover;
-	object-position: top center;
-	width: 100%;
-}
-
-.practice-dashboard-overlay {
-	background: linear-gradient(0deg, rgba(17,24,39,.9) 0%, rgba(17,24,39,.18) 100%);
-	bottom: 0;
-	color: #fff;
-	left: 0;
-	padding: 54px 22px 20px;
-	pointer-events: none;
-	position: absolute;
-	width: 100%;
-}
-
-.practice-dashboard-overlay span {
-	color: #8be3b7;
-	display: block;
-	font-size: .72rem;
-	font-weight: 900;
-	letter-spacing: .04em;
-	margin-bottom: 5px;
-	text-transform: uppercase;
-}
-
-.practice-dashboard-overlay strong {
-	display: block;
-	font-family: var(--font-heading);
-	font-size: 1.18rem;
-	line-height: 1.18;
-}
-
-/* Bento grid — 4 columns, 2 rows */
-.practice-bento {
-	display: grid;
-	gap: 14px;
-	grid-template-columns: 1fr 1fr 1fr 1fr;
-	grid-template-rows: auto auto;
-	align-items: stretch;
-}
-
 .bento-cell {
 	background:
 		linear-gradient(135deg, rgba(255,255,255,.9), rgba(255,255,255,.62));
@@ -2852,11 +2701,6 @@ h3 {
 		grid-template-columns: 1fr;
 	}
 
-	/* Bento collapses to 2 cols on tablet */
-	.practice-bento {
-		grid-template-columns: 1fr 1fr;
-	}
-
 	.bento-ai-chat,
 	.bento-progress,
 	.bento-mock {
@@ -3045,23 +2889,11 @@ h3 {
 		margin-left: auto;
 	}
 
-	/* Removed .course-desk grid override since it is now flex */
-
-	/* Bento to 1 col on mobile */
-	.practice-bento {
-		grid-template-columns: 1fr;
-	}
-
 	.bento-ai-chat,
 	.bento-progress,
 	.bento-mock,
 	.bento-features {
 		grid-column: 1 / -1;
-	}
-
-	.practice-header {
-		flex-direction: column;
-		align-items: flex-start;
 	}
 	.container {
 		padding: 0 18px;
@@ -3469,8 +3301,7 @@ h3 {
 
 	.strip-grid,
 	.course-desk,
-	.post-grid,
-	.practice-track-grid {
+	.post-grid {
 		display: flex;
 		flex-wrap: nowrap;
 		overflow-x: auto;
@@ -3481,8 +3312,7 @@ h3 {
 
 	.strip-grid::-webkit-scrollbar,
 	.course-desk::-webkit-scrollbar,
-	.post-grid::-webkit-scrollbar,
-	.practice-track-grid::-webkit-scrollbar {
+	.post-grid::-webkit-scrollbar {
 		display: none;
 	}
 
@@ -3529,31 +3359,6 @@ h3 {
 		flex: 0 0 min(76vw, 340px);
 		scroll-snap-align: start;
 		width: auto;
-	}
-
-	.practice-board {
-		grid-template-columns: 1fr;
-	}
-
-	.practice-track-grid {
-		gap: 12px;
-		margin-inline: calc(clamp(14px, 4.5vw, 24px) * -1);
-		padding: 0 clamp(14px, 4.5vw, 24px) 12px;
-	}
-
-	.practice-track-card {
-		flex: 0 0 min(72vw, 320px);
-		min-height: 188px;
-		padding: 16px;
-		scroll-snap-align: start;
-	}
-
-	.practice-dashboard {
-		min-height: 230px;
-	}
-
-	.practice-dashboard img {
-		min-height: 230px;
 	}
 }
 
@@ -3608,8 +3413,7 @@ h3 {
 	}
 
 	.strip-grid,
-	.course-desk,
-	.practice-track-grid {
+	.course-desk {
 		margin-inline: -14px;
 		padding-inline: 14px;
 	}
@@ -3626,7 +3430,6 @@ h3 {
 	}
 
 	.strip-grid p,
-	.practice-track-card p,
 	.card-desc {
 		font-size: .78rem;
 		line-height: 1.45;
@@ -3647,33 +3450,6 @@ h3 {
 
 	.course-card-inner {
 		min-height: 178px;
-	}
-
-	.practice-header {
-		gap: 8px;
-		margin-bottom: 18px;
-	}
-
-	.practice-lede {
-		font-size: .84rem;
-	}
-
-	.practice-track-card {
-		flex-basis: 80vw;
-		min-height: 172px;
-	}
-
-	.practice-dashboard,
-	.practice-dashboard img {
-		min-height: 196px;
-	}
-
-	.practice-dashboard-overlay {
-		padding: 44px 16px 16px;
-	}
-
-	.practice-dashboard-overlay strong {
-		font-size: 1rem;
 	}
 }
 

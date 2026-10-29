@@ -20,7 +20,6 @@ class TestAssetManifest extends CBTestCase {
 			'assets/css/polish.css',
 			'assets/css/responsive.css',
 			'assets/css/course-portal.css',
-			'assets/css/system-design-course.css',
 			'assets/css/course-learning.css',
 			'assets/css/typography.css',
 			'assets/css/editor.css',

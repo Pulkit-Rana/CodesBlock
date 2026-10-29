@@ -1,92 +1,33 @@
-# CodesBlock 🚀
+# CodesBlock WordPress Theme
 
-[![Essential Checks](https://github.com/Pulkit-Rana/CodesBlock/actions/workflows/essential-checks.yml/badge.svg?branch=prod_setup)](https://github.com/Pulkit-Rana/CodesBlock/actions/workflows/essential-checks.yml)
-[![Code Checks](https://github.com/Pulkit-Rana/CodesBlock/actions/workflows/code-checks.yml/badge.svg?branch=prod_setup)](https://github.com/Pulkit-Rana/CodesBlock/actions/workflows/code-checks.yml)
-[![Security Checks](https://github.com/Pulkit-Rana/CodesBlock/actions/workflows/security-checks.yml/badge.svg?branch=prod_setup)](https://github.com/Pulkit-Rana/CodesBlock/actions/workflows/security-checks.yml)
-[![Unit Tests](https://github.com/Pulkit-Rana/CodesBlock/actions/workflows/unit-tests.yml/badge.svg?branch=prod_setup)](https://github.com/Pulkit-Rana/CodesBlock/actions/workflows/unit-tests.yml)
-[![PHP Version](https://img.shields.io/badge/php-8.1%20%7C%208.2%20%7C%208.3-blue.svg)](https://www.php.net/)
-[![Security Standards](https://img.shields.io/badge/security-OWASP%20Hardened-green.svg)](SECURITY.md)
+This repository contains the CodesBlock theme. Hostinger deploys its files to `public_html/wp-content/themes/codesblock` from the `main` branch.
 
-Production engineering and AI education platform codebase for developers, system design engineers, and technical leaders.
+## Where site work belongs
 
----
+- **WordPress Admin:** write and edit articles, courses, and lessons; manage users, menus, media, and pages. Course pages use the title, excerpt, metadata, syllabus, thumbnail, and lesson records saved there.
+- **WordPress plugins:** manage memberships, payments, email, social sign-in, SEO, and course data entry.
+- **This repository:** change the theme's layout, styles, templates, and front-end behavior.
 
-## 🏛️ Repository Architecture
+The repository does not contain WordPress core, the site database, posts, courses, lessons, users, uploads, plugin source, plugin settings, or secrets. Theme templates read WordPress content and use public plugin interfaces where needed.
 
-- **Theme Root (`/`)**: Custom WordPress production theme (`functions.php`, `header.php`, `footer.php`, `front-page.php`, `single-course.php`, etc.).
-- **Template Parts (`template-parts/`)**: Modular UI components (`course-map.php`, `paywall.php`, `breadcrumbs.php`).
-- **Assets (`assets/`)**: Production styles (`css/`), modular client-side logic (`js/`), and optimized media (`images/`).
-- **Tests (`tests/`)**: Zero-dependency test harness (`bootstrap.php`), standalone test runner (`run-tests.php`), and automated suites (`tests/unit/`, `tests/security/`).
-- **Automation & CI/CD (`.github/workflows/`)**: Continuous integration, SAST scanning, PR triage, and unit tests.
-- **AI Rulebook (`docs/ai/`, `STRICT_AI_CHECKS.md`)**: Strict quality, security, and verification guardrails for autonomous AI coding agents.
+## Setup and migration
 
----
+For a fresh WordPress install or an existing-site migration, follow [DEPLOYMENT.md](DEPLOYMENT.md). GitHub deploys the theme files only. Existing posts, courses, lessons, accounts, uploads, and plugin settings must be restored separately from a WordPress backup or configured in WordPress Admin.
 
-## ⚡ Quickstart & Local Development
+For everyday publishing and theme changes, see [CODEBLOCK-MAINTENANCE.md](CODEBLOCK-MAINTENANCE.md).
 
-### 1. Requirements
-- PHP 8.1+
-- Node.js 20+
-- Git 2.30+
+## Theme changes
 
-### 2. Configure Local Git Hooks
-Enable automated pre-commit verification so syntax and hygiene issues are caught before committing:
+Edit the PHP templates and files under `assets/`, review the diff, then push to `main`. Hostinger's GitHub integration deploys the tracked theme files. Content edits do not require a Git commit.
+
+The local WordPress installation under `app/` is intentionally excluded from Git. Never add database exports, `wp-config.php`, credentials, or plugin folders to this repository.
+
+## Development checks
+
+PHP 8.1+ and Git are sufficient for theme work. The repository also includes optional local checks and tests:
 
 ```powershell
-# Windows PowerShell:
-powershell -File scripts/setup-hooks.ps1
-
-# Linux / macOS / Bash:
-bash scripts/setup-hooks.sh
-```
-
-### 3. Run Checks Locally
-Replicate GitHub Actions CI pipeline locally with one command:
-
-```powershell
-# Windows:
 powershell -ExecutionPolicy Bypass -File scripts/run-checks.ps1
-
-# Linux / macOS:
-bash scripts/run-checks.sh
-
-# Run unit tests directly:
-php tests/run-tests.php
 ```
 
----
-
-## 🛡️ Company CI/CD & Quality Gates
-
-Every pull request and push to `main` and `prod_setup` must pass 5 automated gates:
-
-```
-+-----------------------------------------------------------------------------------+
-|                            CODESBLOCK CI/CD PIPELINE                              |
-+-----------------------------------------------------------------------------------+
-|  1. Essential Checks   --> Conventional commit PR title, merge conflict detector  |
-|  2. Code Checks        --> php -l linting on PHP 8.1/8.2/8.3, JS syntax check     |
-|  3. Security Checks    --> Gitleaks secret scan, SAST OWASP scanner, npm/composer |
-|  4. Unit Tests         --> php tests/run-tests.php (20 suites, 148 assertions)    |
-|  5. PR Review Triage   --> Auto-sizing, checklist verification, label triage      |
-+-----------------------------------------------------------------------------------+
-```
-
----
-
-## 🤖 Strict AI Engineering Standards
-
-This repository is optimized for autonomous AI pair programming and agentic workflows. All AI agents (Antigravity, Gemini, Copilot, Claude) must follow the non-negotiable standards defined in:
-
-- 📖 [**`STRICT_AI_CHECKS.md`**](STRICT_AI_CHECKS.md)
-- 🔒 [**AI Security Checklist**](docs/ai/AI_SECURITY_CHECKLIST.md)
-- 🧹 [**AI Code Quality Standards**](docs/ai/AI_CODE_QUALITY_CHECKLIST.md)
-- 🧪 [**AI Testing Standards**](docs/ai/AI_TESTING_CHECKLIST.md)
-- 📋 [**AI PR Review Standards**](docs/ai/AI_PR_REVIEW_CHECKLIST.md)
-
----
-
-## 🤝 Contributing & Security
-
-- See [**`CONTRIBUTING.md`**](CONTRIBUTING.md) for branch naming conventions, PR templates, and workflow guidelines.
-- See [**`SECURITY.md`**](SECURITY.md) for vulnerability disclosure policies and contact instructions.
+See [SECURITY.md](SECURITY.md) before reporting or handling a security issue.

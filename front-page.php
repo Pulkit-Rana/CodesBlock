@@ -108,14 +108,6 @@ $codesblock_is_frontend_member = function_exists( 'cbcommerce_is_frontend_member
 	: ( is_user_logged_in() && ! $codesblock_is_admin_session );
 $codesblock_member_profile_url = function_exists( 'cbcommerce_member_profile_url' ) ? cbcommerce_member_profile_url() : home_url( '/my-learning/#profile' );
 $codesblock_member_learning_url = function_exists( 'cbcommerce_member_home_url' ) ? cbcommerce_member_home_url() : home_url( '/my-learning/' );
-$codesblock_interview_paid      = is_user_logged_in() && codesblock_interview_user_has_paid_access( get_current_user_id() );
-$codesblock_interview_free_used = is_user_logged_in() && codesblock_interview_free_session_used( get_current_user_id() );
-$codesblock_interview_free_session_id = is_user_logged_in() ? codesblock_interview_free_session_id( get_current_user_id() ) : 0;
-$codesblock_interview_access    = codesblock_interview_access_state( is_user_logged_in(), $codesblock_interview_paid, $codesblock_interview_free_used );
-$codesblock_interview_url       = home_url( '/interview/' );
-$codesblock_interview_can_resume = 'membership_required' === $codesblock_interview_access && $codesblock_interview_free_session_id > 0;
-$codesblock_interview_cta_label = $codesblock_interview_can_resume ? __( 'Resume your free session', 'codesblock' ) : ( 'membership_required' === $codesblock_interview_access ? __( 'Get more sessions', 'codesblock' ) : ( 'login_required' === $codesblock_interview_access ? __( 'Sign in to start your free session', 'codesblock' ) : __( 'Start an interview session', 'codesblock' ) ) );
-$codesblock_interview_cta_url   = $codesblock_interview_can_resume ? add_query_arg( 'session', $codesblock_interview_free_session_id, $codesblock_interview_url ) : ( 'membership_required' === $codesblock_interview_access ? '#paywall-overlay' : ( 'login_required' === $codesblock_interview_access ? wp_login_url( $codesblock_interview_url ) : $codesblock_interview_url ) );
 ?>
 
 <main id="main">
@@ -357,96 +349,6 @@ $codesblock_interview_cta_url   = $codesblock_interview_can_resume ? add_query_a
 						</div>
 					</div>
 				</aside>
-			</div>
-		</div>
-	</section>
-
-	<section class="section practice" id="practice">
-		<div class="container">
-			<div class="practice-header">
-				<div>
-					<p class="eyebrow">Interview Practice</p>
-					<h2>Practice the decisions interviewers actually score.</h2>
-					<a class="practice-start-link<?php echo 'membership_required' === $codesblock_interview_access && ! $codesblock_interview_can_resume ? ' js-open-paywall' : ''; ?>" href="<?php echo esc_url( $codesblock_interview_cta_url ); ?>"<?php echo 'membership_required' === $codesblock_interview_access && ! $codesblock_interview_can_resume ? ' aria-haspopup="dialog" aria-controls="paywall-overlay"' : ''; ?>><?php echo esc_html( $codesblock_interview_cta_label ); ?><span aria-hidden="true">&rarr;</span></a>
-					<?php if ( $codesblock_interview_can_resume ) : ?><a class="practice-start-link practice-plan-link js-open-paywall" href="#paywall-overlay" aria-haspopup="dialog" aria-controls="paywall-overlay"><?php esc_html_e( 'See membership plans', 'codesblock' ); ?></a><?php endif; ?>
-				</div>
-				<p class="practice-lede">Work through a realistic prompt, make your reasoning visible, and use focused review notes to improve the next attempt.</p>
-			</div>
-
-			<div class="practice-board">
-				<div class="practice-workspace" aria-label="Example system design interview workspace">
-					<div class="practice-window-bar">
-						<span><i></i><i></i><i></i> Interview workspace preview</span>
-						<strong>First phase</strong>
-					</div>
-					<div class="practice-prompt">
-						<span>System design prompt</span>
-						<h3>Design a distributed AI inference architecture.</h3>
-						<p>Talk through GPU load balancing, vector database scaling, latency, and AI model serving tradeoffs.</p>
-					</div>
-					<div class="practice-checkpoints">
-						<div><span>01</span><strong>Clarify</strong><small>Traffic, latency, limits</small></div>
-						<div><span>02</span><strong>Design</strong><small>Data model, flow, storage</small></div>
-						<div><span>03</span><strong>Defend</strong><small>Tradeoffs and failure modes</small></div>
-					</div>
-					<div class="practice-feedback">
-						<span>Example coaching note</span>
-						<p><strong>Sample:</strong> make the bottleneck explicit, then explain what happens when the shared store is unavailable. Live AI coaching is coming next.</p>
-					</div>
-				</div>
-
-				<nav class="practice-track-list" aria-label="Interview guide tracks">
-					<?php
-					$codesblock_practice_courses = new WP_Query(
-						array(
-							'post_type'           => 'course',
-							'posts_per_page'      => 3,
-							'post_status'         => 'publish',
-							'ignore_sticky_posts' => true,
-							'orderby'             => 'date',
-							'order'               => 'DESC',
-						)
-					);
-
-					if ( $codesblock_practice_courses->have_posts() ) :
-						$practice_index = 1;
-						while ( $codesblock_practice_courses->have_posts() ) :
-							$codesblock_practice_courses->the_post();
-							$course_level = get_post_meta( get_the_ID(), '_course_level', true ) ?: 'All Levels';
-							$is_featured = $practice_index === 2 ? 'is-featured' : '';
-							?>
-							<a class="practice-track-card <?php echo esc_attr( $is_featured ); ?>" href="<?php the_permalink(); ?>">
-								<span><?php echo esc_html( sprintf( '%02d', $practice_index ) ); ?> / <?php echo esc_html( $course_level ); ?></span>
-								<h3><?php the_title(); ?></h3>
-								<p><?php echo esc_html( wp_trim_words( get_the_excerpt() ?: wp_strip_all_tags( get_the_content() ), 12 ) ); ?></p>
-								<strong>Open track <b aria-hidden="true">&rarr;</b></strong>
-							</a>
-							<?php
-							$practice_index++;
-						endwhile;
-						wp_reset_postdata();
-					else :
-					?>
-						<a class="practice-track-card" href="<?php echo esc_url( home_url( '/system-design-interview-45-minute-framework/' ) ); ?>">
-							<span>01 / System design</span>
-							<h3>Senior Engineer</h3>
-							<p>Architecture, tradeoffs, ownership, and debugging judgment.</p>
-							<strong>Open track <b aria-hidden="true">&rarr;</b></strong>
-						</a>
-						<a class="practice-track-card is-featured" href="<?php echo esc_url( home_url( '/courses/build-production-ready-ai-agents/' ) ); ?>">
-							<span>02 / Applied AI</span>
-							<h3>AI Engineering</h3>
-							<p>Agents, evaluation, data pipelines, and production tradeoffs.</p>
-							<strong>Open track <b aria-hidden="true">&rarr;</b></strong>
-						</a>
-						<a class="practice-track-card" href="<?php echo esc_url( home_url( '/senior-engineer-interview-stories/' ) ); ?>">
-							<span>03 / Leadership</span>
-							<h3>Engineering Manager</h3>
-							<p>Team building, conflict, delivery stories, and technical leadership.</p>
-							<strong>Open track <b aria-hidden="true">&rarr;</b></strong>
-						</a>
-					<?php endif; ?>
-				</nav>
 			</div>
 		</div>
 	</section>
