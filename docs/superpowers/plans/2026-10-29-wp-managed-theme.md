@@ -104,4 +104,4 @@
 - [x] Confirm `git diff --check` is clean.
 - [x] Confirm no active source references remain to the retired interview route/API/helpers or deleted one-off course template; migration documentation may name the old route.
 - [x] Confirm plugin sources and WordPress content are still absent from Git and the retained course/article templates remain tracked.
-- [ ] Review the complete diff and commit/push the approved cleanup to `main`.
+- [x] Review the complete diff and commit/push the approved cleanup to `main`.
