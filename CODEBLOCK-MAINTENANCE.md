@@ -18,7 +18,7 @@ The site is split into small layers so everyday publishing does not require code
 
 - `wp-content/plugins/codesblock-core`: Courses, editable course fields, featured/premium flags, and server-side protected previews. This remains active even if the theme changes.
 - `wp-content/plugins/codesblock-commerce`: Connects PMPro, membership access, member login, newsletter consent, and learning progress.
-- `wp-content/themes/codesblock`: Visual presentation only. `assets/css/polish.css` is the small final brand layer; the larger historical layout rules remain in `assets/css/main.css`.
+- `wp-content/themes/codesblock`: Site templates, styling, and front-end interactions, including the course and member experiences. It calls CodesBlock Core and Commerce for course data, access, and progress rather than replacing those plugins. The interview practice feature also registers its own REST endpoints and private session records in `inc-interview.php`. `assets/css/polish.css` is the small final brand layer; the larger layout rules remain in `assets/css/main.css`.
 
 ## Lean, low-cost plugin stack
 
