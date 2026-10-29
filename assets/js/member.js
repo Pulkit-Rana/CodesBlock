@@ -335,7 +335,7 @@
 		var nextPage = trigger.getAttribute('data-course-destination') || '';
 		var destination = document.querySelector(target);
 		var navigate = function () {
-			if (nextPage) window.location.assign(nextPage);
+			redirectSameOrigin(nextPage);
 		};
 
 		if (!nextPage && destination) destination.scrollIntoView({ behavior: 'smooth', block: 'start' });
