@@ -4,6 +4,12 @@
  *
  * @package CodesBlock
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+$contact_email = sanitize_email( get_theme_mod( 'codesblock_contact_email', '' ) );
 ?>
 <footer id="contact" class="site-footer">
 	<div class="container footer-grid">
@@ -15,7 +21,7 @@
 					<small><?php bloginfo( 'description' ); ?></small>
 				</span>
 			</a>
-			<p><?php echo esc_html( get_theme_mod( 'codesblock_footer_description', 'AI-assisted courses, interview guides, and practical articles built around real developer growth.' ) ); ?></p>
+			<p><?php echo esc_html( get_theme_mod( 'codesblock_footer_description', '' ) ); ?></p>
 		</div>
 		<div>
 			<h2>Explore</h2>
@@ -30,12 +36,14 @@
 			);
 			?>
 		</div>
-		<div class="footer-contact-card">
-			<p class="footer-kicker"><?php esc_html_e( 'Contact', 'codesblock' ); ?></p>
-			<h2><?php esc_html_e( 'Questions about learning or access?', 'codesblock' ); ?></h2>
-			<p><?php esc_html_e( 'For course access, interview guides, partnerships, or feedback, send the CodesBlock team a note.', 'codesblock' ); ?></p>
-			<a class="footer-contact-button" href="mailto:hello@codesblock.com"><?php esc_html_e( 'Start a conversation', 'codesblock' ); ?><span aria-hidden="true">&rarr;</span></a>
-		</div>
+		<?php if ( $contact_email ) : ?>
+			<div class="footer-contact-card">
+				<p class="footer-kicker"><?php esc_html_e( 'Contact', 'codesblock' ); ?></p>
+				<h2><?php esc_html_e( 'Questions about learning or access?', 'codesblock' ); ?></h2>
+				<p><?php esc_html_e( 'For course access, interview guides, partnerships, or feedback, send the CodesBlock team a note.', 'codesblock' ); ?></p>
+				<a class="footer-contact-button" href="<?php echo esc_url( 'mailto:' . $contact_email ); ?>"><?php esc_html_e( 'Start a conversation', 'codesblock' ); ?><span aria-hidden="true">&rarr;</span></a>
+			</div>
+		<?php endif; ?>
 	</div>
 	<div class="container footer-bottom">
 		<span>&copy; <?php echo esc_html( date_i18n( 'Y' ) ); ?> <?php bloginfo( 'name' ); ?>.</span>

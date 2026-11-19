@@ -14,7 +14,7 @@ This GitHub repository is the theme source. It does not include WordPress core, 
 2. Install and activate the site's plugins through WordPress Admin. The CodesBlock theme expects the separately installed CodesBlock Core and CodesBlock Commerce plugins for course records, membership integration, and progress. Install and configure the other plugins the site needs through their normal WordPress or Hostinger setup.
 3. In Hostinger hPanel, open **Advanced → Git**, connect the GitHub repository, select `main`, and set the deployment directory to `public_html/wp-content/themes/codesblock`.
 4. Deploy the branch. In WordPress Admin, open **Appearance → Themes** and activate CodesBlock.
-5. Create articles, courses, and lessons in their WordPress Admin screens. Configure menus, Site Identity, homepage text, and footer details in WordPress Admin/Customizer.
+5. Create articles, courses, and lessons in their WordPress Admin screens. Assign primary and footer menus, select the logo and site icon, set homepage copy and button destinations, and enter contact and social details in the Customizer. Configure the homepage title in Yoast SEO. See [the maintenance guide](CODEBLOCK-MAINTENANCE.md) for the exact screens.
 6. Configure plugin settings and enter API credentials through the relevant plugin or Hostinger settings. Do not put secrets in GitHub.
 7. Save **Settings → Permalinks** once after setup. Verify the homepage, `/articles/`, `/courses/`, a course lesson, and sign-in/checkout pages.
 

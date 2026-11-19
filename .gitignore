@@ -42,6 +42,7 @@ app/public/wp-config.php
 
 # Local WordPress installation; this repository contains only the CodesBlock theme.
 /app/
+/conf/
 
 # Temp files
 *.tmp
@@ -54,10 +55,8 @@ tmp/
 .codex-tmp/
 outputs/
 
-# Local security-audit snapshots, logs, and deployed plugin/theme copies.
-/output/security-20260912/
-output/mobile-fixes-*/
-output/mobile-responsive-*/
+# Generated reports, local audit snapshots and deployment copies.
+/output/
 
 # Database exports and migration/deployment bundles can contain credentials,
 # authentication cookies, password hashes, and private customer data.

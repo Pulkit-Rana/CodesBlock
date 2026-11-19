@@ -5,16 +5,8 @@
  * @package CodesBlock
  */
 
-function codesblock_default_menu() {
-	$courses_url = get_post_type_archive_link( 'course' ) ?: home_url( '/courses/' );
-	?>
-	<ul class="menu">
-		<li class="<?php echo is_front_page() ? 'current-menu-item' : ''; ?>"><a href="<?php echo esc_url( home_url( '/' ) ); ?>">Home</a></li>
-		<li class="<?php echo ( is_post_type_archive( 'course' ) || is_singular( 'course' ) ) ? 'current-menu-item' : ''; ?>"><a href="<?php echo esc_url( $courses_url ); ?>">Courses</a></li>
-		<li class="<?php echo ( is_page( 'articles' ) || ( is_home() && ! is_front_page() ) || is_singular( 'post' ) ) ? 'current-menu-item' : ''; ?>"><a href="<?php echo esc_url( codesblock_articles_url() ); ?>">Articles</a></li>
-		<li class="menu-item-start-here"><a href="<?php echo esc_url( home_url( '/#start' ) ); ?>">Start</a></li>
-	</ul>
-	<?php
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /**

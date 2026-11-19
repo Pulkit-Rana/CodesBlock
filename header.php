@@ -4,6 +4,10 @@
  *
  * @package CodesBlock
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 ?>
 <!doctype html>
 <html <?php language_attributes(); ?>>
@@ -89,27 +93,17 @@
 		: ( is_user_logged_in() && ! $codesblock_is_admin_session );
 	?>
 	<div class="header-inner header-inner-full">
-		<?php if ( has_custom_logo() ) : ?>
-			<div class="brand">
-				<?php the_custom_logo(); ?>
-			</div>
-		<?php else : ?>
-			<a class="brand" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
+		<a class="brand" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
+			<?php if ( has_custom_logo() ) : ?>
 				<span class="brand-mark">
-					<img
-						src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-cb-gloss-transparent.png' ); ?>"
-						alt=""
-						class="brand-logo"
-						width="512"
-						height="512"
-					>
+					<?php echo wp_get_attachment_image( get_theme_mod( 'custom_logo' ), 'full', false, array( 'class' => 'brand-logo', 'alt' => '' ) ); ?>
 				</span>
-				<span class="brand-copy">
-					<strong><?php bloginfo( 'name' ); ?></strong>
-					<small><?php bloginfo( 'description' ); ?></small>
-				</span>
-			</a>
-		<?php endif; ?>
+			<?php endif; ?>
+			<span class="brand-copy">
+				<strong><?php bloginfo( 'name' ); ?></strong>
+				<small><?php bloginfo( 'description' ); ?></small>
+			</span>
+		</a>
 		<button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu" aria-label="<?php esc_attr_e( 'Open navigation', 'codesblock' ); ?>" data-nav-toggle>
 			<span></span>
 			<span></span>
@@ -122,7 +116,7 @@
 					'theme_location' => 'primary',
 					'container'      => false,
 					'menu_class'     => 'menu original-menu',
-					'fallback_cb'    => 'codesblock_default_menu',
+					'fallback_cb'    => false,
 				)
 			);
 			?>
@@ -145,8 +139,8 @@
 			</div>
 		</nav>
 		<div class="header-actions">
-			<?php if ( get_theme_mod( 'codesblock_support_url', 'https://www.buymeacoffee.com/codesblock' ) ) : ?>
-				<a class="header-coffee-btn" href="<?php echo esc_url( get_theme_mod( 'codesblock_support_url', 'https://www.buymeacoffee.com/codesblock' ) ); ?>" target="_blank" rel="noopener noreferrer" title="<?php esc_attr_e( 'Buy Me a Coffee', 'codesblock' ); ?>" aria-label="<?php esc_attr_e( 'Buy Me a Coffee', 'codesblock' ); ?>">
+			<?php if ( get_theme_mod( 'codesblock_support_url', '' ) ) : ?>
+				<a class="header-coffee-btn" href="<?php echo esc_url( get_theme_mod( 'codesblock_support_url', '' ) ); ?>" target="_blank" rel="noopener noreferrer" title="<?php esc_attr_e( 'Buy Me a Coffee', 'codesblock' ); ?>" aria-label="<?php esc_attr_e( 'Buy Me a Coffee', 'codesblock' ); ?>">
 					<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1-2H7L6 7z" fill="#ffffff" stroke="#1e293b"/><path d="M6.5 9l1.2 10.5a2 2 0 0 0 2 1.8h4.6a2 2 0 0 0 2-1.8L17.5 9H6.5z" fill="#ffdd00" stroke="#1e293b"/><rect x="5.5" y="7" width="13" height="2" rx="1" fill="#ffffff" stroke="#1e293b"/></svg>
 				</a>
 			<?php endif; ?>

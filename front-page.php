@@ -5,6 +5,10 @@
  * @package CodesBlock
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 get_header();
 
 if ( 'page' === get_option( 'show_on_front' ) && have_posts() ) {
@@ -29,9 +33,14 @@ if ( 'page' === get_option( 'show_on_front' ) && have_posts() ) {
 	rewind_posts();
 }
 
-$hero_eyebrow = get_theme_mod( 'codesblock_hero_eyebrow', 'Stay Relevant. Stay Curious.' );
-$hero_title   = get_theme_mod( 'codesblock_hero_title', 'CodesBlock' );
-$hero_lede    = get_theme_mod( 'codesblock_hero_lede', 'Production AI engineering, system design, and interview practice for developers who want practical proof - not another passive tutorial catalog.' );
+$hero_eyebrow = get_theme_mod( 'codesblock_hero_eyebrow', '' );
+$hero_title   = get_theme_mod( 'codesblock_hero_title', get_bloginfo( 'name' ) );
+$hero_lede    = get_theme_mod( 'codesblock_hero_lede', '' );
+$hero_primary_label   = get_theme_mod( 'codesblock_hero_primary_label', '' );
+$hero_secondary_label = get_theme_mod( 'codesblock_hero_secondary_label', '' );
+$hero_primary_url     = get_theme_mod( 'codesblock_hero_primary_url', '' );
+$hero_secondary_url   = get_theme_mod( 'codesblock_hero_secondary_url', '' );
+
 $codesblock_published_course_count = (int) wp_count_posts( 'course' )->publish;
 $codesblock_published_post_count   = (int) wp_count_posts( 'post' )->publish;
 $codesblock_user_counts           = count_users();
@@ -114,12 +123,20 @@ $codesblock_member_learning_url = function_exists( 'cbcommerce_member_home_url' 
 	<section class="hero">
 		<div class="container hero-grid">
 			<div class="hero-copy">
-				<p class="eyebrow"><?php echo esc_html( $hero_eyebrow ); ?></p>
+				<?php if ( $hero_eyebrow ) : ?>
+					<p class="eyebrow"><?php echo esc_html( $hero_eyebrow ); ?></p>
+				<?php endif; ?>
 				<h1><?php echo esc_html( $hero_title ); ?></h1>
-				<p class="hero-lede"><?php echo esc_html( $hero_lede ); ?></p>
+				<?php if ( $hero_lede ) : ?>
+					<p class="hero-lede"><?php echo esc_html( $hero_lede ); ?></p>
+				<?php endif; ?>
 				<div class="hero-actions">
-					<a class="button button-primary" href="<?php echo esc_url( get_theme_mod( 'codesblock_hero_primary_url', get_post_type_archive_link( 'course' ) ?: home_url( '/courses/' ) ) ); ?>"><?php echo esc_html( get_theme_mod( 'codesblock_hero_primary_label', 'Explore paths' ) ); ?></a>
-					<a class="button button-secondary" href="<?php echo esc_url( get_theme_mod( 'codesblock_hero_secondary_url', home_url( '/articles/' ) ) ); ?>"><?php echo esc_html( get_theme_mod( 'codesblock_hero_secondary_label', 'Read free lessons' ) ); ?></a>
+					<?php if ( $hero_primary_label && $hero_primary_url ) : ?>
+						<a class="button button-primary" href="<?php echo esc_url( $hero_primary_url ); ?>"><?php echo esc_html( $hero_primary_label ); ?></a>
+					<?php endif; ?>
+					<?php if ( $hero_secondary_label && $hero_secondary_url ) : ?>
+						<a class="button button-secondary" href="<?php echo esc_url( $hero_secondary_url ); ?>"><?php echo esc_html( $hero_secondary_label ); ?></a>
+					<?php endif; ?>
 				</div>
 				<div class="learning-search" aria-label="Search learning topics">
 					<form class="hero-search-form" action="<?php echo esc_url( home_url( '/' ) ); ?>" method="get">
@@ -388,32 +405,32 @@ $codesblock_member_learning_url = function_exists( 'cbcommerce_member_home_url' 
 						<strong><?php esc_html_e( 'Join free', 'codesblock' ); ?></strong>
 					</a>
 				<?php endif; ?>
-				<?php if ( get_theme_mod( 'codesblock_support_url', 'https://www.buymeacoffee.com/codesblock' ) ) : ?>
-					<a class="community-card cb-glass-pill coffee-card" href="<?php echo esc_url( get_theme_mod( 'codesblock_support_url', 'https://www.buymeacoffee.com/codesblock' ) ); ?>" target="_blank" rel="noopener noreferrer">
+				<?php if ( get_theme_mod( 'codesblock_support_url', '' ) ) : ?>
+					<a class="community-card cb-glass-pill coffee-card" href="<?php echo esc_url( get_theme_mod( 'codesblock_support_url', '' ) ); ?>" target="_blank" rel="noopener noreferrer">
 						<span class="community-icon-badge coffee-icon">
 							<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1-2H7L6 7z" fill="#ffffff" stroke="#1e293b"/><path d="M6.5 9l1.2 10.5a2 2 0 0 0 2 1.8h4.6a2 2 0 0 0 2-1.8L17.5 9H6.5z" fill="#ffdd00" stroke="#1e293b"/><rect x="5.5" y="7" width="13" height="2" rx="1" fill="#ffffff" stroke="#1e293b"/></svg>
 						</span>
 						<strong>Buy Me a Coffee</strong>
 					</a>
 				<?php endif; ?>
-				<?php if ( get_theme_mod( 'codesblock_youtube_url', 'https://www.youtube.com/@codesblock' ) ) : ?>
-					<a class="community-card cb-glass-pill youtube-card" href="<?php echo esc_url( get_theme_mod( 'codesblock_youtube_url', 'https://www.youtube.com/@codesblock' ) ); ?>" target="_blank" rel="noopener noreferrer">
+				<?php if ( get_theme_mod( 'codesblock_youtube_url', '' ) ) : ?>
+					<a class="community-card cb-glass-pill youtube-card" href="<?php echo esc_url( get_theme_mod( 'codesblock_youtube_url', '' ) ); ?>" target="_blank" rel="noopener noreferrer">
 						<span class="community-icon-badge youtube-icon">
 							<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
 						</span>
 						<strong>YouTube</strong>
 					</a>
 				<?php endif; ?>
-				<?php if ( get_theme_mod( 'codesblock_instagram_url', 'https://www.instagram.com/codesblock' ) ) : ?>
-					<a class="community-card cb-glass-pill instagram-card" href="<?php echo esc_url( get_theme_mod( 'codesblock_instagram_url', 'https://www.instagram.com/codesblock' ) ); ?>" target="_blank" rel="noopener noreferrer">
+				<?php if ( get_theme_mod( 'codesblock_instagram_url', '' ) ) : ?>
+					<a class="community-card cb-glass-pill instagram-card" href="<?php echo esc_url( get_theme_mod( 'codesblock_instagram_url', '' ) ); ?>" target="_blank" rel="noopener noreferrer">
 						<span class="community-icon-badge instagram-icon">
 							<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
 						</span>
 						<strong>Instagram</strong>
 					</a>
 				<?php endif; ?>
-				<?php if ( get_theme_mod( 'codesblock_github_url', 'https://github.com/Pulkit-Rana/CodesBlock' ) ) : ?>
-					<a class="community-card cb-glass-pill github-card" href="<?php echo esc_url( get_theme_mod( 'codesblock_github_url', 'https://github.com/Pulkit-Rana/CodesBlock' ) ); ?>" target="_blank" rel="noopener noreferrer">
+				<?php if ( get_theme_mod( 'codesblock_github_url', '' ) ) : ?>
+					<a class="community-card cb-glass-pill github-card" href="<?php echo esc_url( get_theme_mod( 'codesblock_github_url', '' ) ); ?>" target="_blank" rel="noopener noreferrer">
 						<span class="community-icon-badge github-icon">
 							<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
 						</span>

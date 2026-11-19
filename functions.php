@@ -495,27 +495,22 @@ function codesblock_customize_register( $wp_customize ) {
 	$fields = array(
 		'codesblock_hero_eyebrow' => array(
 			'label'   => __( 'Hero eyebrow', 'codesblock' ),
-			'default' => 'Stay Relevant. Stay Curious.',
 			'type'    => 'text',
 		),
 		'codesblock_hero_title'   => array(
 			'label'   => __( 'Hero title', 'codesblock' ),
-			'default' => 'CodesBlock',
 			'type'    => 'text',
 		),
 		'codesblock_hero_lede'    => array(
 			'label'   => __( 'Hero description', 'codesblock' ),
-			'default' => 'Production AI engineering, system design, and interview practice for developers who want practical proof - not another passive tutorial catalog.',
 			'type'    => 'textarea',
 		),
 		'codesblock_hero_primary_label' => array(
 			'label'   => __( 'Primary button label', 'codesblock' ),
-			'default' => 'Explore paths',
 			'type'    => 'text',
 		),
 		'codesblock_hero_secondary_label' => array(
 			'label'   => __( 'Secondary button label', 'codesblock' ),
-			'default' => 'Read free lessons',
 			'type'    => 'text',
 		),
 	);
@@ -524,7 +519,6 @@ function codesblock_customize_register( $wp_customize ) {
 		$wp_customize->add_setting(
 			$setting_id,
 			array(
-				'default'           => $field['default'],
 				'sanitize_callback' => 'textarea' === $field['type'] ? 'sanitize_textarea_field' : 'sanitize_text_field',
 			)
 		);
@@ -813,14 +807,14 @@ function codesblock_customize_register( $wp_customize ) {
 		),
 		'codesblock_hero_primary_url' => array(
 			'label'             => __( 'Primary button URL', 'codesblock' ),
-			'default'           => '#courses',
+			'default'           => '',
 			'type'              => 'text',
 			'sanitize_callback' => 'codesblock_sanitize_promo_url',
 			'description'       => __( 'Use a full URL, /courses/, or an anchor such as #courses.', 'codesblock' ),
 		),
 		'codesblock_hero_secondary_url' => array(
 			'label'             => __( 'Secondary button URL', 'codesblock' ),
-			'default'           => '/articles/',
+			'default'           => '',
 			'type'              => 'url',
 			'sanitize_callback' => 'esc_url_raw',
 		),
@@ -857,13 +851,14 @@ function codesblock_customize_register( $wp_customize ) {
 	);
 
 	$footer_fields = array(
-		'codesblock_footer_description' => array( __( 'Footer description', 'codesblock' ), 'AI-assisted courses, interview guides, and practical articles built around real developer growth.', 'textarea', 'sanitize_textarea_field' ),
+		'codesblock_contact_email'       => array( __( 'Contact email', 'codesblock' ), '', 'email', 'sanitize_email' ),
+		'codesblock_footer_description' => array( __( 'Footer description', 'codesblock' ), '', 'textarea', 'sanitize_textarea_field' ),
 		'codesblock_newsletter_heading'  => array( __( 'Newsletter heading', 'codesblock' ), 'Join the weekly build note', 'text', 'sanitize_text_field' ),
 		'codesblock_newsletter_copy'     => array( __( 'Newsletter description', 'codesblock' ), 'One practical engineering idea and one focused learning prompt, delivered without the noise.', 'textarea', 'sanitize_textarea_field' ),
-		'codesblock_youtube_url'         => array( __( 'YouTube URL', 'codesblock' ), 'https://www.youtube.com/@codesblock', 'url', 'esc_url_raw' ),
-		'codesblock_instagram_url'       => array( __( 'Instagram URL', 'codesblock' ), 'https://www.instagram.com/codesblock', 'url', 'esc_url_raw' ),
-		'codesblock_github_url'          => array( __( 'GitHub URL', 'codesblock' ), 'https://github.com/Pulkit-Rana/CodesBlock', 'url', 'esc_url_raw' ),
-		'codesblock_support_url'         => array( __( 'Support / Buy me a coffee URL', 'codesblock' ), 'https://www.buymeacoffee.com/codesblock', 'url', 'esc_url_raw' ),
+		'codesblock_youtube_url'         => array( __( 'YouTube URL', 'codesblock' ), '', 'url', 'esc_url_raw' ),
+		'codesblock_instagram_url'       => array( __( 'Instagram URL', 'codesblock' ), '', 'url', 'esc_url_raw' ),
+		'codesblock_github_url'          => array( __( 'GitHub URL', 'codesblock' ), '', 'url', 'esc_url_raw' ),
+		'codesblock_support_url'         => array( __( 'Support / Buy me a coffee URL', 'codesblock' ), '', 'url', 'esc_url_raw' ),
 	);
 
 	foreach ( $footer_fields as $setting_id => $field ) {
@@ -941,41 +936,6 @@ function codesblock_excerpt_more() {
 }
 add_filter( 'excerpt_more', 'codesblock_excerpt_more' );
 
-function codesblock_seed_navigation() {
-	if ( get_option( 'codesblock_seeded_navigation' ) ) {
-		return;
-	}
-
-	$menu_name = 'CodesBlock Primary';
-	$menu_id   = wp_create_nav_menu( $menu_name );
-
-	if ( ! is_wp_error( $menu_id ) ) {
-		$items = array(
-			array( 'title' => 'Home', 'url' => home_url( '/' ) ),
-			array( 'title' => 'Courses', 'url' => home_url( '/courses/' ) ),
-			array( 'title' => 'Articles', 'url' => home_url( '/articles/' ) ),
-			array( 'title' => 'Start Here', 'url' => home_url( '/#start' ) ),
-		);
-
-		foreach ( $items as $item ) {
-			wp_update_nav_menu_item(
-				$menu_id,
-				0,
-				array(
-					'menu-item-title'  => $item['title'],
-					'menu-item-url'    => $item['url'],
-					'menu-item-status' => 'publish',
-				)
-			);
-		}
-
-		set_theme_mod( 'nav_menu_locations', array( 'primary' => $menu_id, 'footer' => $menu_id ) );
-	}
-
-	update_option( 'codesblock_seeded_navigation', 1 );
-}
-add_action( 'after_switch_theme', 'codesblock_seed_navigation' );
-
 /**
  * Ensure active blue highlight is applied strictly to the exact current page.
  */
@@ -1033,66 +993,6 @@ function codesblock_filter_nav_menu_link_attributes( $atts, $item ) {
 	return $atts;
 }
 add_filter( 'nav_menu_link_attributes', 'codesblock_filter_nav_menu_link_attributes', 10, 2 );
-
-/**
- * Use a concise, descriptive homepage title in browser tabs and Yoast output.
- */
-function codesblock_homepage_title( $title ) {
-	if ( is_front_page() || is_home() ) {
-		return 'CodesBlock | Production AI Engineering for Developers';
-	}
-
-	return $title;
-}
-add_filter( 'pre_get_document_title', 'codesblock_homepage_title', 100 );
-add_filter( 'wpseo_title', 'codesblock_homepage_title', 100 );
-add_filter( 'wpseo_opengraph_title', 'codesblock_homepage_title', 100 );
-
-/**
- * Always use the compact glossy CB favicon instead of the larger header logo.
- */
-function codesblock_site_icon_url( $url, $size = 512 ) {
-	$icon_size = 512;
-
-	if ( $size <= 32 ) {
-		$icon_size = ( $size <= 16 ) ? 16 : 32;
-	} elseif ( $size <= 192 ) {
-		$icon_size = 192;
-	}
-
-	$relative_path = '/assets/images/favicon-cb-transparent-' . $icon_size . '.png';
-	$file_path     = get_template_directory() . $relative_path;
-	$icon_url      = get_template_directory_uri() . $relative_path;
-
-	if ( file_exists( $file_path ) ) {
-		$icon_url = add_query_arg( 'ver', (string) filemtime( $file_path ), $icon_url );
-		return $icon_url;
-	}
-
-	return $url;
-}
-add_filter( 'get_site_icon_url', 'codesblock_site_icon_url', 100, 2 );
-
-/**
- * Add explicit legacy and 16px favicon declarations after WordPress' icon tags.
- */
-function codesblock_favicon_links() {
-	$favicon_directory = get_template_directory() . '/assets/images/';
-	$favicon_uri       = get_template_directory_uri() . '/assets/images/';
-	$favicon_16_path   = $favicon_directory . 'favicon-cb-transparent-16.png';
-	$favicon_ico_path  = $favicon_directory . 'favicon-cb-transparent.ico';
-	if ( ! file_exists( $favicon_16_path ) || ! file_exists( $favicon_ico_path ) ) {
-		return;
-	}
-
-	$favicon_16 = add_query_arg( 'ver', (string) filemtime( $favicon_16_path ), $favicon_uri . 'favicon-cb-transparent-16.png' );
-	$favicon_ico = add_query_arg( 'ver', (string) filemtime( $favicon_ico_path ), $favicon_uri . 'favicon-cb-transparent.ico' );
-	?>
-	<link rel="icon" type="image/png" sizes="16x16" href="<?php echo esc_url( $favicon_16 ); ?>">
-	<link rel="shortcut icon" type="image/x-icon" href="<?php echo esc_url( $favicon_ico ); ?>">
-	<?php
-}
-add_action( 'wp_head', 'codesblock_favicon_links', 100 );
 
 add_action('rest_api_init', function () {
   register_rest_route('codesblock/v1', '/stats', array(

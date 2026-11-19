@@ -47,20 +47,4 @@ class TestAssetManifest extends CBTestCase {
 			$this->assertTrue( filesize( $file ) > 0, "JS asset is empty: {$asset}" );
 		}
 	}
-
-	public function testCoreFaviconAssetsExist(): void {
-		$theme_dir = dirname( __DIR__, 2 );
-		$favicons = array(
-			'assets/images/favicon-cb-transparent-16.png',
-			'assets/images/favicon-cb-transparent-32.png',
-			'assets/images/favicon-cb-transparent-192.png',
-			'assets/images/favicon-cb-transparent-512.png',
-			'assets/images/favicon-cb-transparent.ico',
-		);
-
-		foreach ( $favicons as $asset ) {
-			$file = $theme_dir . '/' . $asset;
-			$this->assertFileExists( $file, "Favicon asset missing: {$asset}" );
-		}
-	}
 }

@@ -24,36 +24,19 @@ class TestCourseFunctions extends CBTestCase {
 		$this->assertEquals( 'https://codesblock.test/page-123/', $url );
 	}
 
-	public function testHomepageTitleFilter(): void {
+	public function testHomepageUsesConfiguredTitlesAndSiteIcon(): void {
 		require_once dirname( __DIR__, 2 ) . '/functions.php';
 
-		// When on front page
+		$previous = $GLOBALS['_cb_mock_context']['is_front_page'];
 		$GLOBALS['_cb_mock_context']['is_front_page'] = true;
-		$GLOBALS['_cb_mock_context']['is_home'] = false;
-		$title = codesblock_homepage_title( 'Default Title' );
-		$this->assertEquals( 'CodesBlock | Production AI Engineering for Developers', $title );
-
-		// When on another page
-		$GLOBALS['_cb_mock_context']['is_front_page'] = false;
-		$GLOBALS['_cb_mock_context']['is_home'] = false;
-		$title = codesblock_homepage_title( 'Sample Course | CodesBlock' );
-		$this->assertEquals( 'Sample Course | CodesBlock', $title );
-	}
-
-	public function testSiteIconUrlSizing(): void {
-		require_once dirname( __DIR__, 2 ) . '/functions.php';
-
-		// Small size (16px)
-		$icon16 = codesblock_site_icon_url( 'default.png', 16 );
-		$this->assertContains( 'favicon-cb-transparent-16.png', $icon16 );
-
-		// Medium size (32px)
-		$icon32 = codesblock_site_icon_url( 'default.png', 32 );
-		$this->assertContains( 'favicon-cb-transparent-32.png', $icon32 );
-
-		// Large size (512px)
-		$icon512 = codesblock_site_icon_url( 'default.png', 512 );
-		$this->assertContains( 'favicon-cb-transparent-512.png', $icon512 );
+		try {
+			$this->assertEquals( 'Search title', apply_filters( 'wpseo_title', 'Search title' ) );
+			$this->assertEquals( 'Social title', apply_filters( 'wpseo_opengraph_title', 'Social title' ) );
+			$icon = 'https://codesblock.test/wp-content/uploads/site-icon.png';
+			$this->assertEquals( $icon, apply_filters( 'get_site_icon_url', $icon, 32 ) );
+		} finally {
+			$GLOBALS['_cb_mock_context']['is_front_page'] = $previous;
+		}
 	}
 
 	public function testStatsEndpointReturnsArray(): void {

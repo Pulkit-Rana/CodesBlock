@@ -5,7 +5,10 @@
 - **Articles:** **Posts → Add New**. Write the title and article in the editor; set the excerpt, categories, tags, and featured image there.
 - **Courses:** **Courses → Add New Course**. CodesBlock Core provides the course editor and course fields. The theme displays the saved course title, excerpt, thumbnail, metadata, syllabus, and lessons for every course; there are no course-specific landing pages to edit in code.
 - **Lessons:** **Courses → Course Lessons**. Add and edit lesson content in WordPress.
-- **Navigation and site identity:** **Appearance → Menus** and **Appearance → Customize**.
+- **Navigation:** assign a saved menu to both Primary Menu and Footer Menu under **Appearance → Menus → Manage Locations**.
+- **Logo and site icon:** choose images from the Media Library under **Appearance → Customize → Site Identity**. Use a square image of at least 512 × 512 pixels for the site icon.
+- **Homepage and footer:** edit the introduction and its two buttons under **Appearance → Customize → CodesBlock Homepage**. Set the contact email, footer description, social profiles and support link under **CodesBlock Footer & Social**.
+- **Homepage search and social titles:** edit the homepage in **Yoast SEO → Settings → Content types → Homepage** while the homepage displays the latest posts.
 - **Memberships and orders:** **Memberships** (Paid Memberships Pro).
 - **Payments:** **Knit Pay** and the configured gateway settings.
 - **Newsletter:** **MailPoet**.
