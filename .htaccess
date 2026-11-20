@@ -9,3 +9,8 @@ RewriteRule (^|/)\.[^/]+(?:/|$) - [F,L]
 <FilesMatch "(?i)\.(md|sql|log|bak|env|envrc|pem|key|toml|ya?ml|py|sh|ps1|cmd)$">
 Require all denied
 </FilesMatch>
+
+# WordPress loads theme PHP from the filesystem. Browser requests only need assets.
+<FilesMatch "(?i)\.php$">
+Require all denied
+</FilesMatch>
