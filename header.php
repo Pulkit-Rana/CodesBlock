@@ -28,8 +28,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 		'168'     => __( 'Dismiss announcement for 7 days', 'codesblock' ),
 		'720'     => __( 'Dismiss announcement for 30 days', 'codesblock' ),
 	);
-	$codesblock_dismissal = isset( $codesblock_promo['dismissal'] ) ? (string) $codesblock_promo['dismissal'] : '168';
-	$codesblock_bar_classes = array( 'top-promo-bar', 'promo-scheme-' . $codesblock_promo['scheme'] );
+	$codesblock_dismissal      = isset( $codesblock_promo['dismissal'] ) ? (string) $codesblock_promo['dismissal'] : '168';
+	$codesblock_bar_classes    = array( 'top-promo-bar', 'promo-scheme-' . $codesblock_promo['scheme'] );
 	if ( ! empty( $codesblock_promo['status'] ) ) {
 		$codesblock_bar_classes[] = 'promo-status-' . sanitize_html_class( $codesblock_promo['status'] );
 	}
@@ -44,7 +44,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 		data-promo-campaign="<?php echo esc_attr( $codesblock_promo['campaign'] ); ?>"
 		data-promo-dismissal="<?php echo esc_attr( $codesblock_dismissal ); ?>"
 		data-promo-preview="<?php echo ! empty( $codesblock_promo['preview'] ) ? '1' : '0'; ?>"
-		<?php if ( ! empty( $codesblock_promo['ends_at'] ) ) : ?>data-promo-expires="<?php echo esc_attr( (string) ( $codesblock_promo['ends_at'] * 1000 ) ); ?>"<?php endif; ?>
+		<?php
+		if ( ! empty( $codesblock_promo['ends_at'] ) ) :
+			?>
+			data-promo-expires="<?php echo esc_attr( (string) ( $codesblock_promo['ends_at'] * 1000 ) ); ?>"<?php endif; ?>
 	>
 		<span class="promo-glow promo-glow-one" aria-hidden="true"></span>
 		<span class="promo-glow promo-glow-two" aria-hidden="true"></span>
@@ -57,6 +60,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<p><?php echo esc_html( $codesblock_promo['text'] ); ?></p>
 			</div>
 			<?php if ( ! empty( $codesblock_promo['countdown'] ) ) : ?>
+				<?php /* translators: %s: campaign end date and time in the site timezone. */ ?>
 				<div class="promo-countdown" role="img" aria-label="<?php echo esc_attr( sprintf( __( 'Campaign ends %s', 'codesblock' ), wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $codesblock_promo['ends_at'], wp_timezone() ) ) ); ?>">
 					<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
 					<span><?php esc_html_e( 'Ends in', 'codesblock' ); ?></span>
@@ -68,8 +72,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 					class="promo-cta <?php echo esc_attr( implode( ' ', $codesblock_promo['classes'] ) ); ?>"
 					href="<?php echo esc_url( $codesblock_promo['url'] ); ?>"
 					data-promo-action="click"
-					<?php if ( ! empty( $codesblock_promo['new_tab'] ) ) : ?>target="_blank" rel="noopener noreferrer"<?php endif; ?>
-					<?php if ( ! empty( $codesblock_promo['member_view'] ) ) : ?>data-member-view="<?php echo esc_attr( $codesblock_promo['member_view'] ); ?>" aria-haspopup="dialog" aria-controls="member-overlay"<?php endif; ?>
+					<?php
+					if ( ! empty( $codesblock_promo['new_tab'] ) ) :
+						?>
+						target="_blank" rel="noopener noreferrer"<?php endif; ?>
+					<?php
+					if ( ! empty( $codesblock_promo['member_view'] ) ) :
+						?>
+						data-member-view="<?php echo esc_attr( $codesblock_promo['member_view'] ); ?>" aria-haspopup="dialog" aria-controls="member-overlay"<?php endif; ?>
 				>
 					<span><?php echo esc_html( $codesblock_promo['cta'] ); ?></span>
 					<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"></path></svg>
@@ -85,7 +95,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <?php endif; ?>
 <header class="site-header" data-site-header>
 	<?php
-	$codesblock_is_admin_session = function_exists( 'cbcommerce_user_can_access_admin' )
+	$codesblock_is_admin_session   = function_exists( 'cbcommerce_user_can_access_admin' )
 		? cbcommerce_user_can_access_admin()
 		: current_user_can( 'manage_options' );
 	$codesblock_is_frontend_member = function_exists( 'cbcommerce_is_frontend_member' )
@@ -96,7 +106,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<a class="brand" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
 			<?php if ( has_custom_logo() ) : ?>
 				<span class="brand-mark">
-					<?php echo wp_get_attachment_image( get_theme_mod( 'custom_logo' ), 'full', false, array( 'class' => 'brand-logo', 'alt' => '' ) ); ?>
+					<?php
+					echo wp_get_attachment_image(
+						get_theme_mod( 'custom_logo' ),
+						'full',
+						false,
+						array(
+							'class' => 'brand-logo',
+							'alt'   => '',
+						)
+					);
+					?>
 				</span>
 			<?php endif; ?>
 			<span class="brand-copy">
@@ -146,13 +166,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php endif; ?>
 			<?php if ( $codesblock_is_frontend_member ) : ?>
 				<?php
-					$current_user = wp_get_current_user();
-					$profile_url = function_exists( 'cbcommerce_member_profile_url' ) ? cbcommerce_member_profile_url() : home_url( '/my-learning/#profile' );
-					$learning_url = function_exists( 'cbcommerce_member_home_url' ) ? cbcommerce_member_home_url() : home_url( '/my-learning/' );
+					$codesblock_current_user = wp_get_current_user();
+					$profile_url             = function_exists( 'cbcommerce_member_profile_url' ) ? cbcommerce_member_profile_url() : home_url( '/my-learning/#profile' );
+					$learning_url            = function_exists( 'cbcommerce_member_home_url' ) ? cbcommerce_member_home_url() : home_url( '/my-learning/' );
 				?>
 				<a class="header-profile" href="<?php echo esc_url( $profile_url ); ?>">
-					<?php echo get_avatar( $current_user->ID, 32, '', '', array( 'class' => 'header-profile-avatar' ) ); ?>
-					<span><?php echo esc_html( $current_user->display_name ); ?></span>
+					<?php echo get_avatar( $codesblock_current_user->ID, 32, '', '', array( 'class' => 'header-profile-avatar' ) ); ?>
+					<span><?php echo esc_html( $codesblock_current_user->display_name ); ?></span>
 				</a>
 				<a class="header-button header-learning-button" href="<?php echo esc_url( $learning_url ); ?>"><span aria-hidden="true">&#9654;</span><?php esc_html_e( 'My learning', 'codesblock' ); ?></a>
 			<?php elseif ( $codesblock_is_admin_session ) : ?>

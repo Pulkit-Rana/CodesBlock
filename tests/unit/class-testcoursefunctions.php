@@ -10,24 +10,36 @@ declare(strict_types=1);
 require_once dirname( __DIR__ ) . '/bootstrap.php';
 require_once dirname( __DIR__, 2 ) . '/inc.php';
 
+/**
+ * Check public navigation, site identity and published counts.
+ */
 class TestCourseFunctions extends CBTestCase {
 
+	/**
+	 * Use the public article path when the landing page is missing.
+	 */
 	public function testArticlesUrlFallback(): void {
 		$GLOBALS['_cb_mock_context']['page_by_path'] = array();
 		$url = codesblock_articles_url();
 		$this->assertEquals( 'https://codesblock.test/articles/', $url );
 	}
 
+	/**
+	 * Prefer the saved article page permalink.
+	 */
 	public function testArticlesUrlWithPage(): void {
 		$GLOBALS['_cb_mock_context']['page_by_path']['articles'] = array( 'ID' => 123 );
 		$url = codesblock_articles_url();
 		$this->assertEquals( 'https://codesblock.test/page-123/', $url );
 	}
 
+	/**
+	 * Preserve the configured SEO titles and WordPress site icon.
+	 */
 	public function testHomepageUsesConfiguredTitlesAndSiteIcon(): void {
 		require_once dirname( __DIR__, 2 ) . '/functions.php';
 
-		$previous = $GLOBALS['_cb_mock_context']['is_front_page'];
+		$previous                                     = $GLOBALS['_cb_mock_context']['is_front_page'];
 		$GLOBALS['_cb_mock_context']['is_front_page'] = true;
 		try {
 			$this->assertEquals( 'Search title', apply_filters( 'wpseo_title', 'Search title' ) );
@@ -39,6 +51,9 @@ class TestCourseFunctions extends CBTestCase {
 		}
 	}
 
+	/**
+	 * Return the published totals for the homepage counters.
+	 */
 	public function testStatsEndpointReturnsArray(): void {
 		require_once dirname( __DIR__, 2 ) . '/functions.php';
 

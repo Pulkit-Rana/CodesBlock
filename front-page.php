@@ -33,9 +33,9 @@ if ( 'page' === get_option( 'show_on_front' ) && have_posts() ) {
 	rewind_posts();
 }
 
-$hero_eyebrow = get_theme_mod( 'codesblock_hero_eyebrow', '' );
-$hero_title   = get_theme_mod( 'codesblock_hero_title', get_bloginfo( 'name' ) );
-$hero_lede    = get_theme_mod( 'codesblock_hero_lede', '' );
+$hero_eyebrow         = get_theme_mod( 'codesblock_hero_eyebrow', '' );
+$hero_title           = get_theme_mod( 'codesblock_hero_title', get_bloginfo( 'name' ) );
+$hero_lede            = get_theme_mod( 'codesblock_hero_lede', '' );
 $hero_primary_label   = get_theme_mod( 'codesblock_hero_primary_label', '' );
 $hero_secondary_label = get_theme_mod( 'codesblock_hero_secondary_label', '' );
 $hero_primary_url     = get_theme_mod( 'codesblock_hero_primary_url', '' );
@@ -43,16 +43,16 @@ $hero_secondary_url   = get_theme_mod( 'codesblock_hero_secondary_url', '' );
 
 $codesblock_published_course_count = (int) wp_count_posts( 'course' )->publish;
 $codesblock_published_post_count   = (int) wp_count_posts( 'post' )->publish;
-$codesblock_user_counts           = count_users();
-$codesblock_learner_count         = (int) $codesblock_user_counts['total_users'];
+$codesblock_user_counts            = count_users();
+$codesblock_learner_count          = (int) $codesblock_user_counts['total_users'];
 
 $codesblock_recommended_articles = new WP_Query(
 	array(
 		'posts_per_page'      => 3,
 		'post_status'         => 'publish',
 		'ignore_sticky_posts' => true,
-		'meta_key'            => '_codesblock_recommended',
-		'meta_value'          => '1',
+		'meta_key'            => '_codesblock_recommended', // phpcs:ignore WordPress.DB.SlowDBQuery -- The course plugin stores editorial recommendations in post metadata.
+		'meta_value'          => '1', // phpcs:ignore WordPress.DB.SlowDBQuery -- The course plugin stores editorial recommendations in post metadata.
 		'orderby'             => 'date',
 		'order'               => 'DESC',
 	)
@@ -64,8 +64,8 @@ $codesblock_recommended_courses = new WP_Query(
 		'posts_per_page'      => 3,
 		'post_status'         => 'publish',
 		'ignore_sticky_posts' => true,
-		'meta_key'            => '_codesblock_recommended',
-		'meta_value'          => '1',
+		'meta_key'            => '_codesblock_recommended', // phpcs:ignore WordPress.DB.SlowDBQuery -- The course plugin stores editorial recommendations in post metadata.
+		'meta_value'          => '1', // phpcs:ignore WordPress.DB.SlowDBQuery -- The course plugin stores editorial recommendations in post metadata.
 		'orderby'             => 'date',
 		'order'               => 'DESC',
 	)
@@ -78,8 +78,8 @@ $codesblock_featured_courses  = new WP_Query(
 		'posts_per_page'      => 6,
 		'post_status'         => 'publish',
 		'ignore_sticky_posts' => true,
-		'meta_key'            => '_codesblock_recommended',
-		'meta_value'          => '1',
+		'meta_key'            => '_codesblock_recommended', // phpcs:ignore WordPress.DB.SlowDBQuery -- The course plugin stores editorial recommendations in post metadata.
+		'meta_value'          => '1', // phpcs:ignore WordPress.DB.SlowDBQuery -- The course plugin stores editorial recommendations in post metadata.
 		'orderby'             => 'date',
 		'order'               => 'DESC',
 	)
@@ -109,13 +109,13 @@ if ( count( $codesblock_home_course_posts ) < 6 ) {
 
 wp_reset_postdata();
 
-$codesblock_is_admin_session = function_exists( 'cbcommerce_user_can_access_admin' )
+$codesblock_is_admin_session    = function_exists( 'cbcommerce_user_can_access_admin' )
 	? cbcommerce_user_can_access_admin()
 	: current_user_can( 'manage_options' );
-$codesblock_is_frontend_member = function_exists( 'cbcommerce_is_frontend_member' )
+$codesblock_is_frontend_member  = function_exists( 'cbcommerce_is_frontend_member' )
 	? cbcommerce_is_frontend_member()
 	: ( is_user_logged_in() && ! $codesblock_is_admin_session );
-$codesblock_member_profile_url = function_exists( 'cbcommerce_member_profile_url' ) ? cbcommerce_member_profile_url() : home_url( '/my-learning/#profile' );
+$codesblock_member_profile_url  = function_exists( 'cbcommerce_member_profile_url' ) ? cbcommerce_member_profile_url() : home_url( '/my-learning/#profile' );
 $codesblock_member_learning_url = function_exists( 'cbcommerce_member_home_url' ) ? cbcommerce_member_home_url() : home_url( '/my-learning/' );
 ?>
 
@@ -216,7 +216,7 @@ $codesblock_member_learning_url = function_exists( 'cbcommerce_member_home_url' 
 						<p class="eyebrow">Courses</p>
 						<h2 class="courses-h2">Pick a path and keep moving.</h2>
 					</div>
-					<a class="button button-secondary explore-courses-btn" href="<?php echo esc_url( get_post_type_archive_link( 'course' ) ?: home_url( '/courses/' ) ); ?>" id="explore-all-courses">Explore All &rarr;</a>
+					<a class="button button-secondary explore-courses-btn" href="<?php echo esc_url( codesblock_courses_url() ); ?>" id="explore-all-courses">Explore All &rarr;</a>
 				</div>
 			<p class="courses-subhead">Focused tracks for practical developer learning &mdash; <strong>start with free courses</strong>, then upgrade only when a paid course fits your goals.</p>
 			</div>
@@ -224,7 +224,7 @@ $codesblock_member_learning_url = function_exists( 'cbcommerce_member_home_url' 
 				<div class="course-desk">
 					<?php if ( $codesblock_home_course_posts ) : ?>
 						<?php
-						foreach ( $codesblock_home_course_posts as $codesblock_course_index => $post ) :
+						foreach ( $codesblock_home_course_posts as $codesblock_course_index => $post ) : // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Template tags use the loop post; wp_reset_postdata() restores it.
 							setup_postdata( $post );
 
 							$codesblock_course_id       = get_the_ID();
@@ -314,7 +314,7 @@ $codesblock_member_learning_url = function_exists( 'cbcommerce_member_home_url' 
 											<?php if ( has_post_thumbnail() ) : ?>
 												<?php the_post_thumbnail( 'thumbnail', array( 'loading' => 'lazy' ) ); ?>
 											<?php else : ?>
-												<span class="side-card-thumb-fallback" aria-hidden="true"><?php echo esc_html( $codesblock_recommendation_initials ?: 'CB' ); ?></span>
+												<span class="side-card-thumb-fallback" aria-hidden="true"><?php echo esc_html( $codesblock_recommendation_initials ? $codesblock_recommendation_initials : 'CB' ); ?></span>
 											<?php endif; ?>
 										</span>
 										<span class="side-card-copy">
@@ -350,7 +350,7 @@ $codesblock_member_learning_url = function_exists( 'cbcommerce_member_home_url' 
 											<?php if ( has_post_thumbnail() ) : ?>
 												<?php the_post_thumbnail( 'thumbnail', array( 'loading' => 'lazy' ) ); ?>
 											<?php else : ?>
-												<span class="side-card-thumb-fallback" aria-hidden="true"><?php echo esc_html( $codesblock_recommendation_initials ?: 'CB' ); ?></span>
+												<span class="side-card-thumb-fallback" aria-hidden="true"><?php echo esc_html( $codesblock_recommendation_initials ? $codesblock_recommendation_initials : 'CB' ); ?></span>
 											<?php endif; ?>
 										</span>
 										<span class="side-card-copy">

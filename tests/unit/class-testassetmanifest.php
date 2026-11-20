@@ -9,10 +9,16 @@ declare(strict_types=1);
 
 require_once dirname( __DIR__ ) . '/bootstrap.php';
 
+/**
+ * Check the runtime assets used by the theme.
+ */
 class TestAssetManifest extends CBTestCase {
 
+	/**
+	 * Verify that each enqueued stylesheet exists.
+	 */
 	public function testCoreCssAssetsExist(): void {
-		$theme_dir = dirname( __DIR__, 2 );
+		$theme_dir  = dirname( __DIR__, 2 );
 		$css_assets = array(
 			'assets/css/main.css',
 			'assets/css/member.css',
@@ -32,6 +38,9 @@ class TestAssetManifest extends CBTestCase {
 		}
 	}
 
+	/**
+	 * Verify that each enqueued script exists.
+	 */
 	public function testCoreJsAssetsExist(): void {
 		$theme_dir = dirname( __DIR__, 2 );
 		$js_assets = array(
