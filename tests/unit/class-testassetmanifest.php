@@ -27,6 +27,7 @@ class TestAssetManifest extends CBTestCase {
 			'assets/css/responsive.css',
 			'assets/css/course-portal.css',
 			'assets/css/course-learning.css',
+			'assets/css/course-landing.css',
 			'assets/css/typography.css',
 			'assets/css/editor.css',
 		);
@@ -48,6 +49,7 @@ class TestAssetManifest extends CBTestCase {
 			'assets/js/member.js',
 			'assets/js/course-portal.js',
 			'assets/js/course-learning.js',
+			'assets/js/course-landing.js',
 		);
 
 		foreach ( $js_assets as $asset ) {

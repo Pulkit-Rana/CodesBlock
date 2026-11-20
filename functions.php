@@ -182,6 +182,34 @@ function codesblock_typography_assets() {
 add_action( 'wp_enqueue_scripts', 'codesblock_typography_assets', 99 );
 
 /**
+ * Course landing layout for single course pages, loaded after the shared reading scale.
+ */
+function codesblock_course_landing_assets() {
+	if ( ! is_singular( 'course' ) ) {
+		return;
+	}
+
+	$landing_css_path = get_template_directory() . '/assets/css/course-landing.css';
+	$landing_js_path  = get_template_directory() . '/assets/js/course-landing.js';
+
+	wp_enqueue_style(
+		'codesblock-course-landing',
+		get_template_directory_uri() . '/assets/css/course-landing.css',
+		array( 'codesblock-responsive' ),
+		file_exists( $landing_css_path ) ? (string) filemtime( $landing_css_path ) : '1.0.0'
+	);
+
+	wp_enqueue_script(
+		'codesblock-course-landing',
+		get_template_directory_uri() . '/assets/js/course-landing.js',
+		array(),
+		file_exists( $landing_js_path ) ? (string) filemtime( $landing_js_path ) : '1.0.0',
+		true
+	);
+}
+add_action( 'wp_enqueue_scripts', 'codesblock_course_landing_assets', 100 );
+
+/**
  * Convert the editable "## Module" / "- Lesson" curriculum into a course tree.
  *
  * @param int $course_id Course post ID.
