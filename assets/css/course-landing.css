@@ -1755,8 +1755,18 @@ details[open] > summary .cbl-chevron {
 		flex: 1 1 100%;
 	}
 
+	.cbl-facts {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
 	.cbl-facts > div {
 		padding: 2px 16px;
+	}
+
+	.cbl-facts > div:nth-child(odd) {
+		border-left: 0;
+		padding-left: 0;
 	}
 
 	.cbl-facts dt {
