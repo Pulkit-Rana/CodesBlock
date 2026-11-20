@@ -328,57 +328,6 @@
 		});
 	});
 
-	document.querySelectorAll('[data-course-progress-form]').forEach(function (form) {
-		form.addEventListener('submit', function (event) {
-			event.preventDefault();
-			var feedback = form.querySelector('.cb-form-feedback');
-			var submit = form.querySelector('button[type="submit"]');
-			var section = form.closest('.cb-course-progress');
-			var data = new FormData(form);
-
-			if (!config.ajaxUrl || !config.nonce) {
-				if (feedback) feedback.textContent = 'Progress saving is temporarily unavailable.';
-				return;
-			}
-
-			data.append('action', 'cbcommerce_update_course_progress');
-			data.append('nonce', config.nonce);
-			if (submit) submit.disabled = true;
-			if (feedback) {
-				feedback.textContent = '';
-				feedback.classList.remove('is-success');
-			}
-
-			fetch(config.ajaxUrl, { method: 'POST', body: data, credentials: 'same-origin' })
-				.then(function (response) { return response.json(); })
-				.then(function (result) {
-					var payload = result && result.data ? result.data : {};
-					if (!result || !result.success) {
-						if (feedback) feedback.textContent = payload.message || 'Progress could not be saved.';
-						return;
-					}
-
-					var percent = Math.max(0, Math.min(100, parseInt(payload.percent, 10) || 0));
-					var fill = section ? section.querySelector('[data-course-progress-fill]') : null;
-					var value = section ? section.querySelector('[data-course-progress-value]') : null;
-					var bar = section ? section.querySelector('[role="progressbar"]') : null;
-					if (fill) fill.style.width = percent + '%';
-					if (value) value.textContent = percent + '%';
-					if (bar) bar.setAttribute('aria-valuenow', String(percent));
-					if (feedback) {
-						feedback.textContent = payload.message || 'Learning progress saved.';
-						feedback.classList.add('is-success');
-					}
-				})
-				.catch(function () {
-					if (feedback) feedback.textContent = 'We could not reach the server. Please try again.';
-				})
-				.finally(function () {
-					if (submit) submit.disabled = false;
-				});
-		});
-	});
-
 	function startCourse(trigger) {
 		var courseId = parseInt(trigger.getAttribute('data-course-id'), 10) || 0;
 		var target = trigger.getAttribute('data-course-target') || '#about-heading';

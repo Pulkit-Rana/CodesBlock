@@ -48,6 +48,10 @@ $codesblock_can_track_progress = $codesblock_is_frontend_member && $user_has_acc
 $codesblock_course_progress    = $codesblock_can_track_progress && function_exists( 'cbcommerce_get_course_progress' ) ? cbcommerce_get_course_progress( $post_id ) : 0;
 $codesblock_first_lesson       = function_exists( 'cbcore_get_first_course_lesson' ) ? cbcore_get_first_course_lesson( $post_id ) : null;
 $codesblock_start_destination  = $codesblock_first_lesson ? get_permalink( $codesblock_first_lesson ) : '#about-heading';
+$codesblock_resume_url         = $codesblock_can_track_progress && function_exists( 'codesblock_course_resume_url' ) ? codesblock_course_resume_url( $post_id ) : '';
+if ( $codesblock_resume_url ) {
+	$codesblock_start_destination = $codesblock_resume_url;
+}
 $codesblock_course_start_url   = add_query_arg( 'cb_course_start', $post_id, get_permalink( $post_id ) );
 $codesblock_payments_ready     = function_exists( 'cbcommerce_payments_ready' ) && cbcommerce_payments_ready();
 $codesblock_billing_url        = function_exists( 'cbcommerce_checkout_url' ) ? cbcommerce_checkout_url( 'pro' ) : wp_login_url( get_permalink( $post_id ) );
@@ -193,20 +197,34 @@ $codesblock_render_cta = function ( $extra_class = '', $is_primary = false ) use
 				<p class="cbl-hero-lead"><?php echo esc_html( get_the_excerpt() ); ?></p>
 			<?php endif; ?>
 
-			<ul class="cbl-stats" role="list">
-				<?php if ( $codesblock_totals['modules'] ) : ?>
-					<li><strong><?php echo esc_html( number_format_i18n( $codesblock_totals['modules'] ) ); ?></strong><span><?php esc_html_e( 'modules', 'codesblock' ); ?></span></li>
-				<?php endif; ?>
-				<?php if ( $codesblock_totals['items'] ) : ?>
-					<li><strong><?php echo esc_html( number_format_i18n( $codesblock_totals['items'] ) ); ?></strong><span><?php esc_html_e( 'lessons & labs', 'codesblock' ); ?></span></li>
-				<?php endif; ?>
-				<?php if ( $codesblock_hands_on ) : ?>
-					<li><strong><?php echo esc_html( number_format_i18n( $codesblock_hands_on ) ); ?></strong><span><?php esc_html_e( 'hands-on labs & drills', 'codesblock' ); ?></span></li>
-				<?php endif; ?>
-				<?php if ( $codesblock_mocks ) : ?>
-					<li><strong><?php echo esc_html( number_format_i18n( $codesblock_mocks ) ); ?></strong><span><?php esc_html_e( 'scored mock interviews', 'codesblock' ); ?></span></li>
-				<?php endif; ?>
-			</ul>
+			<?php
+			$codesblock_facts = array();
+			if ( $codesblock_totals['modules'] ) {
+				$codesblock_facts[] = array( number_format_i18n( $codesblock_totals['modules'] ), __( 'modules', 'codesblock' ) );
+			}
+			if ( $codesblock_totals['items'] ) {
+				$codesblock_facts[] = array( number_format_i18n( $codesblock_totals['items'] ), __( 'lessons & labs', 'codesblock' ) );
+			}
+			if ( $codesblock_hands_on ) {
+				$codesblock_facts[] = array( number_format_i18n( $codesblock_hands_on ), __( 'hands-on drills', 'codesblock' ) );
+			}
+			if ( $codesblock_mocks ) {
+				$codesblock_facts[] = array( number_format_i18n( $codesblock_mocks ), __( 'scored mocks', 'codesblock' ) );
+			}
+			?>
+			<?php if ( $codesblock_facts ) : ?>
+				<dl class="cbl-facts">
+					<?php foreach ( $codesblock_facts as $codesblock_fact ) : ?>
+						<div><dt><?php echo esc_html( $codesblock_fact[0] ); ?></dt><dd><?php echo esc_html( $codesblock_fact[1] ); ?></dd></div>
+					<?php endforeach; ?>
+				</dl>
+			<?php endif; ?>
+
+			<a class="cbl-ai-flag" href="#ai-tutor-heading">
+				<span class="cbl-ai-flag-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg></span>
+				<span><strong><?php esc_html_e( 'AI tutor built in.', 'codesblock' ); ?></strong> <?php esc_html_e( 'Highlight any line and ask, by text or voice.', 'codesblock' ); ?></span>
+				<svg class="cbl-ai-flag-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+			</a>
 
 			<div class="cbl-hero-actions">
 				<?php $codesblock_render_cta( 'cbl-btn cbl-btn-primary' ); ?>
@@ -262,6 +280,11 @@ $codesblock_render_cta = function ( $extra_class = '', $is_primary = false ) use
 						<?php echo esc_html( $is_free ? __( 'No card needed · Sign in with Google', 'codesblock' ) : __( 'One-time passes. No automatic renewal.', 'codesblock' ) ); ?>
 					</p>
 
+					<p class="cbl-card-ai">
+						<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4z"/></svg>
+						<span><?php esc_html_e( 'Includes the AI tutor: ask by text or voice inside every lesson', 'codesblock' ); ?></span>
+					</p>
+
 					<?php if ( $codesblock_feature_list ) : ?>
 						<p class="cbl-card-label"><?php esc_html_e( 'This course includes', 'codesblock' ); ?></p>
 						<ul class="cbl-checks" role="list">
@@ -293,31 +316,7 @@ $codesblock_render_cta = function ( $extra_class = '', $is_primary = false ) use
 		<!-- ══════════════ MAIN COLUMN ══════════════ -->
 		<div class="cbl-main">
 
-			<?php if ( $codesblock_can_track_progress ) : ?>
-				<section class="cbl-section cb-course-progress" id="course-progress" aria-labelledby="course-progress-heading">
-					<div class="cb-course-progress-heading">
-						<div>
-							<p class="eyebrow"><?php esc_html_e( 'My learning', 'codesblock' ); ?></p>
-							<h2 id="course-progress-heading"><?php esc_html_e( 'Track this course', 'codesblock' ); ?></h2>
-						</div>
-						<strong data-course-progress-value><?php echo esc_html( $codesblock_course_progress ); ?>%</strong>
-					</div>
-					<div class="cb-course-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?php echo esc_attr( $codesblock_course_progress ); ?>">
-						<span data-course-progress-fill style="width: <?php echo esc_attr( $codesblock_course_progress ); ?>%"></span>
-					</div>
-					<form class="cb-course-progress-form" data-course-progress-form>
-						<input type="hidden" name="course_id" value="<?php echo esc_attr( $post_id ); ?>">
-						<label for="cb-course-progress-select"><?php esc_html_e( 'Current progress', 'codesblock' ); ?></label>
-						<select id="cb-course-progress-select" name="progress">
-							<?php foreach ( array( 0, 25, 50, 75, 100 ) as $codesblock_progress_step ) : ?>
-								<option value="<?php echo esc_attr( $codesblock_progress_step ); ?>" <?php selected( $codesblock_course_progress, $codesblock_progress_step ); ?>><?php echo esc_html( $codesblock_progress_step ); ?>%</option>
-							<?php endforeach; ?>
-						</select>
-						<button class="button button-primary" type="submit"><?php esc_html_e( 'Save progress', 'codesblock' ); ?></button>
-						<p class="cb-form-feedback" role="status" aria-live="polite"></p>
-					</form>
-				</section>
-			<?php endif; ?>
+			<?php get_template_part( 'template-parts/course-ai-tutor', null, array( 'course_id' => $post_id, 'modules' => $codesblock_modules ) ); ?>
 
 			<?php if ( $codesblock_learn_list ) : ?>
 				<section class="cbl-section" aria-labelledby="learn-heading">
@@ -332,84 +331,17 @@ $codesblock_render_cta = function ( $extra_class = '', $is_primary = false ) use
 			<?php endif; ?>
 
 			<?php if ( $codesblock_modules ) : ?>
-				<section class="cbl-section cbl-curriculum" aria-labelledby="syllabus-heading">
-					<div class="cbl-section-head">
-						<div>
-							<p class="cbl-eyebrow"><?php esc_html_e( 'Curriculum', 'codesblock' ); ?></p>
-							<h2 id="syllabus-heading"><?php esc_html_e( 'Course curriculum', 'codesblock' ); ?></h2>
-							<p class="cbl-muted">
-								<?php
-								echo esc_html(
-									sprintf(
-										/* translators: 1: modules, 2: items */
-										__( '%1$s modules · %2$s lessons, labs and drills', 'codesblock' ),
-										number_format_i18n( $codesblock_totals['modules'] ),
-										number_format_i18n( $codesblock_totals['items'] )
-									)
-								);
-								?>
-							</p>
-						</div>
-						<button class="cbl-link-btn" type="button" data-cbl-toggle-all aria-pressed="false" data-label-expand="<?php esc_attr_e( 'Expand all', 'codesblock' ); ?>" data-label-collapse="<?php esc_attr_e( 'Collapse all', 'codesblock' ); ?>"><?php esc_html_e( 'Expand all', 'codesblock' ); ?></button>
-					</div>
-
-					<ul class="cbl-legend" role="list" aria-label="<?php esc_attr_e( 'Item types', 'codesblock' ); ?>">
-						<?php foreach ( $codesblock_kind_labels as $codesblock_kind => $codesblock_label ) : ?>
-							<?php if ( ! empty( $codesblock_totals[ $codesblock_kind ] ) ) : ?>
-								<li class="cbl-tag cbl-tag-<?php echo esc_attr( $codesblock_kind ); ?>"><?php echo esc_html( $codesblock_label ); ?> <b><?php echo esc_html( number_format_i18n( $codesblock_totals[ $codesblock_kind ] ) ); ?></b></li>
-							<?php endif; ?>
-						<?php endforeach; ?>
-					</ul>
-
-					<ol class="cbl-modules" role="list">
-						<?php foreach ( $codesblock_modules as $codesblock_index => $codesblock_module ) : ?>
-							<?php
-							$codesblock_item_count = count( $codesblock_module['items'] );
-							$codesblock_extra      = array();
-							foreach ( $codesblock_kind_labels as $codesblock_kind => $codesblock_label ) {
-								if ( ! empty( $codesblock_module['counts'][ $codesblock_kind ] ) ) {
-									$codesblock_extra[] = $codesblock_module['counts'][ $codesblock_kind ] . ' ' . strtolower( $codesblock_label );
-								}
-							}
-							?>
-							<li class="cbl-module<?php echo $codesblock_module['is_bonus'] ? ' is-bonus' : ''; ?>">
-								<details>
-									<summary>
-										<span class="cbl-module-num" aria-hidden="true"><?php echo esc_html( $codesblock_module['is_bonus'] ? '+' : (string) $codesblock_index ); ?></span>
-										<span class="cbl-module-text">
-											<span class="cbl-module-kicker">
-												<?php echo esc_html( $codesblock_module['label'] ); ?>
-												<?php if ( $codesblock_module['schedule'] ) : ?>
-													<em><?php echo esc_html( $codesblock_module['schedule'] ); ?></em>
-												<?php endif; ?>
-											</span>
-											<strong><?php echo esc_html( $codesblock_module['title'] ? $codesblock_module['title'] : __( 'Lessons', 'codesblock' ) ); ?></strong>
-											<span class="cbl-module-meta">
-												<?php
-												echo esc_html( sprintf( _n( '%s item', '%s items', $codesblock_item_count, 'codesblock' ), number_format_i18n( $codesblock_item_count ) ) );
-												if ( $codesblock_extra ) {
-													echo esc_html( ' · ' . implode( ' · ', $codesblock_extra ) );
-												}
-												?>
-											</span>
-										</span>
-										<svg class="cbl-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-									</summary>
-									<ul class="cbl-items" role="list">
-										<?php foreach ( $codesblock_module['items'] as $codesblock_item ) : ?>
-											<li class="is-<?php echo esc_attr( $codesblock_item['kind'] ); ?>">
-												<span><?php echo esc_html( $codesblock_item['text'] ); ?></span>
-												<?php if ( isset( $codesblock_kind_labels[ $codesblock_item['kind'] ] ) ) : ?>
-													<em class="cbl-tag cbl-tag-<?php echo esc_attr( $codesblock_item['kind'] ); ?>"><?php echo esc_html( $codesblock_kind_labels[ $codesblock_item['kind'] ] ); ?></em>
-												<?php endif; ?>
-											</li>
-										<?php endforeach; ?>
-									</ul>
-								</details>
-							</li>
-						<?php endforeach; ?>
-					</ol>
-				</section>
+				<?php
+				get_template_part(
+					'template-parts/course-curriculum',
+					null,
+					array(
+						'modules'     => $codesblock_modules,
+						'totals'      => $codesblock_totals,
+						'kind_labels' => $codesblock_kind_labels,
+					)
+				);
+				?>
 			<?php endif; ?>
 
 			<?php if ( '' !== trim( (string) $codesblock_content_parts['main'] ) ) : ?>
@@ -436,7 +368,7 @@ $codesblock_render_cta = function ( $extra_class = '', $is_primary = false ) use
 							<?php echo apply_filters( 'the_content', $codesblock_content_parts['extended'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Editor-authored post content filtered by WordPress. ?>
 						</div>
 					<?php else : ?>
-						<p class="cbl-muted"><?php esc_html_e( 'Open the lessons and materials with a CodesBlock access pass. Your progress stays saved.', 'codesblock' ); ?></p>
+						<p class="cbl-muted"><?php esc_html_e( 'Open the lessons and materials with a CodesBlock access pass. Progress saves as you learn.', 'codesblock' ); ?></p>
 						<?php $codesblock_render_cta( 'cbl-btn cbl-btn-primary' ); ?>
 					<?php endif; ?>
 				</section>
@@ -458,21 +390,11 @@ $codesblock_render_cta = function ( $extra_class = '', $is_primary = false ) use
 			<section class="cbl-final" aria-labelledby="cbl-final-heading">
 				<div>
 					<h2 id="cbl-final-heading"><?php echo esc_html( sprintf( __( 'Start %s today', 'codesblock' ), get_the_title() ) ); ?></h2>
-					<p><?php echo esc_html( $is_free ? __( 'Free during early access. Sign in, open Module 0 and keep your progress saved.', 'codesblock' ) : __( 'Choose a pass, open the lessons and keep your progress saved.', 'codesblock' ) ); ?></p>
+					<p><?php echo esc_html( $is_free ? __( 'Free during early access. Sign in, open Module 0 and pick up where you left off.', 'codesblock' ) : __( 'Choose a pass and open the lessons. Your progress saves as you learn.', 'codesblock' ) ); ?></p>
 				</div>
 				<?php $codesblock_render_cta( 'cbl-btn cbl-btn-light' ); ?>
 			</section>
 
-			<?php if ( $user_has_access ) : ?>
-				<section class="cbl-section cbl-guide">
-					<div>
-						<p class="cbl-eyebrow"><?php esc_html_e( 'Course Guide', 'codesblock' ); ?></p>
-						<h2><?php esc_html_e( 'Questions while you learn?', 'codesblock' ); ?></h2>
-						<p class="cbl-muted"><?php esc_html_e( 'Ask the interactive guide about prerequisites, pacing or any module.', 'codesblock' ); ?></p>
-					</div>
-					<button class="button button-primary" id="open-ai-tutor-inline" type="button"><?php esc_html_e( 'Open Course Guide', 'codesblock' ); ?></button>
-				</section>
-			<?php endif; ?>
 		</div>
 	</div>
 

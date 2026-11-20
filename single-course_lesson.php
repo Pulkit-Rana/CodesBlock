@@ -46,6 +46,11 @@ foreach ( $outline as $outline_module_index => $outline_module ) {
 
 $progress_percent = $planned_total && $current_step ? max( 2, round( ( $current_step / $planned_total ) * 100, 2 ) ) : 2;
 
+/* Opening a lesson is the progress signal: no manual "save progress" step. */
+if ( $is_member && function_exists( 'codesblock_record_lesson_visit' ) ) {
+	codesblock_record_lesson_visit( $course_id, $lesson_id, $current_step, $planned_total );
+}
+
 get_header();
 get_template_part(
 	'template-parts/course-map',
