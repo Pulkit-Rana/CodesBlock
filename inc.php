@@ -154,3 +154,92 @@ function codesblock_parse_course_syllabus( $syllabus ) {
 		'totals'  => $totals,
 	);
 }
+
+/**
+ * Social sign-in providers the account dialog can offer, in display order.
+ *
+ * A provider appears only when Nextend Social Login has it configured and
+ * enabled, so a GitHub button shows up automatically once it is switched on.
+ *
+ * @return array<string, array{label: string, url: string}>
+ */
+function codesblock_social_providers() {
+	$labels    = array(
+		'google' => __( 'Google', 'codesblock' ),
+		'github' => __( 'GitHub', 'codesblock' ),
+	);
+	$providers = array();
+
+	if ( ! class_exists( 'NextendSocialLogin' ) || ! method_exists( 'NextendSocialLogin', 'isProviderEnabled' ) ) {
+		return $providers;
+	}
+
+	foreach ( $labels as $provider_id => $label ) {
+		if ( ! NextendSocialLogin::isProviderEnabled( $provider_id ) ) {
+			continue;
+		}
+
+		$url = '';
+		if ( isset( NextendSocialLogin::$enabledProviders[ $provider_id ] ) && method_exists( NextendSocialLogin::$enabledProviders[ $provider_id ], 'getLoginUrl' ) ) {
+			$url = (string) NextendSocialLogin::$enabledProviders[ $provider_id ]->getLoginUrl();
+		}
+		if ( '' === $url ) {
+			$url = add_query_arg( 'loginSocial', $provider_id, wp_login_url() );
+		}
+
+		$providers[ $provider_id ] = array(
+			'label' => $label,
+			'url'   => remove_query_arg( 'redirect', $url ),
+		);
+	}
+
+	return $providers;
+}
+
+/**
+ * Add a validated same-site return address to a social sign-in URL.
+ *
+ * @param string $login_url Provider login URL without a redirect.
+ * @param string $redirect  Where the visitor should land after signing in.
+ * @return string
+ */
+function codesblock_social_login_url( $login_url, $redirect ) {
+	$redirect = codesblock_member_redirect( $redirect );
+	return $redirect ? add_query_arg( 'redirect', rawurlencode( $redirect ), $login_url ) : $login_url;
+}
+
+/**
+ * Accept a post-sign-in destination only when it is a public page on this site.
+ *
+ * @param string $url Requested destination.
+ * @return string The URL, or an empty string when it is not allowed.
+ */
+function codesblock_member_redirect( $url ) {
+	$url = wp_validate_redirect( (string) $url, '' );
+	if ( '' === $url ) {
+		return '';
+	}
+
+	$path = (string) wp_parse_url( $url, PHP_URL_PATH );
+	foreach ( array( '/wp-admin', 'wp-login.php', 'admin-ajax.php', '/wp-json' ) as $blocked ) {
+		if ( false !== strpos( $path, $blocked ) ) {
+			return '';
+		}
+	}
+
+	return $url;
+}
+
+/**
+ * Remember the destination Nextend Social Login received before other plugins replace it.
+ *
+ * @param string|null $url Destination to store, or null to read the stored value.
+ * @return string
+ */
+function codesblock_requested_social_redirect( $url = null ) {
+	static $requested = '';
+	if ( null !== $url ) {
+		$requested = codesblock_member_redirect( $url );
+	}
+	return $requested;
+}

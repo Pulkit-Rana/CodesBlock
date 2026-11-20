@@ -46,7 +46,6 @@ add_action( 'after_setup_theme', 'codesblock_setup' );
 function codesblock_assets() {
 	$main_css_path    = get_template_directory() . '/assets/css/main.css';
 	$member_css_path  = get_template_directory() . '/assets/css/member.css';
-	$account_css_path = get_template_directory() . '/assets/css/member-dashboard.css';
 	$polish_css_path  = get_template_directory() . '/assets/css/polish.css';
 	$main_js_path     = get_template_directory() . '/assets/js/main.js';
 	$member_js_path   = get_template_directory() . '/assets/js/member.js';
@@ -54,9 +53,6 @@ function codesblock_assets() {
 	wp_enqueue_style( 'codesblock-main', get_template_directory_uri() . '/assets/css/main.css', array(), file_exists( $main_css_path ) ? (string) filemtime( $main_css_path ) : '2.0.0' );
 	wp_enqueue_style( 'codesblock-member', get_template_directory_uri() . '/assets/css/member.css', array( 'codesblock-main' ), file_exists( $member_css_path ) ? (string) filemtime( $member_css_path ) : '1.1.0' );
 	wp_enqueue_style( 'codesblock-polish', get_template_directory_uri() . '/assets/css/polish.css', array( 'codesblock-main', 'codesblock-member' ), file_exists( $polish_css_path ) ? (string) filemtime( $polish_css_path ) : '2.0.0' );
-	if ( is_page_template( 'page-my-learning.php' ) ) {
-		wp_enqueue_style( 'codesblock-member-dashboard', get_template_directory_uri() . '/assets/css/member-dashboard.css', array( 'codesblock-polish' ), file_exists( $account_css_path ) ? (string) filemtime( $account_css_path ) : '1.0.0' );
-	}
 	wp_enqueue_script( 'codesblock-main', get_template_directory_uri() . '/assets/js/main.js', array(), file_exists( $main_js_path ) ? (string) filemtime( $main_js_path ) : '2.0.0', true );
 	wp_enqueue_script( 'codesblock-member', get_template_directory_uri() . '/assets/js/member.js', array( 'codesblock-main' ), file_exists( $member_js_path ) ? (string) filemtime( $member_js_path ) : '1.1.0', true );
 	wp_localize_script(
@@ -208,6 +204,58 @@ function codesblock_course_landing_assets() {
 	);
 }
 add_action( 'wp_enqueue_scripts', 'codesblock_course_landing_assets', 100 );
+
+/**
+ * Account dialogs, newsletter forms and the My learning dashboard.
+ * Loaded last so the shared reading scale cannot override the dialog layout.
+ */
+function codesblock_account_assets() {
+	$account_css_path = get_template_directory() . '/assets/css/account.css';
+
+	wp_enqueue_style(
+		'codesblock-account',
+		get_template_directory_uri() . '/assets/css/account.css',
+		array( 'codesblock-responsive' ),
+		file_exists( $account_css_path ) ? (string) filemtime( $account_css_path ) : '1.0.0'
+	);
+}
+add_action( 'wp_enqueue_scripts', 'codesblock_account_assets', 100 );
+
+/**
+ * Note the destination Nextend Social Login was given (a course, checkout or the
+ * page the visitor was reading) before CodesBlock Commerce replaces it.
+ *
+ * @param string $url Redirect URL from Nextend Social Login.
+ * @return string
+ */
+function codesblock_capture_social_redirect( $url ) {
+	codesblock_requested_social_redirect( (string) $url );
+	return $url;
+}
+add_filter( 'nsl_login_redirect_url', 'codesblock_capture_social_redirect', 90 );
+add_filter( 'nsl_register_redirect_url', 'codesblock_capture_social_redirect', 90 );
+
+/**
+ * Send a member back to where they started signing in, or to My learning.
+ *
+ * @param string $url Redirect URL after CodesBlock Commerce's default.
+ * @return string
+ */
+function codesblock_restore_social_redirect( $url ) {
+	$requested = codesblock_requested_social_redirect();
+	if ( $requested && untrailingslashit( $requested ) !== untrailingslashit( home_url( '/' ) ) ) {
+		return $requested;
+	}
+	return $url;
+}
+add_filter( 'nsl_login_redirect_url', 'codesblock_restore_social_redirect', 110 );
+add_filter( 'nsl_register_redirect_url', 'codesblock_restore_social_redirect', 110 );
+
+/*
+ * Social sign-up is one click: interests and newsletter consent are offered
+ * later on My learning instead of an extra form between Google and the course.
+ */
+add_filter( 'nsl_registration_require_extra_input', '__return_false', 20 );
 
 /**
  * Convert the editable "## Module" / "- Lesson" curriculum into a course tree.

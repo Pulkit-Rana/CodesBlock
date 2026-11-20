@@ -7,10 +7,37 @@
 	var courseAuthOverlay = document.getElementById('course-auth-overlay');
 	var activeOverlay = null;
 	var lastFocused = null;
+	var authRedirect = '';
+
+	/* Tailor the account dialog to where it was opened from and where to return afterwards. */
+	function applyAuthContext(trigger) {
+		if (!authOverlay) return;
+		var modal = authOverlay.querySelector('.cbx-auth');
+		var title = authOverlay.querySelector('#member-title');
+		var kicker = authOverlay.querySelector('[data-auth-kicker]');
+		var data = trigger && trigger.dataset ? trigger.dataset : {};
+
+		if (title) title.textContent = data.memberTitle || title.getAttribute('data-default') || title.textContent;
+		if (kicker) kicker.textContent = data.memberKicker || kicker.getAttribute('data-default') || kicker.textContent;
+
+		var emailPanel = authOverlay.querySelector('.cbx-email');
+		if (emailPanel && data.memberEmail) emailPanel.open = true;
+
+		authRedirect = data.memberRedirect || (modal ? modal.getAttribute('data-default-redirect') : '') || '';
+		authOverlay.querySelectorAll('.cbx-provider[data-base-href]').forEach(function (link) {
+			try {
+				var url = new URL(link.getAttribute('data-base-href'), window.location.origin);
+				if (authRedirect) url.searchParams.set('redirect', new URL(authRedirect, window.location.origin).href);
+				link.setAttribute('href', url.href);
+			} catch (error) {
+				// Keep the server-rendered link when a URL cannot be parsed.
+			}
+		});
+	}
 
 	function setView(view, focusField) {
 		if (!authOverlay) return;
-		view = view === 'signin' ? 'signin' : 'register';
+		view = view === 'register' ? 'register' : 'signin';
 		var heading = authOverlay.querySelector('#member-title');
 		var description = authOverlay.querySelector('#member-description');
 		if (heading) heading.textContent = heading.getAttribute('data-' + view + '-title') || heading.textContent;
@@ -41,7 +68,7 @@
 		overlay.setAttribute('aria-hidden', 'true');
 	}
 
-	function openOverlay(overlay, view) {
+	function openOverlay(overlay, view, trigger) {
 		if (!overlay) return false;
 		var modal = overlay.querySelector('.cb-member-modal');
 		if (!modal) return false;
@@ -56,12 +83,15 @@
 		overlay.hidden = false;
 		overlay.setAttribute('aria-hidden', 'false');
 		document.body.classList.add('cb-modal-open');
-		if (overlay === authOverlay) setView(view || 'register', false);
+		if (overlay === authOverlay) {
+			setView(view || 'signin', false);
+			applyAuthContext(trigger);
+		}
 		modal.scrollTop = 0;
 		window.requestAnimationFrame(function () {
 			var initialFocus = overlay === authOverlay
-				? modal.querySelector('[role="tab"][aria-selected="true"]')
-				: modal.querySelector('.cb-member-close');
+				? modal.querySelector('.cbx-provider, .cbx-email summary')
+				: modal.querySelector('.cbx-plan.is-featured .cbx-plan-cta, .cb-member-close');
 			(initialFocus || modal).focus();
 		});
 		return true;
@@ -96,7 +126,7 @@
 			trigger.addEventListener('click', function (event) {
 				if (!overlay) return;
 				event.preventDefault();
-				openOverlay(overlay, trigger.getAttribute('data-member-view') || defaultView);
+				openOverlay(overlay, trigger.getAttribute('data-member-view') || defaultView, trigger);
 			});
 		});
 	}
@@ -163,7 +193,7 @@
 		});
 	}
 
-	bindTriggers('.js-open-member', authOverlay, 'register');
+	bindTriggers('.js-open-member', authOverlay, 'signin');
 	bindTriggers('.js-open-paywall', purchaseOverlay, '');
 	bindTriggers('.js-open-course-auth', courseAuthOverlay, '');
 	bindOverlay(authOverlay);
@@ -180,7 +210,7 @@
 		if (!overlay || !overlay.hidden) return;
 
 		event.preventDefault();
-		openOverlay(overlay, trigger.getAttribute('data-member-view') || (overlay === authOverlay ? 'register' : ''));
+		openOverlay(overlay, trigger.getAttribute('data-member-view') || (overlay === authOverlay ? 'signin' : ''), trigger);
 	});
 
 	document.querySelectorAll('[data-password-toggle]').forEach(function (button) {
@@ -250,7 +280,8 @@
 					feedback.classList.add('is-success');
 				}
 				if (action === 'cbcommerce_newsletter') form.reset();
-				if (payload.redirect) window.setTimeout(function () { redirectSameOrigin(payload.redirect); }, 550);
+				var destination = (action !== 'cbcommerce_newsletter' && authRedirect) ? authRedirect : payload.redirect;
+				if (destination) window.setTimeout(function () { redirectSameOrigin(destination); }, 550);
 			})
 			.catch(function () {
 				if (feedback) feedback.textContent = 'We could not reach the server. Please try again.';

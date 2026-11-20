@@ -101,6 +101,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	$codesblock_is_frontend_member = function_exists( 'cbcommerce_is_frontend_member' )
 		? cbcommerce_is_frontend_member()
 		: ( is_user_logged_in() && ! $codesblock_is_admin_session );
+	$codesblock_has_paid_access    = function_exists( 'cbcommerce_user_has_paid_access' )
+		? cbcommerce_user_has_paid_access()
+		: $codesblock_is_admin_session;
 	?>
 	<div class="header-inner header-inner-full">
 		<a class="brand" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
@@ -147,15 +150,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</ul>
 			<?php endif; ?>
 			<div class="mobile-menu-account">
-				<?php if ( $codesblock_is_admin_session ) : ?>
-					<a href="<?php echo esc_url( admin_url() ); ?>"><?php esc_html_e( 'WP Admin', 'codesblock' ); ?></a>
-				<?php endif; ?>
 				<?php if ( is_user_logged_in() ) : ?>
-					<a href="<?php echo esc_url( home_url( '/my-learning/' ) ); ?>"><?php esc_html_e( 'My learning', 'codesblock' ); ?></a>
+					<a href="<?php echo esc_url( function_exists( 'cbcommerce_member_home_url' ) ? cbcommerce_member_home_url() : home_url( '/my-learning/' ) ); ?>"><?php esc_html_e( 'My learning', 'codesblock' ); ?></a>
+					<?php if ( $codesblock_is_admin_session ) : ?>
+						<a href="<?php echo esc_url( admin_url() ); ?>"><?php esc_html_e( 'WP Admin', 'codesblock' ); ?></a>
+					<?php endif; ?>
 				<?php else : ?>
-					<a class="js-open-member" data-member-view="register" href="#member-overlay" aria-haspopup="dialog" aria-controls="member-overlay"><?php esc_html_e( 'Create free account', 'codesblock' ); ?></a>
+					<a class="js-open-member" data-member-view="signin" href="#member-overlay" aria-haspopup="dialog" aria-controls="member-overlay"><?php esc_html_e( 'Sign in or join free', 'codesblock' ); ?></a>
 				<?php endif; ?>
-				<a class="js-open-paywall" href="#paywall-overlay" aria-haspopup="dialog" aria-controls="paywall-overlay"><?php esc_html_e( 'View membership', 'codesblock' ); ?></a>
+				<?php if ( ! $codesblock_has_paid_access ) : ?>
+					<a class="js-open-paywall" href="#paywall-overlay" aria-haspopup="dialog" aria-controls="paywall-overlay"><?php esc_html_e( 'Get full access', 'codesblock' ); ?></a>
+				<?php endif; ?>
 			</div>
 		</nav>
 		<div class="header-actions">
@@ -164,22 +169,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1-2H7L6 7z" fill="#ffffff" stroke="#1e293b"/><path d="M6.5 9l1.2 10.5a2 2 0 0 0 2 1.8h4.6a2 2 0 0 0 2-1.8L17.5 9H6.5z" fill="#ffdd00" stroke="#1e293b"/><rect x="5.5" y="7" width="13" height="2" rx="1" fill="#ffffff" stroke="#1e293b"/></svg>
 				</a>
 			<?php endif; ?>
-			<?php if ( $codesblock_is_frontend_member ) : ?>
+			<?php if ( is_user_logged_in() ) : ?>
 				<?php
 					$codesblock_current_user = wp_get_current_user();
-					$profile_url             = function_exists( 'cbcommerce_member_profile_url' ) ? cbcommerce_member_profile_url() : home_url( '/my-learning/#profile' );
 					$learning_url            = function_exists( 'cbcommerce_member_home_url' ) ? cbcommerce_member_home_url() : home_url( '/my-learning/' );
 				?>
-				<a class="header-profile" href="<?php echo esc_url( $profile_url ); ?>">
+				<?php if ( ! $codesblock_has_paid_access ) : ?>
+					<a class="header-link header-upgrade-link js-open-paywall" href="#paywall-overlay" aria-haspopup="dialog" aria-controls="paywall-overlay"><?php esc_html_e( 'Upgrade', 'codesblock' ); ?></a>
+				<?php endif; ?>
+				<?php if ( $codesblock_is_admin_session ) : ?>
+					<a class="header-link header-admin-link" href="<?php echo esc_url( admin_url() ); ?>"><?php esc_html_e( 'WP Admin', 'codesblock' ); ?></a>
+				<?php endif; ?>
+				<a class="header-profile" href="<?php echo esc_url( $learning_url . '#account' ); ?>" aria-label="<?php esc_attr_e( 'Your account', 'codesblock' ); ?>">
 					<?php echo get_avatar( $codesblock_current_user->ID, 32, '', '', array( 'class' => 'header-profile-avatar' ) ); ?>
-					<span><?php echo esc_html( $codesblock_current_user->display_name ); ?></span>
 				</a>
-				<a class="header-button header-learning-button" href="<?php echo esc_url( $learning_url ); ?>"><span aria-hidden="true">&#9654;</span><?php esc_html_e( 'My learning', 'codesblock' ); ?></a>
-			<?php elseif ( $codesblock_is_admin_session ) : ?>
-				<a class="header-link header-admin-link" href="<?php echo esc_url( admin_url() ); ?>"><?php esc_html_e( 'WP Admin', 'codesblock' ); ?></a>
+				<a class="header-button header-learning-button" href="<?php echo esc_url( $learning_url ); ?>"><?php esc_html_e( 'My learning', 'codesblock' ); ?></a>
 			<?php else : ?>
 				<a class="header-link header-signin-button js-open-member" data-member-view="signin" href="#member-overlay" aria-haspopup="dialog" aria-controls="member-overlay"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg><?php esc_html_e( 'Sign in', 'codesblock' ); ?></a>
-				<a class="header-button js-open-paywall" href="#paywall-overlay" aria-haspopup="dialog" aria-controls="paywall-overlay"><?php esc_html_e( 'Become a member', 'codesblock' ); ?></a>
+				<a class="header-button js-open-paywall" href="#paywall-overlay" aria-haspopup="dialog" aria-controls="paywall-overlay"><?php esc_html_e( 'Get full access', 'codesblock' ); ?></a>
 			<?php endif; ?>
 		</div>
 	</div>

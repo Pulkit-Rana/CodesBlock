@@ -2,219 +2,271 @@
 /**
  * Template Name: My Learning
  *
- * A dedicated learner dashboard for progress, profile, and membership details.
+ * The signed-in home: continue learning, plan, newsletter and account in one place.
  *
  * @package CodesBlock
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 get_header();
 
-$is_admin_session = function_exists( 'cbcommerce_user_can_access_admin' )
-	? cbcommerce_user_can_access_admin()
-	: current_user_can( 'manage_options' );
-$is_member        = function_exists( 'cbcommerce_is_frontend_member' )
-	? cbcommerce_is_frontend_member()
-	: ( is_user_logged_in() && ! $is_admin_session );
-$course_archive   = get_post_type_archive_link( 'course' ) ?: home_url( '/courses/' );
-
-$member_user        = null;
-$member_courses     = array();
-$member_progress    = array();
-$member_average     = 0;
-$member_completed   = 0;
-$membership_level   = false;
-$membership_name    = __( 'Starter', 'codesblock' );
-$membership_detail  = __( 'Free member access', 'codesblock' );
-$profile_edit_url   = function_exists( 'cbcommerce_profile_edit_url' ) ? cbcommerce_profile_edit_url() : '';
-
-if ( $is_member ) {
-	$member_user = wp_get_current_user();
-	if ( function_exists( 'pmpro_getMembershipLevelForUser' ) ) {
-		$membership_level = pmpro_getMembershipLevelForUser( $member_user->ID );
-		if ( $membership_level && ! empty( $membership_level->name ) ) {
-			$membership_name = $membership_level->name;
-		}
-		if ( $membership_level && ! empty( $membership_level->enddate ) ) {
-			$membership_detail = sprintf(
-				/* translators: %s: membership expiry date. */
-				__( 'Access active through %s', 'codesblock' ),
-				wp_date( get_option( 'date_format' ), (int) $membership_level->enddate )
-			);
-		} elseif ( $membership_level ) {
-			$membership_detail = __( 'Active with no scheduled expiry', 'codesblock' );
-		}
-	}
-
-	if ( function_exists( 'cbcommerce_get_user_course_progress' ) ) {
-		$member_progress = cbcommerce_get_user_course_progress( $member_user->ID );
-	}
-
-	if ( $member_progress ) {
-		$progress_query = new WP_Query(
-			array(
-				'post_type'      => 'course',
-				'post_status'    => 'publish',
-				'posts_per_page' => 12,
-				'post__in'       => array_map( 'absint', array_keys( $member_progress ) ),
-				'orderby'        => 'post__in',
-			)
-		);
-		$member_courses = $progress_query->posts;
-		wp_reset_postdata();
-
-		$progress_total = 0;
-		foreach ( $member_courses as $member_course ) {
-			$progress_record = $member_progress[ $member_course->ID ] ?? array();
-			$percent         = is_array( $progress_record ) ? absint( $progress_record['percent'] ?? 0 ) : absint( $progress_record );
-			$progress_total += $percent;
-			if ( 100 === $percent ) {
-				$member_completed++;
-			}
-		}
-		if ( $member_courses ) {
-			$member_average = (int) round( $progress_total / count( $member_courses ) );
-		}
-	}
-}
+$codesblock_courses_url = get_post_type_archive_link( 'course' ) ?: home_url( '/courses/' );
+$codesblock_home_url    = function_exists( 'cbcommerce_member_home_url' ) ? cbcommerce_member_home_url() : home_url( '/my-learning/' );
 ?>
 
-<main id="main" class="cb-account-page">
-	<?php if ( $is_member && $member_user ) : ?>
-		<section class="cb-account-hero" aria-labelledby="cb-account-title">
-			<div class="container cb-account-hero-inner">
-				<div class="cb-account-identity">
-					<div class="cb-account-avatar-wrap">
-						<?php echo get_avatar( $member_user->ID, 96, '', '', array( 'class' => 'cb-account-avatar' ) ); ?>
-						<span class="cb-account-online" aria-label="<?php esc_attr_e( 'Account active', 'codesblock' ); ?>"></span>
-					</div>
-					<div>
-						<p class="cb-account-kicker"><?php esc_html_e( 'Your CodesBlock workspace', 'codesblock' ); ?></p>
-						<h1 id="cb-account-title"><?php printf( esc_html__( 'Welcome back, %s.', 'codesblock' ), esc_html( $member_user->display_name ) ); ?></h1>
-						<p><?php esc_html_e( 'Pick up your next lesson, check access, and keep your learning identity in one calm place.', 'codesblock' ); ?></p>
-					</div>
-				</div>
-				<div class="cb-account-hero-actions">
-					<span class="cb-account-plan"><i aria-hidden="true"></i><?php echo esc_html( $membership_name ); ?></span>
-					<a class="button button-secondary" href="<?php echo esc_url( $course_archive ); ?>"><?php esc_html_e( 'Explore courses', 'codesblock' ); ?> <span aria-hidden="true">&rarr;</span></a>
+<main id="main" class="cba-page">
+<?php if ( is_user_logged_in() ) : ?>
+	<?php
+	$codesblock_user     = wp_get_current_user();
+	$codesblock_is_admin = function_exists( 'cbcommerce_user_can_access_admin' ) ? cbcommerce_user_can_access_admin() : current_user_can( 'manage_options' );
+	$codesblock_paid     = function_exists( 'cbcommerce_user_has_paid_access' ) ? cbcommerce_user_has_paid_access() : $codesblock_is_admin;
+	$codesblock_first    = $codesblock_user->first_name ? $codesblock_user->first_name : $codesblock_user->display_name;
+
+	/* Courses in progress, most recent first. */
+	$codesblock_progress = function_exists( 'cbcommerce_get_user_course_progress' ) ? cbcommerce_get_user_course_progress( $codesblock_user->ID ) : array();
+	$codesblock_courses  = array();
+	foreach ( $codesblock_progress as $codesblock_course_id => $codesblock_record ) {
+		if ( 'publish' !== get_post_status( $codesblock_course_id ) ) {
+			continue;
+		}
+		$codesblock_first_lesson = function_exists( 'cbcore_get_first_course_lesson' ) ? cbcore_get_first_course_lesson( $codesblock_course_id ) : null;
+		$codesblock_courses[]    = array(
+			'id'       => (int) $codesblock_course_id,
+			'percent'  => (int) $codesblock_record['percent'],
+			'updated'  => (int) $codesblock_record['updated_at'],
+			'continue' => $codesblock_first_lesson ? get_permalink( $codesblock_first_lesson ) : get_permalink( $codesblock_course_id ),
+		);
+	}
+	$codesblock_completed = count( array_filter( $codesblock_courses, function ( $course ) { return 100 === $course['percent']; } ) );
+	$codesblock_average   = $codesblock_courses ? (int) round( array_sum( wp_list_pluck( $codesblock_courses, 'percent' ) ) / count( $codesblock_courses ) ) : 0;
+	$codesblock_featured  = $codesblock_courses ? array_shift( $codesblock_courses ) : null;
+
+	/* Suggestions: published courses the member has not started. */
+	$codesblock_started     = array_map( 'absint', array_keys( $codesblock_progress ) );
+	$codesblock_suggestions = get_posts(
+		array(
+			'post_type'      => 'course',
+			'post_status'    => 'publish',
+			'posts_per_page' => 3,
+			'post__not_in'   => $codesblock_started,
+			'no_found_rows'  => true,
+		)
+	);
+
+	/* Plan. */
+	$codesblock_level     = function_exists( 'pmpro_getMembershipLevelForUser' ) ? pmpro_getMembershipLevelForUser( $codesblock_user->ID ) : false;
+	$codesblock_plan_name = $codesblock_is_admin ? __( 'Administrator', 'codesblock' ) : ( $codesblock_paid && $codesblock_level && ! empty( $codesblock_level->name ) ? $codesblock_level->name : __( 'Free account', 'codesblock' ) );
+	$codesblock_end       = $codesblock_paid && $codesblock_level && ! empty( $codesblock_level->enddate ) ? (int) $codesblock_level->enddate : 0;
+	$codesblock_start     = $codesblock_paid && $codesblock_level && ! empty( $codesblock_level->startdate ) ? (int) $codesblock_level->startdate : 0;
+	$codesblock_days_left = $codesblock_end ? max( 0, (int) ceil( ( $codesblock_end - time() ) / DAY_IN_SECONDS ) ) : 0;
+	$codesblock_remaining = ( $codesblock_end && $codesblock_start && $codesblock_end > $codesblock_start ) ? max( 0, min( 100, (int) round( 100 * ( $codesblock_end - time() ) / ( $codesblock_end - $codesblock_start ) ) ) ) : 0;
+	$codesblock_orders    = function_exists( 'pmpro_url' ) ? pmpro_url( 'invoice' ) : '';
+	$codesblock_edit_url  = function_exists( 'cbcommerce_profile_edit_url' ) ? cbcommerce_profile_edit_url() : '';
+
+	/* Newsletter status (subscribed to the CodesBlock list in MailPoet). */
+	$codesblock_news = 'none';
+	if ( class_exists( 'MailPoet\\API\\API' ) ) {
+		try {
+			$codesblock_subscriber = MailPoet\API\API::MP( 'v1' )->getSubscriber( $codesblock_user->user_email );
+			$codesblock_list_id    = function_exists( 'cbcommerce_mailpoet_list_id' ) ? cbcommerce_mailpoet_list_id() : 0;
+			$codesblock_on_list    = false;
+			foreach ( (array) ( $codesblock_subscriber['subscriptions'] ?? array() ) as $codesblock_subscription ) {
+				if ( (int) ( $codesblock_subscription['segment_id'] ?? 0 ) === (int) $codesblock_list_id && 'subscribed' === ( $codesblock_subscription['status'] ?? '' ) ) {
+					$codesblock_on_list = true;
+				}
+			}
+			if ( $codesblock_on_list ) {
+				$codesblock_news = 'subscribed' === ( $codesblock_subscriber['status'] ?? '' ) ? 'subscribed' : 'unconfirmed';
+			}
+		} catch ( Throwable $error ) {
+			$codesblock_news = 'none';
+		}
+	}
+
+	/* How this member signs in. */
+	$codesblock_methods = array();
+	if ( class_exists( 'NextendSocialLogin' ) ) {
+		foreach ( array( 'google' => 'Google', 'github' => 'GitHub' ) as $codesblock_provider_id => $codesblock_provider_label ) {
+			$codesblock_provider = NextendSocialLogin::$enabledProviders[ $codesblock_provider_id ] ?? null;
+			if ( $codesblock_provider && method_exists( $codesblock_provider, 'isUserConnected' ) && $codesblock_provider->isUserConnected( $codesblock_user->ID ) ) {
+				$codesblock_methods[] = $codesblock_provider_label;
+			}
+		}
+	}
+	if ( ! $codesblock_methods ) {
+		$codesblock_methods[] = __( 'Email and password', 'codesblock' );
+	}
+	?>
+
+	<section class="cba-hero" aria-labelledby="cba-title">
+		<div class="container cba-hero-inner">
+			<div class="cba-identity">
+				<?php echo get_avatar( $codesblock_user->ID, 72, '', '', array( 'class' => 'cba-avatar' ) ); ?>
+				<div>
+					<p class="cba-kicker"><?php esc_html_e( 'My learning', 'codesblock' ); ?></p>
+					<h1 id="cba-title"><?php echo esc_html( sprintf( __( 'Welcome back, %s', 'codesblock' ), $codesblock_first ) ); ?></h1>
+					<span class="cba-plan-pill<?php echo $codesblock_paid ? ' is-paid' : ''; ?>"><?php echo esc_html( $codesblock_plan_name ); ?></span>
 				</div>
 			</div>
-		</section>
+			<ul class="cba-stats" role="list">
+				<li><strong><?php echo esc_html( number_format_i18n( count( $codesblock_courses ) + ( $codesblock_featured ? 1 : 0 ) ) ); ?></strong><span><?php esc_html_e( 'Courses started', 'codesblock' ); ?></span></li>
+				<li><strong><?php echo esc_html( number_format_i18n( $codesblock_completed ) ); ?></strong><span><?php esc_html_e( 'Completed', 'codesblock' ); ?></span></li>
+				<li><strong><?php echo esc_html( $codesblock_average ); ?>%</strong><span><?php esc_html_e( 'Average progress', 'codesblock' ); ?></span></li>
+			</ul>
+		</div>
+	</section>
 
-		<div class="container cb-account-shell">
-			<nav class="cb-account-nav" aria-label="<?php esc_attr_e( 'Learning account sections', 'codesblock' ); ?>">
-				<a href="#overview" class="is-current"><span aria-hidden="true">&#9672;</span><?php esc_html_e( 'Overview', 'codesblock' ); ?></a>
-				<a href="#learning"><span aria-hidden="true">&#9654;</span><?php esc_html_e( 'My learning', 'codesblock' ); ?></a>
-				<a href="#profile"><span aria-hidden="true">&#9786;</span><?php esc_html_e( 'Profile', 'codesblock' ); ?></a>
-				<a href="#membership"><span aria-hidden="true">&#9670;</span><?php esc_html_e( 'Membership', 'codesblock' ); ?></a>
-			</nav>
+	<div class="container cba-grid">
+		<div class="cba-main">
+			<?php if ( $codesblock_is_admin ) : ?>
+				<p class="cba-note"><?php esc_html_e( 'You are signed in as an administrator. Course progress is recorded for learner accounts only; this view shows what members see.', 'codesblock' ); ?> <a href="<?php echo esc_url( admin_url() ); ?>"><?php esc_html_e( 'Open WP Admin', 'codesblock' ); ?> &rarr;</a></p>
+			<?php endif; ?>
 
-			<div class="cb-account-content">
-				<section class="cb-account-overview" id="overview" aria-labelledby="cb-overview-title">
-					<div class="cb-account-section-heading">
-						<div><span><?php esc_html_e( 'At a glance', 'codesblock' ); ?></span><h2 id="cb-overview-title"><?php esc_html_e( 'Your learning momentum', 'codesblock' ); ?></h2></div>
-						<p><?php esc_html_e( 'Small, consistent steps beat passive course collecting.', 'codesblock' ); ?></p>
-					</div>
-					<div class="cb-account-stats">
-						<article><span class="cb-stat-icon cb-stat-blue" aria-hidden="true">&#9654;</span><div><strong><?php echo esc_html( count( $member_courses ) ); ?></strong><small><?php esc_html_e( 'Active paths', 'codesblock' ); ?></small></div></article>
-						<article><span class="cb-stat-icon cb-stat-green" aria-hidden="true">&#10003;</span><div><strong><?php echo esc_html( $member_completed ); ?></strong><small><?php esc_html_e( 'Completed', 'codesblock' ); ?></small></div></article>
-						<article><span class="cb-stat-icon cb-stat-violet" aria-hidden="true">%</span><div><strong><?php echo esc_html( $member_average ); ?>%</strong><small><?php esc_html_e( 'Average progress', 'codesblock' ); ?></small></div></article>
+			<?php if ( $codesblock_featured ) : ?>
+				<section class="cba-continue" aria-labelledby="cba-continue-title">
+					<a class="cba-continue-cover" href="<?php echo esc_url( $codesblock_featured['continue'] ); ?>" tabindex="-1" aria-hidden="true">
+						<?php echo get_the_post_thumbnail( $codesblock_featured['id'], 'medium_large' ); ?>
+					</a>
+					<div class="cba-continue-body">
+						<p class="cba-kicker"><?php esc_html_e( 'Continue where you left off', 'codesblock' ); ?></p>
+						<h2 id="cba-continue-title"><a href="<?php echo esc_url( get_permalink( $codesblock_featured['id'] ) ); ?>"><?php echo esc_html( get_the_title( $codesblock_featured['id'] ) ); ?></a></h2>
+						<div class="cba-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?php echo esc_attr( $codesblock_featured['percent'] ); ?>" aria-label="<?php esc_attr_e( 'Course progress', 'codesblock' ); ?>"><span style="width:<?php echo esc_attr( $codesblock_featured['percent'] ); ?>%"></span></div>
+						<p class="cba-meta">
+							<strong><?php echo esc_html( $codesblock_featured['percent'] ); ?>% <?php esc_html_e( 'complete', 'codesblock' ); ?></strong>
+							<?php if ( $codesblock_featured['updated'] ) : ?>
+								· <?php echo esc_html( sprintf( __( 'last studied %s ago', 'codesblock' ), human_time_diff( $codesblock_featured['updated'] ) ) ); ?>
+							<?php endif; ?>
+						</p>
+						<a class="cba-btn cba-btn-primary" href="<?php echo esc_url( $codesblock_featured['continue'] ); ?>"><?php echo esc_html( 100 === $codesblock_featured['percent'] ? __( 'Review course', 'codesblock' ) : __( 'Continue learning', 'codesblock' ) ); ?> &rarr;</a>
 					</div>
 				</section>
-
-				<section class="cb-account-card cb-learning-card" id="learning" aria-labelledby="cb-learning-title">
-					<div class="cb-account-card-head">
-						<div><span><?php esc_html_e( 'Continue learning', 'codesblock' ); ?></span><h2 id="cb-learning-title"><?php esc_html_e( 'Your courses', 'codesblock' ); ?></h2></div>
-						<a href="<?php echo esc_url( $course_archive ); ?>"><?php esc_html_e( 'Browse all', 'codesblock' ); ?> <span aria-hidden="true">&rarr;</span></a>
+			<?php else : ?>
+				<section class="cba-empty" aria-labelledby="cba-empty-title">
+					<span class="cba-empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg></span>
+					<div>
+						<h2 id="cba-empty-title"><?php esc_html_e( 'Start your first course', 'codesblock' ); ?></h2>
+						<p><?php esc_html_e( 'Open any course and press Start. It appears here with your progress, so you can always pick up where you left off.', 'codesblock' ); ?></p>
 					</div>
+				</section>
+			<?php endif; ?>
 
-					<?php if ( $member_courses ) : ?>
-						<div class="cb-dashboard-course-list">
-							<?php foreach ( $member_courses as $index => $member_course ) : ?>
-								<?php
-								$progress_record = $member_progress[ $member_course->ID ] ?? array();
-								$percent         = is_array( $progress_record ) ? absint( $progress_record['percent'] ?? 0 ) : absint( $progress_record );
-								$first_lesson    = function_exists( 'cbcore_get_first_course_lesson' ) ? cbcore_get_first_course_lesson( $member_course->ID ) : null;
-								$continue_url    = $first_lesson ? get_permalink( $first_lesson ) : get_permalink( $member_course );
-								$course_level    = get_post_meta( $member_course->ID, '_course_level', true );
-								$course_duration = get_post_meta( $member_course->ID, '_course_duration', true );
-								?>
-								<article class="cb-dashboard-course<?php echo 0 === $index ? ' is-featured' : ''; ?>">
-									<a class="cb-dashboard-course-cover" href="<?php echo esc_url( $continue_url ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Continue %s', 'codesblock' ), get_the_title( $member_course ) ) ); ?>">
-										<?php if ( has_post_thumbnail( $member_course ) ) : ?>
-											<?php echo get_the_post_thumbnail( $member_course, 'medium_large' ); ?>
-										<?php else : ?>
-											<span>CB</span><small><?php esc_html_e( 'Learning path', 'codesblock' ); ?></small>
-										<?php endif; ?>
-									</a>
-									<div class="cb-dashboard-course-body">
-										<div class="cb-dashboard-course-meta"><span><?php echo esc_html( $course_level ?: __( 'Self-paced', 'codesblock' ) ); ?></span><?php if ( $course_duration ) : ?><span><?php echo esc_html( $course_duration ); ?></span><?php endif; ?></div>
-										<h3><a href="<?php echo esc_url( $continue_url ); ?>"><?php echo esc_html( get_the_title( $member_course ) ); ?></a></h3>
-										<div class="cb-dashboard-progress-label"><span><?php echo 100 === $percent ? esc_html__( 'Course complete', 'codesblock' ) : esc_html__( 'Course progress', 'codesblock' ); ?></span><strong><?php echo esc_html( $percent ); ?>%</strong></div>
-										<div class="cb-dashboard-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?php echo esc_attr( $percent ); ?>"><span style="width:<?php echo esc_attr( $percent ); ?>%"></span></div>
-										<a class="cb-dashboard-continue" href="<?php echo esc_url( $continue_url ); ?>"><?php echo 100 === $percent ? esc_html__( 'Review course', 'codesblock' ) : esc_html__( 'Continue learning', 'codesblock' ); ?> <span aria-hidden="true">&rarr;</span></a>
-									</div>
-								</article>
-							<?php endforeach; ?>
-						</div>
-					<?php else : ?>
-						<div class="cb-dashboard-empty">
-							<div class="cb-dashboard-empty-mark" aria-hidden="true"><span>01</span><i></i><b>&rarr;</b></div>
-							<div><h3><?php esc_html_e( 'Choose your first learning path.', 'codesblock' ); ?></h3><p><?php esc_html_e( 'Open a course and start its first lesson. It will appear here automatically with saved progress.', 'codesblock' ); ?></p></div>
-							<a class="button button-primary" href="<?php echo esc_url( $course_archive ); ?>"><?php esc_html_e( 'Find a course', 'codesblock' ); ?></a>
-						</div>
+			<?php if ( $codesblock_courses ) : ?>
+				<section class="cba-card" aria-labelledby="cba-courses-title">
+					<div class="cba-card-head"><h2 id="cba-courses-title"><?php esc_html_e( 'Your other courses', 'codesblock' ); ?></h2></div>
+					<ul class="cba-course-list" role="list">
+						<?php foreach ( $codesblock_courses as $codesblock_course ) : ?>
+							<li>
+								<a href="<?php echo esc_url( $codesblock_course['continue'] ); ?>"><?php echo esc_html( get_the_title( $codesblock_course['id'] ) ); ?></a>
+								<div class="cba-progress is-small" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?php echo esc_attr( $codesblock_course['percent'] ); ?>"><span style="width:<?php echo esc_attr( $codesblock_course['percent'] ); ?>%"></span></div>
+								<span><?php echo esc_html( $codesblock_course['percent'] ); ?>%</span>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+				</section>
+			<?php endif; ?>
+
+			<?php if ( $codesblock_suggestions ) : ?>
+				<section class="cba-card" aria-labelledby="cba-next-title">
+					<div class="cba-card-head">
+						<h2 id="cba-next-title"><?php echo esc_html( $codesblock_featured ? __( 'Recommended next', 'codesblock' ) : __( 'Pick a course to begin', 'codesblock' ) ); ?></h2>
+						<a href="<?php echo esc_url( $codesblock_courses_url ); ?>"><?php esc_html_e( 'All courses', 'codesblock' ); ?> &rarr;</a>
+					</div>
+					<div class="cba-suggest">
+						<?php foreach ( $codesblock_suggestions as $codesblock_suggestion ) : ?>
+							<?php
+							$codesblock_price   = trim( (string) get_post_meta( $codesblock_suggestion->ID, '_course_price', true ) );
+							$codesblock_is_free = '' === $codesblock_price || 'free' === strtolower( $codesblock_price );
+							?>
+							<a class="cba-suggest-card" href="<?php echo esc_url( get_permalink( $codesblock_suggestion ) ); ?>">
+								<span class="cba-suggest-thumb"><?php echo get_the_post_thumbnail( $codesblock_suggestion, 'medium' ); ?></span>
+								<span class="cba-suggest-tag"><?php echo esc_html( $codesblock_is_free ? __( 'Free', 'codesblock' ) : __( 'Full access', 'codesblock' ) ); ?></span>
+								<strong><?php echo esc_html( get_the_title( $codesblock_suggestion ) ); ?></strong>
+								<span class="cba-suggest-meta"><?php echo esc_html( (string) get_post_meta( $codesblock_suggestion->ID, '_course_duration', true ) ); ?></span>
+							</a>
+						<?php endforeach; ?>
+					</div>
+				</section>
+			<?php endif; ?>
+		</div>
+
+		<aside class="cba-side" aria-label="<?php esc_attr_e( 'Plan and account', 'codesblock' ); ?>">
+			<section class="cba-card cba-plan<?php echo $codesblock_paid ? ' is-paid' : ''; ?>" id="membership" aria-labelledby="cba-plan-title">
+				<p class="cba-kicker"><?php esc_html_e( 'Your plan', 'codesblock' ); ?></p>
+				<h2 id="cba-plan-title"><?php echo esc_html( $codesblock_plan_name ); ?></h2>
+				<?php if ( $codesblock_is_admin ) : ?>
+					<p><?php esc_html_e( 'Full access to every course for site management.', 'codesblock' ); ?></p>
+				<?php elseif ( $codesblock_paid && $codesblock_end ) : ?>
+					<p><?php echo esc_html( sprintf( __( 'Full access until %s', 'codesblock' ), wp_date( get_option( 'date_format' ), $codesblock_end ) ) ); ?></p>
+					<div class="cba-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?php echo esc_attr( $codesblock_remaining ); ?>" aria-label="<?php esc_attr_e( 'Access time remaining', 'codesblock' ); ?>"><span style="width:<?php echo esc_attr( $codesblock_remaining ); ?>%"></span></div>
+					<p class="cba-meta"><?php echo esc_html( sprintf( _n( '%s day left', '%s days left', $codesblock_days_left, 'codesblock' ), number_format_i18n( $codesblock_days_left ) ) ); ?></p>
+					<?php if ( $codesblock_days_left <= 14 ) : ?>
+						<button class="cba-btn cba-btn-primary cba-btn-block js-open-paywall" type="button"><?php esc_html_e( 'Extend access', 'codesblock' ); ?></button>
 					<?php endif; ?>
-				</section>
+				<?php elseif ( $codesblock_paid ) : ?>
+					<p><?php esc_html_e( 'Full access with no expiry. Thank you for being a founding member.', 'codesblock' ); ?></p>
+				<?php else : ?>
+					<p><?php esc_html_e( 'Free lessons in every course, saved progress and all articles.', 'codesblock' ); ?></p>
+					<ul class="cba-unlocks" role="list">
+						<li><?php esc_html_e( 'Every paid course and new launch', 'codesblock' ); ?></li>
+						<li><?php esc_html_e( 'Labs, drills and scored mock interviews', 'codesblock' ); ?></li>
+						<li><?php esc_html_e( 'One payment, no auto-renewal', 'codesblock' ); ?></li>
+					</ul>
+					<button class="cba-btn cba-btn-primary cba-btn-block js-open-paywall" type="button"><?php esc_html_e( 'Get full access', 'codesblock' ); ?></button>
+				<?php endif; ?>
+				<?php if ( $codesblock_paid && ! $codesblock_is_admin && $codesblock_orders ) : ?>
+					<a class="cba-link" href="<?php echo esc_url( $codesblock_orders ); ?>"><?php esc_html_e( 'Orders and receipts', 'codesblock' ); ?> &rarr;</a>
+				<?php endif; ?>
+			</section>
 
-				<div class="cb-account-detail-grid">
-					<section class="cb-account-card cb-profile-detail" id="profile" aria-labelledby="cb-profile-title">
-						<div class="cb-account-card-head"><div><span><?php esc_html_e( 'Personal details', 'codesblock' ); ?></span><h2 id="cb-profile-title"><?php esc_html_e( 'Profile', 'codesblock' ); ?></h2></div><span class="cb-card-status"><?php esc_html_e( 'Private', 'codesblock' ); ?></span></div>
-						<dl class="cb-account-details">
-							<div><dt><?php esc_html_e( 'Name', 'codesblock' ); ?></dt><dd><?php echo esc_html( $member_user->display_name ); ?></dd></div>
-							<div><dt><?php esc_html_e( 'Email', 'codesblock' ); ?></dt><dd><?php echo esc_html( $member_user->user_email ); ?></dd></div>
-							<div><dt><?php esc_html_e( 'Member since', 'codesblock' ); ?></dt><dd><?php echo esc_html( wp_date( 'F Y', strtotime( $member_user->user_registered ) ) ); ?></dd></div>
-						</dl>
-						<?php if ( $profile_edit_url ) : ?><a class="cb-account-text-link" href="<?php echo esc_url( $profile_edit_url ); ?>"><?php esc_html_e( 'Edit profile details', 'codesblock' ); ?> <span aria-hidden="true">&rarr;</span></a><?php endif; ?>
-					</section>
+			<section class="cba-card cba-news" aria-labelledby="cba-news-title">
+				<?php if ( 'subscribed' === $codesblock_news ) : ?>
+					<p class="cba-kicker"><?php esc_html_e( 'Newsletter', 'codesblock' ); ?></p>
+					<h2 id="cba-news-title"><?php esc_html_e( 'You get the weekly build note', 'codesblock' ); ?></h2>
+					<p class="cba-meta"><?php esc_html_e( 'Unsubscribe anytime from the link at the bottom of any email.', 'codesblock' ); ?></p>
+				<?php elseif ( 'unconfirmed' === $codesblock_news ) : ?>
+					<p class="cba-kicker"><?php esc_html_e( 'Newsletter', 'codesblock' ); ?></p>
+					<h2 id="cba-news-title"><?php esc_html_e( 'Confirm your subscription', 'codesblock' ); ?></h2>
+					<p class="cba-meta"><?php echo esc_html( sprintf( __( 'We sent a confirmation link to %s.', 'codesblock' ), $codesblock_user->user_email ) ); ?></p>
+				<?php else : ?>
+					<span id="cba-news-title" class="screen-reader-text"><?php esc_html_e( 'Newsletter', 'codesblock' ); ?></span>
+					<?php get_template_part( 'template-parts/newsletter', null, array( 'variant' => 'account', 'email' => $codesblock_user->user_email ) ); ?>
+				<?php endif; ?>
+			</section>
 
-					<section class="cb-account-card cb-membership-detail" id="membership" aria-labelledby="cb-membership-title">
-						<div class="cb-account-card-head"><div><span><?php esc_html_e( 'Access & billing', 'codesblock' ); ?></span><h2 id="cb-membership-title"><?php esc_html_e( 'Membership', 'codesblock' ); ?></h2></div><span class="cb-card-status is-active"><?php esc_html_e( 'Active', 'codesblock' ); ?></span></div>
-						<div class="cb-membership-plan"><span class="cb-membership-gem" aria-hidden="true">&#9670;</span><div><strong><?php echo esc_html( $membership_name ); ?></strong><small><?php echo esc_html( $membership_detail ); ?></small></div></div>
-						<p><?php esc_html_e( 'Your course access and billing controls stay together here. CodesBlock never stores your payment details.', 'codesblock' ); ?></p>
-						<a class="cb-account-text-link" href="<?php echo esc_url( $course_archive ); ?>"><?php esc_html_e( 'Browse courses for your membership', 'codesblock' ); ?> <span aria-hidden="true">&rarr;</span></a>
-					</section>
-				</div>
-
-				<div class="cb-account-footer-actions">
-					<p><strong><?php esc_html_e( 'Need a clean slate?', 'codesblock' ); ?></strong> <?php esc_html_e( 'You can sign out safely and return whenever you are ready.', 'codesblock' ); ?></p>
+			<section class="cba-card cba-account" id="account" aria-labelledby="cba-account-title">
+				<p class="cba-kicker"><?php esc_html_e( 'Account', 'codesblock' ); ?></p>
+				<h2 id="cba-account-title" class="screen-reader-text"><?php esc_html_e( 'Account details', 'codesblock' ); ?></h2>
+				<dl>
+					<div><dt><?php esc_html_e( 'Name', 'codesblock' ); ?></dt><dd><?php echo esc_html( $codesblock_user->display_name ); ?></dd></div>
+					<div><dt><?php esc_html_e( 'Email', 'codesblock' ); ?></dt><dd><?php echo esc_html( $codesblock_user->user_email ); ?></dd></div>
+					<div><dt><?php esc_html_e( 'Signs in with', 'codesblock' ); ?></dt><dd><?php echo esc_html( implode( ', ', $codesblock_methods ) ); ?></dd></div>
+					<div><dt><?php esc_html_e( 'Member since', 'codesblock' ); ?></dt><dd><?php echo esc_html( wp_date( 'F Y', strtotime( $codesblock_user->user_registered ) ) ); ?></dd></div>
+				</dl>
+				<div class="cba-account-actions">
+					<?php if ( $codesblock_edit_url && ! $codesblock_is_admin ) : ?>
+						<a href="<?php echo esc_url( $codesblock_edit_url ); ?>"><?php esc_html_e( 'Edit profile', 'codesblock' ); ?></a>
+					<?php endif; ?>
 					<a href="<?php echo esc_url( wp_logout_url( home_url( '/' ) ) ); ?>"><?php esc_html_e( 'Sign out', 'codesblock' ); ?></a>
 				</div>
-			</div>
+			</section>
+		</aside>
+	</div>
+
+<?php else : ?>
+	<section class="cba-gate" aria-labelledby="cba-gate-title">
+		<div class="cba-gate-card">
+			<span class="cbx-brand" aria-hidden="true">CB</span>
+			<h1 id="cba-gate-title"><?php esc_html_e( 'Sign in to your learning', 'codesblock' ); ?></h1>
+			<p><?php esc_html_e( 'Pick up where you left off, see your courses and manage your plan. New here? Your free account is created when you continue.', 'codesblock' ); ?></p>
+			<?php get_template_part( 'template-parts/auth-providers', null, array( 'redirect' => $codesblock_home_url ) ); ?>
+			<button class="cba-btn cba-btn-ghost cba-btn-block js-open-member" type="button" data-member-view="signin" data-member-email="open"><?php esc_html_e( 'Use email instead', 'codesblock' ); ?></button>
+			<a class="cba-link" href="<?php echo esc_url( $codesblock_courses_url ); ?>"><?php esc_html_e( 'Browse courses first', 'codesblock' ); ?> &rarr;</a>
 		</div>
-	<?php else : ?>
-		<section class="cb-account-gate" aria-labelledby="cb-account-gate-title">
-			<div class="container cb-account-gate-grid">
-				<div class="cb-account-gate-story">
-					<span class="cb-account-gate-brand">CB</span>
-					<p class="cb-account-kicker"><?php esc_html_e( 'A calmer way to keep learning', 'codesblock' ); ?></p>
-					<h1 id="cb-account-gate-title"><?php esc_html_e( 'Your learning belongs on its own page.', 'codesblock' ); ?></h1>
-					<p><?php esc_html_e( 'Sign in to continue courses, see progress, and manage your profile and membership without crowding the homepage.', 'codesblock' ); ?></p>
-					<div class="cb-account-gate-preview" aria-hidden="true"><span><i></i><i></i><i></i></span><strong>64%</strong><small><?php esc_html_e( 'Learning momentum', 'codesblock' ); ?></small></div>
-				</div>
-				<div class="cb-account-gate-card">
-					<span class="cb-account-gate-icon" aria-hidden="true">&#9654;</span>
-					<h2><?php esc_html_e( 'Welcome back.', 'codesblock' ); ?></h2>
-					<p><?php esc_html_e( 'Use your CodesBlock account to open your private learning workspace.', 'codesblock' ); ?></p>
-					<ul><li><?php esc_html_e( 'Continue directly into lessons', 'codesblock' ); ?></li><li><?php esc_html_e( 'See every saved course', 'codesblock' ); ?></li><li><?php esc_html_e( 'Manage profile and membership', 'codesblock' ); ?></li></ul>
-					<?php if ( $is_admin_session ) : ?>
-						<a class="button button-primary" href="<?php echo esc_url( admin_url() ); ?>"><?php esc_html_e( 'Return to WP Admin', 'codesblock' ); ?> <span aria-hidden="true">&rarr;</span></a>
-					<?php else : ?>
-						<button class="button button-primary js-open-member" type="button" data-member-view="signin" aria-haspopup="dialog" aria-controls="member-overlay"><?php esc_html_e( 'Sign in to my learning', 'codesblock' ); ?> <span aria-hidden="true">&rarr;</span></button>
-					<?php endif; ?>
-					<a class="cb-account-gate-browse" href="<?php echo esc_url( $course_archive ); ?>"><?php esc_html_e( 'Browse courses first', 'codesblock' ); ?></a>
-				</div>
-			</div>
-		</section>
-	<?php endif; ?>
+	</section>
+<?php endif; ?>
 </main>
 
 <?php get_footer(); ?>

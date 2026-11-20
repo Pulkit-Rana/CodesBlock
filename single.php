@@ -201,6 +201,10 @@ function codesblock_prepare_article_content( $content ) {
 						</div>
 					<?php endif; ?>
 
+					<?php if ( ! $show_gate && ! is_user_logged_in() ) : ?>
+						<?php get_template_part( 'template-parts/newsletter', null, array( 'variant' => 'inline' ) ); ?>
+					<?php endif; ?>
+
 					<?php if ( function_exists( 'cbcore_render_engagement_controls' ) ) : ?>
 						<?php cbcore_render_engagement_controls( get_the_ID() ); ?>
 					<?php endif; ?>

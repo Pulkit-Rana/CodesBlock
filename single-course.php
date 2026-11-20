@@ -100,7 +100,7 @@ $codesblock_mocks = isset( $codesblock_totals['mock'] ) ? (int) $codesblock_tota
  * @param string $extra_class Additional button classes.
  * @param bool   $is_primary  Whether this is the main card button (receives the stable ID).
  */
-$codesblock_render_cta = function ( $extra_class = '', $is_primary = false ) use ( $post_id, $is_free, $codesblock_can_track_progress, $codesblock_course_progress, $codesblock_start_destination, $codesblock_is_admin_session, $codesblock_is_frontend_member, $codesblock_payments_ready ) {
+$codesblock_render_cta = function ( $extra_class = '', $is_primary = false ) use ( $post_id, $is_free, $codesblock_can_track_progress, $codesblock_course_progress, $codesblock_start_destination, $codesblock_is_admin_session, $codesblock_is_frontend_member, $codesblock_payments_ready, $codesblock_course_start_url, $codesblock_billing_url ) {
 	$id_attr = $is_primary ? ' id="btn-enroll-main"' : '';
 	$classes = trim( 'btn-enroll ' . $extra_class );
 
@@ -128,22 +128,32 @@ $codesblock_render_cta = function ( $extra_class = '', $is_primary = false ) use
 		return;
 	}
 
-	if ( $is_free ) {
-		$trigger = 'js-open-course-auth';
-		$target  = 'course-auth-overlay';
-		$label   = __( 'Start learning free', 'codesblock' );
+	$course_title = wp_strip_all_tags( get_the_title( $post_id ) );
+	if ( $codesblock_is_frontend_member ) {
+		/* Signed in, but this paid course needs a pass. */
+		$trigger  = 'js-open-paywall';
+		$target   = 'paywall-overlay';
+		$label    = __( 'Get full access', 'codesblock' );
+		$context  = '';
 	} else {
-		$trigger = $codesblock_is_frontend_member ? 'js-open-paywall' : 'js-open-course-auth';
-		$target  = $codesblock_is_frontend_member ? 'paywall-overlay' : 'course-auth-overlay';
-		$label   = $codesblock_is_frontend_member ? __( 'View access passes', 'codesblock' ) : ( $codesblock_payments_ready ? __( 'Sign in to buy', 'codesblock' ) : __( 'Sign in for launch updates', 'codesblock' ) );
+		$trigger  = 'js-open-member';
+		$target   = 'member-overlay';
+		$label    = $is_free ? __( 'Start learning free', 'codesblock' ) : ( $codesblock_payments_ready ? __( 'Sign in to buy', 'codesblock' ) : __( 'Sign in for launch updates', 'codesblock' ) );
+		$context  = sprintf(
+			' data-member-kicker="%1$s" data-member-title="%2$s" data-member-redirect="%3$s"',
+			esc_attr( $course_title ),
+			esc_attr( $is_free ? __( 'Start this course with a free account', 'codesblock' ) : __( 'Sign in to choose your pass', 'codesblock' ) ),
+			esc_url( $is_free ? $codesblock_course_start_url : $codesblock_billing_url )
+		);
 	}
 
 	printf(
-		'<button class="%1$s %2$s" type="button"%3$s aria-haspopup="dialog" aria-controls="%4$s">%5$s &rarr;</button>',
+		'<button class="%1$s %2$s" type="button"%3$s aria-haspopup="dialog" aria-controls="%4$s"%5$s>%6$s &rarr;</button>',
 		esc_attr( $classes ),
 		esc_attr( $trigger ),
 		$id_attr, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Static attribute.
 		esc_attr( $target ),
+		$context, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped above.
 		esc_html( $label )
 	);
 };
@@ -475,46 +485,6 @@ $codesblock_render_cta = function ( $extra_class = '', $is_primary = false ) use
 		<?php $codesblock_render_cta( 'cbl-btn cbl-btn-primary' ); ?>
 	</div>
 
-	<?php if ( ! is_user_logged_in() ) : ?>
-		<div id="course-auth-overlay" class="cb-member-overlay cb-auth-overlay" aria-hidden="true" hidden>
-			<div class="cb-member-backdrop" data-member-close></div>
-			<section class="cb-member-modal cb-auth-modal cb-course-auth-modal" role="dialog" aria-modal="true" aria-labelledby="course-auth-title" aria-describedby="course-auth-description" tabindex="-1">
-				<button class="cb-member-close" type="button" data-member-close aria-label="<?php esc_attr_e( 'Close course sign-in dialog', 'codesblock' ); ?>">
-					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
-				</button>
-				<div class="cb-course-auth-layout">
-					<div class="cb-course-auth-story">
-						<a class="cb-course-auth-brand" href="<?php echo esc_url( home_url( '/' ) ); ?>" tabindex="-1" aria-hidden="true">CB</a>
-						<span class="cb-course-auth-kicker"><?php echo esc_html( $is_free ? __( 'Free learning path', 'codesblock' ) : __( 'Protected learning path', 'codesblock' ) ); ?></span>
-						<h2 id="course-auth-title"><?php echo esc_html( $is_free ? __( 'Your first lesson is one click away.', 'codesblock' ) : ( $codesblock_payments_ready ? __( 'Sign in before choosing access.', 'codesblock' ) : __( 'Sign in for the paid-course launch.', 'codesblock' ) ) ); ?></h2>
-						<p id="course-auth-description"><?php echo esc_html( get_the_title( $post_id ) ); ?></p>
-						<ol class="cb-course-auth-steps">
-							<li><span>1</span><strong><?php esc_html_e( 'Continue securely', 'codesblock' ); ?></strong></li>
-							<li><span>2</span><strong><?php echo esc_html( $is_free ? __( 'Open lesson one', 'codesblock' ) : ( $codesblock_payments_ready ? __( 'Choose your pass', 'codesblock' ) : __( 'Get launch updates', 'codesblock' ) ) ); ?></strong></li>
-							<li><span>3</span><strong><?php esc_html_e( 'Keep progress saved', 'codesblock' ); ?></strong></li>
-						</ol>
-					</div>
-					<div class="cb-course-auth-action">
-						<span class="cb-course-auth-eyebrow"><?php esc_html_e( 'CodesBlock account', 'codesblock' ); ?></span>
-						<h3><?php esc_html_e( 'Continue with Google', 'codesblock' ); ?></h3>
-						<p><?php echo esc_html( $is_free ? __( 'We will open your first lesson immediately after sign-in.', 'codesblock' ) : ( $codesblock_payments_ready ? __( 'We will take you to secure billing immediately after sign-in.', 'codesblock' ) : __( 'We will take you to launch updates while payment setup is completed and verified.', 'codesblock' ) ) ); ?></p>
-						<div class="cb-social-grid cb-course-social-grid" aria-label="<?php esc_attr_e( 'Social sign in', 'codesblock' ); ?>">
-							<?php
-							$codesblock_social_redirect = $is_free ? $codesblock_course_start_url : $codesblock_billing_url;
-							$codesblock_social_buttons  = shortcode_exists( 'nextend_social_login' ) ? do_shortcode( '[nextend_social_login redirect="' . esc_url( $codesblock_social_redirect ) . '"]' ) : '';
-							if ( false !== strpos( $codesblock_social_buttons, 'nsl-button' ) ) {
-								echo $codesblock_social_buttons; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Trusted provider shortcode output.
-							} else {
-								echo '<p class="cb-form-feedback">' . esc_html__( 'Social sign-in is not configured yet. Enable a provider to start this course.', 'codesblock' ) . '</p>';
-							}
-							?>
-						</div>
-						<div class="cb-course-auth-trust"><span aria-hidden="true">&#10003;</span><p><strong><?php esc_html_e( 'No password to remember', 'codesblock' ); ?></strong><small><?php esc_html_e( 'Only basic profile details are used for your learning account.', 'codesblock' ); ?></small></p></div>
-					</div>
-				</div>
-			</section>
-		</div>
-	<?php endif; ?>
 </main>
 
 

@@ -12,6 +12,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 $contact_email = sanitize_email( get_theme_mod( 'codesblock_contact_email', '' ) );
 ?>
 <footer id="contact" class="site-footer">
+	<?php if ( ! is_page_template( 'page-my-learning.php' ) ) : ?>
+		<div class="container">
+			<?php get_template_part( 'template-parts/newsletter', null, array( 'variant' => 'band' ) ); ?>
+		</div>
+	<?php endif; ?>
 	<div class="container footer-grid">
 		<div>
 			<a class="brand footer-brand" href="<?php echo esc_url( home_url( '/' ) ); ?>">
