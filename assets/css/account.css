@@ -1425,3 +1425,41 @@
 .cbx-auth-main .cbx-kicker {
 	padding-right: 40px;
 }
+
+/* Newsletter opt-in in the sign-in dialog */
+.cbx-optin {
+	align-items: flex-start;
+	background: var(--bg);
+	border: 1px solid var(--line);
+	border-radius: 12px;
+	cursor: pointer;
+	display: flex;
+	gap: 10px;
+	margin: 0 0 14px;
+	padding: 10px 12px;
+}
+
+.cbx-optin input {
+	accent-color: var(--green);
+	flex: 0 0 auto;
+	height: 18px;
+	margin: 1px 0 0;
+	width: 18px;
+}
+
+.cbx-optin span {
+	color: var(--ink);
+	font-size: .88rem;
+	line-height: 1.4;
+}
+
+.cba-gate-card .cbx-optin {
+	text-align: left;
+}
+
+button.cbx-plan-cta {
+	cursor: pointer;
+	font: inherit;
+	font-weight: 800;
+	width: 100%;
+}

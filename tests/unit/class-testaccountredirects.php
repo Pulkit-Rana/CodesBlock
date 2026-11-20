@@ -36,22 +36,33 @@ class TestAccountRedirects extends CBTestCase {
 	}
 
 	/**
-	 * Add the encoded return address to a provider link, or leave it unchanged.
+	 * Add the encoded WordPress redirect_to parameter, or leave the URL unchanged.
 	 */
 	public function testSocialLoginUrlAddsEncodedRedirect(): void {
-		$url = codesblock_social_login_url( 'https://codesblock.test/wp-login.php?loginSocial=google', 'https://codesblock.test/my-learning/' );
-		$this->assertContains( 'redirect=', $url );
-		$this->assertContains( rawurlencode( rawurlencode( 'https://codesblock.test/my-learning/' ) ), $url );
-		$this->assertEquals( 'https://codesblock.test/wp-login.php?loginSocial=google', codesblock_social_login_url( 'https://codesblock.test/wp-login.php?loginSocial=google', 'https://evil.example/' ) );
+		$base = 'https://codesblock.test/wp-json/wslu-social-login/type/github';
+		$url  = codesblock_social_login_url( $base, 'https://codesblock.test/my-learning/' );
+		$this->assertContains( 'redirect_to=', $url );
+		$this->assertEquals( $base, codesblock_social_login_url( $base, 'https://evil.example/' ) );
 	}
 
 	/**
-	 * Remember the first valid destination for the social redirect filters.
+	 * Treat Knit Pay's Test gateway as "not ready", so plans never reach checkout.
 	 */
-	public function testRequestedSocialRedirectIsValidated(): void {
-		codesblock_requested_social_redirect( 'https://evil.example/' );
-		$this->assertEquals( '', codesblock_requested_social_redirect() );
-		codesblock_requested_social_redirect( 'https://codesblock.test/courses/x/' );
-		$this->assertEquals( 'https://codesblock.test/courses/x/', codesblock_requested_social_redirect() );
+	public function testTestGatewayIsNotLive(): void {
+		$GLOBALS['_cb_mock_options']['pmpro_gateway']            = 'knit_pay';
+		$GLOBALS['_cb_mock_options']['pmpro_knit_pay_config_id'] = array( 38 );
+		$GLOBALS['_cb_mock_context']['post_meta']['_pronamic_gateway_id'] = 'test';
+		$this->assertTrue( codesblock_checkout_uses_test_gateway() );
+
+		$GLOBALS['_cb_mock_context']['post_meta']['_pronamic_gateway_id'] = 'razorpay';
+		$this->assertFalse( codesblock_checkout_uses_test_gateway() );
+
+		$GLOBALS['_cb_mock_options']['pmpro_knit_pay_config_id'] = array();
+		$this->assertTrue( codesblock_checkout_uses_test_gateway() );
+
+		$GLOBALS['_cb_mock_options']['pmpro_gateway'] = 'stripe';
+		$this->assertFalse( codesblock_checkout_uses_test_gateway() );
+
+		unset( $GLOBALS['_cb_mock_options']['pmpro_gateway'], $GLOBALS['_cb_mock_options']['pmpro_knit_pay_config_id'], $GLOBALS['_cb_mock_context']['post_meta']['_pronamic_gateway_id'] );
 	}
 }

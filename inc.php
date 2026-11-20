@@ -158,8 +158,9 @@ function codesblock_parse_course_syllabus( $syllabus ) {
 /**
  * Social sign-in providers the account dialog can offer, in display order.
  *
- * A provider appears only when Nextend Social Login has it configured and
- * enabled, so a GitHub button shows up automatically once it is switched on.
+ * Uses WP Social (Wpmet). A provider appears only when it is enabled under
+ * WP Social > Social Login > Providers, so Google shows up automatically once
+ * its keys are saved there.
  *
  * @return array<string, array{label: string, url: string}>
  */
@@ -170,26 +171,18 @@ function codesblock_social_providers() {
 	);
 	$providers = array();
 
-	if ( ! class_exists( 'NextendSocialLogin' ) || ! method_exists( 'NextendSocialLogin', 'isProviderEnabled' ) ) {
+	if ( ! class_exists( 'WP_Social\\App\\Settings' ) || ! method_exists( 'WP_Social\\App\\Settings', 'get_enabled_provider_conf_login' ) ) {
 		return $providers;
 	}
 
+	$enabled = (array) \WP_Social\App\Settings::get_enabled_provider_conf_login();
 	foreach ( $labels as $provider_id => $label ) {
-		if ( ! NextendSocialLogin::isProviderEnabled( $provider_id ) ) {
+		if ( empty( $enabled[ $provider_id ]['enable'] ) ) {
 			continue;
 		}
-
-		$url = '';
-		if ( isset( NextendSocialLogin::$enabledProviders[ $provider_id ] ) && method_exists( NextendSocialLogin::$enabledProviders[ $provider_id ], 'getLoginUrl' ) ) {
-			$url = (string) NextendSocialLogin::$enabledProviders[ $provider_id ]->getLoginUrl();
-		}
-		if ( '' === $url ) {
-			$url = add_query_arg( 'loginSocial', $provider_id, wp_login_url() );
-		}
-
 		$providers[ $provider_id ] = array(
 			'label' => $label,
-			'url'   => remove_query_arg( 'redirect', $url ),
+			'url'   => home_url( '/wp-json/wslu-social-login/type/' . $provider_id ),
 		);
 	}
 
@@ -199,13 +192,15 @@ function codesblock_social_providers() {
 /**
  * Add a validated same-site return address to a social sign-in URL.
  *
+ * WP Social reads the standard WordPress `redirect_to` parameter.
+ *
  * @param string $login_url Provider login URL without a redirect.
  * @param string $redirect  Where the visitor should land after signing in.
  * @return string
  */
 function codesblock_social_login_url( $login_url, $redirect ) {
 	$redirect = codesblock_member_redirect( $redirect );
-	return $redirect ? add_query_arg( 'redirect', rawurlencode( $redirect ), $login_url ) : $login_url;
+	return $redirect ? add_query_arg( 'redirect_to', rawurlencode( $redirect ), $login_url ) : $login_url;
 }
 
 /**
@@ -231,15 +226,38 @@ function codesblock_member_redirect( $url ) {
 }
 
 /**
- * Remember the destination Nextend Social Login received before other plugins replace it.
+ * Whether paid checkout is wired to a real payment gateway.
  *
- * @param string|null $url Destination to store, or null to read the stored value.
- * @return string
+ * Knit Pay's "Test" gateway lets anyone mark a payment as paid, so plans
+ * must not lead to checkout while it is the configured gateway.
+ *
+ * @return bool
  */
-function codesblock_requested_social_redirect( $url = null ) {
-	static $requested = '';
-	if ( null !== $url ) {
-		$requested = codesblock_member_redirect( $url );
+function codesblock_checkout_uses_test_gateway() {
+	if ( 'knit_pay' !== get_option( 'pmpro_gateway' ) ) {
+		return false;
 	}
-	return $requested;
+
+	$config_ids = array_filter( array_map( 'absint', (array) get_option( 'pmpro_knit_pay_config_id' ) ) );
+	if ( ! $config_ids ) {
+		return true;
+	}
+
+	foreach ( $config_ids as $config_id ) {
+		if ( 'test' === get_post_meta( $config_id, '_pronamic_gateway_id', true ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Whether visitors can buy a pass right now.
+ *
+ * @return bool
+ */
+function codesblock_payments_live() {
+	$ready = function_exists( 'cbcommerce_payments_ready' ) ? cbcommerce_payments_ready() : false;
+	return $ready && ! codesblock_checkout_uses_test_gateway();
 }

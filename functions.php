@@ -222,40 +222,145 @@ function codesblock_account_assets() {
 add_action( 'wp_enqueue_scripts', 'codesblock_account_assets', 100 );
 
 /**
- * Note the destination Nextend Social Login was given (a course, checkout or the
- * page the visitor was reading) before CodesBlock Commerce replaces it.
+ * Whether the current request is WP Social's sign-in callback.
  *
- * @param string $url Redirect URL from Nextend Social Login.
- * @return string
+ * @return bool
  */
-function codesblock_capture_social_redirect( $url ) {
-	codesblock_requested_social_redirect( (string) $url );
-	return $url;
+function codesblock_is_social_login_request() {
+	$uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+	return false !== strpos( $uri, '/wslu-social-login/' );
 }
-add_filter( 'nsl_login_redirect_url', 'codesblock_capture_social_redirect', 90 );
-add_filter( 'nsl_register_redirect_url', 'codesblock_capture_social_redirect', 90 );
 
 /**
- * Send a member back to where they started signing in, or to My learning.
+ * Give people who join with Google or GitHub the free Starter plan, like email sign-ups.
  *
- * @param string $url Redirect URL after CodesBlock Commerce's default.
- * @return string
+ * @param int $user_id New user ID.
  */
-function codesblock_restore_social_redirect( $url ) {
-	$requested = codesblock_requested_social_redirect();
-	if ( $requested && untrailingslashit( $requested ) !== untrailingslashit( home_url( '/' ) ) ) {
-		return $requested;
+function codesblock_social_user_registered( $user_id ) {
+	if ( ! codesblock_is_social_login_request() ) {
+		return;
 	}
-	return $url;
-}
-add_filter( 'nsl_login_redirect_url', 'codesblock_restore_social_redirect', 110 );
-add_filter( 'nsl_register_redirect_url', 'codesblock_restore_social_redirect', 110 );
 
-/*
- * Social sign-up is one click: interests and newsletter consent are offered
- * later on My learning instead of an extra form between Google and the course.
+	update_user_meta( $user_id, 'codesblock_signup_source', 'social' );
+	$starter_id = function_exists( 'cbcommerce_level_id' ) ? cbcommerce_level_id( 'starter' ) : 0;
+	if ( $starter_id && function_exists( 'pmpro_changeMembershipLevel' ) ) {
+		pmpro_changeMembershipLevel( $starter_id, $user_id );
+	}
+}
+add_action( 'user_register', 'codesblock_social_user_registered' );
+
+/**
+ * Honour the "send me the weekly build note" box from the sign-in dialog.
+ *
+ * The dialog stores the choice in a short-lived first-party cookie, so it
+ * survives the round trip to Google or GitHub. It only ever subscribes the
+ * person signing in, and MailPoet still asks them to confirm by email.
+ *
+ * @param string $auth_cookie Unused.
+ * @param int    $expire      Unused.
+ * @param int    $expiration  Unused.
+ * @param int    $user_id     User being signed in.
  */
-add_filter( 'nsl_registration_require_extra_input', '__return_false', 20 );
+function codesblock_apply_newsletter_optin( $auth_cookie, $expire, $expiration, $user_id ) {
+	if ( empty( $_COOKIE['cb_newsletter_optin'] ) || '1' !== $_COOKIE['cb_newsletter_optin'] ) {
+		return;
+	}
+
+	setcookie( 'cb_newsletter_optin', '', time() - HOUR_IN_SECONDS, COOKIEPATH ? COOKIEPATH : '/', COOKIE_DOMAIN, is_ssl(), false );
+	unset( $_COOKIE['cb_newsletter_optin'] );
+
+	$user = get_userdata( $user_id );
+	if ( ! $user || 'yes' === get_user_meta( $user_id, 'codesblock_marketing_consent', true ) ) {
+		return;
+	}
+
+	update_user_meta( $user_id, 'codesblock_marketing_consent', 'yes' );
+	update_user_meta( $user_id, 'codesblock_marketing_consent_at', gmdate( 'c' ) );
+	if ( function_exists( 'cbcommerce_subscribe_mailpoet' ) ) {
+		cbcommerce_subscribe_mailpoet( $user->user_email, $user->first_name, array(), 'Sign-in dialog' );
+	}
+}
+add_action( 'set_auth_cookie', 'codesblock_apply_newsletter_optin', 10, 4 );
+
+/**
+ * One way in: send signed-out visitors from PMPro's login and checkout pages
+ * to My learning, which offers Google, GitHub and email, then returns them.
+ */
+function codesblock_route_member_pages() {
+	if ( is_user_logged_in() || ! function_exists( 'pmpro_getOption' ) ) {
+		return;
+	}
+
+	$login_page    = absint( get_option( 'pmpro_login_page_id' ) );
+	$checkout_page = absint( get_option( 'pmpro_checkout_page_id' ) );
+	$home          = function_exists( 'cbcommerce_member_home_url' ) ? cbcommerce_member_home_url() : home_url( '/my-learning/' );
+
+	// Keep PMPro's password reset screens working.
+	if ( $login_page && is_page( $login_page ) && empty( $_GET['action'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only routing.
+		$back = isset( $_GET['redirect_to'] ) ? codesblock_member_redirect( esc_url_raw( wp_unslash( $_GET['redirect_to'] ) ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		wp_safe_redirect( $back ? add_query_arg( 'redirect_to', rawurlencode( $back ), $home ) : $home );
+		exit;
+	}
+
+	if ( $checkout_page && is_page( $checkout_page ) ) {
+		$args = array();
+		foreach ( array( 'level', 'pmpro_level', 'discount_code', 'pmpro_discount_code' ) as $key ) {
+			if ( isset( $_GET[ $key ] ) && is_string( $_GET[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only routing.
+				$args[ $key ] = sanitize_text_field( wp_unslash( $_GET[ $key ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			}
+		}
+		$checkout = add_query_arg( array_map( 'rawurlencode', $args ), get_permalink( $checkout_page ) );
+		wp_safe_redirect( add_query_arg( 'redirect_to', rawurlencode( $checkout ), $home ) );
+		exit;
+	}
+}
+add_action( 'template_redirect', 'codesblock_route_member_pages', 5 );
+
+/**
+ * Do not let anyone through checkout while it is wired to a test gateway.
+ */
+function codesblock_block_test_checkout() {
+	$checkout_page = absint( get_option( 'pmpro_checkout_page_id' ) );
+	if ( ! $checkout_page || ! is_page( $checkout_page ) || current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	if ( function_exists( 'codesblock_checkout_uses_test_gateway' ) && codesblock_checkout_uses_test_gateway() ) {
+		wp_safe_redirect( home_url( '/#newsletter' ) );
+		exit;
+	}
+}
+add_action( 'template_redirect', 'codesblock_block_test_checkout', 4 );
+
+/**
+ * Drop front-end assets the theme replaces: WP Social's button styles
+ * (the theme draws its own sign-in buttons) and PMPro styles outside PMPro pages.
+ */
+function codesblock_trim_plugin_assets() {
+	if ( is_admin() ) {
+		return;
+	}
+
+	$pmpro_pages = array();
+	foreach ( array( 'account', 'billing', 'cancel', 'checkout', 'confirmation', 'invoice', 'levels', 'login', 'member_profile_edit' ) as $pmpro_page ) {
+		$page_id = absint( get_option( 'pmpro_' . $pmpro_page . '_page_id' ) );
+		if ( $page_id ) {
+			$pmpro_pages[] = $page_id;
+		}
+	}
+	$keep_pmpro = $pmpro_pages && is_page( $pmpro_pages );
+
+	foreach ( array( wp_styles(), wp_scripts() ) as $registry ) {
+		foreach ( (array) $registry->queue as $handle ) {
+			$src = isset( $registry->registered[ $handle ] ) ? (string) $registry->registered[ $handle ]->src : '';
+			if ( false !== strpos( $src, '/plugins/wp-social/' ) || ( ! $keep_pmpro && false !== strpos( $src, '/plugins/paid-memberships-pro/css/frontend/' ) ) ) {
+				wp_dequeue_style( $handle );
+				wp_dequeue_script( $handle );
+			}
+		}
+	}
+}
+add_action( 'wp_enqueue_scripts', 'codesblock_trim_plugin_assets', 999 );
 
 /**
  * Convert the editable "## Module" / "- Lesson" curriculum into a course tree.

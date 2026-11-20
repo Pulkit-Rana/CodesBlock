@@ -86,15 +86,11 @@ $codesblock_home_url    = function_exists( 'cbcommerce_member_home_url' ) ? cbco
 		}
 	}
 
-	/* How this member signs in. */
+	/* How this member signs in (WP Social records the provider used). */
 	$codesblock_methods = array();
-	if ( class_exists( 'NextendSocialLogin' ) ) {
-		foreach ( array( 'google' => 'Google', 'github' => 'GitHub' ) as $codesblock_provider_id => $codesblock_provider_label ) {
-			$codesblock_provider = NextendSocialLogin::$enabledProviders[ $codesblock_provider_id ] ?? null;
-			if ( $codesblock_provider && method_exists( $codesblock_provider, 'isUserConnected' ) && $codesblock_provider->isUserConnected( $codesblock_user->ID ) ) {
-				$codesblock_methods[] = $codesblock_provider_label;
-			}
-		}
+	$codesblock_social  = (string) get_user_meta( $codesblock_user->ID, 'xs_social_register_by', true );
+	if ( '' !== $codesblock_social ) {
+		$codesblock_methods[] = 'github' === strtolower( $codesblock_social ) ? 'GitHub' : ucfirst( strtolower( $codesblock_social ) );
 	}
 	if ( ! $codesblock_methods ) {
 		$codesblock_methods[] = __( 'Email and password', 'codesblock' );
@@ -256,13 +252,20 @@ $codesblock_home_url    = function_exists( 'cbcommerce_member_home_url' ) ? cbco
 	</div>
 
 <?php else : ?>
+	<?php
+	$codesblock_return = isset( $_GET['redirect_to'] ) && function_exists( 'codesblock_member_redirect' ) ? codesblock_member_redirect( esc_url_raw( wp_unslash( $_GET['redirect_to'] ) ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only return address, validated.
+	$codesblock_pay_id = absint( get_option( 'pmpro_checkout_page_id' ) );
+	$codesblock_pay    = $codesblock_pay_id ? (string) wp_parse_url( (string) get_permalink( $codesblock_pay_id ), PHP_URL_PATH ) : '';
+	$codesblock_to_pay = $codesblock_return && '' !== $codesblock_pay && false !== strpos( $codesblock_return, $codesblock_pay );
+	$codesblock_return = $codesblock_return ? $codesblock_return : $codesblock_home_url;
+	?>
 	<section class="cba-gate" aria-labelledby="cba-gate-title">
 		<div class="cba-gate-card">
 			<span class="cbx-brand" aria-hidden="true">CB</span>
-			<h1 id="cba-gate-title"><?php esc_html_e( 'Sign in to your learning', 'codesblock' ); ?></h1>
-			<p><?php esc_html_e( 'Pick up where you left off, see your courses and manage your plan. New here? Your free account is created when you continue.', 'codesblock' ); ?></p>
-			<?php get_template_part( 'template-parts/auth-providers', null, array( 'redirect' => $codesblock_home_url ) ); ?>
-			<button class="cba-btn cba-btn-ghost cba-btn-block js-open-member" type="button" data-member-view="signin" data-member-email="open"><?php esc_html_e( 'Use email instead', 'codesblock' ); ?></button>
+			<h1 id="cba-gate-title"><?php echo esc_html( $codesblock_to_pay ? __( 'Sign in to continue to checkout', 'codesblock' ) : __( 'Sign in to your learning', 'codesblock' ) ); ?></h1>
+			<p><?php echo esc_html( $codesblock_to_pay ? __( 'Your pass is linked to your CodesBlock account, so your access and receipts stay in one place. New here? Your free account is created when you continue.', 'codesblock' ) : __( 'Pick up where you left off, see your courses and manage your plan. New here? Your free account is created when you continue.', 'codesblock' ) ); ?></p>
+			<?php get_template_part( 'template-parts/auth-providers', null, array( 'redirect' => $codesblock_return ) ); ?>
+			<button class="cba-btn cba-btn-ghost cba-btn-block js-open-member" type="button" data-member-view="signin" data-member-email="open" data-member-redirect="<?php echo esc_url( $codesblock_return ); ?>"><?php esc_html_e( 'Use email instead', 'codesblock' ); ?></button>
 			<a class="cba-link" href="<?php echo esc_url( $codesblock_courses_url ); ?>"><?php esc_html_e( 'Browse courses first', 'codesblock' ); ?> &rarr;</a>
 		</div>
 	</section>

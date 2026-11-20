@@ -27,7 +27,8 @@
 		authOverlay.querySelectorAll('.cbx-provider[data-base-href]').forEach(function (link) {
 			try {
 				var url = new URL(link.getAttribute('data-base-href'), window.location.origin);
-				if (authRedirect) url.searchParams.set('redirect', new URL(authRedirect, window.location.origin).href);
+				url.searchParams.delete('redirect_to');
+				if (authRedirect) url.searchParams.set('redirect_to', new URL(authRedirect, window.location.origin).href);
 				link.setAttribute('href', url.href);
 			} catch (error) {
 				// Keep the server-rendered link when a URL cannot be parsed.
@@ -236,6 +237,23 @@
 		}
 	}
 
+	/* Newsletter choice from the sign-in dialog: kept in a short-lived cookie so it survives Google/GitHub sign-in. */
+	function newsletterOptedIn() {
+		return Array.prototype.some.call(document.querySelectorAll('[data-newsletter-optin]'), function (box) { return box.checked; });
+	}
+
+	function rememberNewsletterChoice(checked) {
+		var secure = window.location.protocol === 'https:' ? '; Secure' : '';
+		document.cookie = 'cb_newsletter_optin=' + (checked ? '1; Max-Age=1800' : '; Max-Age=0') + '; Path=/; SameSite=Lax' + secure;
+		document.querySelectorAll('[data-newsletter-optin]').forEach(function (box) { box.checked = checked; });
+	}
+
+	document.addEventListener('change', function (event) {
+		if (event.target && event.target.matches && event.target.matches('[data-newsletter-optin]')) {
+			rememberNewsletterChoice(event.target.checked);
+		}
+	});
+
 	function submitForm(form, action) {
 		var feedback = form.querySelector('.cb-form-feedback');
 		var submit = form.querySelector('button[type="submit"]');
@@ -253,6 +271,7 @@
 
 		var data = new FormData(form);
 		data.append('action', action);
+		if (action === 'cbcommerce_register' && newsletterOptedIn()) data.append('marketing_consent', '1');
 		data.append('nonce', config.nonce);
 		if (submit) {
 			submit.disabled = true;

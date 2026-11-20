@@ -42,8 +42,29 @@ $providers      = function_exists( 'codesblock_social_providers' ) ? codesblock_
 $has_providers  = (bool) $providers;
 $provider_names = implode( __( ' or ', 'codesblock' ), wp_list_pluck( $providers, 'label' ) );
 $annual_monthly = $annual_level && function_exists( 'pmpro_formatPrice' ) ? pmpro_formatPrice( round( $annual_amount / 12 ) ) : '₹' . number_format_i18n( round( $annual_amount / 12 ) );
-$checkout       = function ( $plan ) {
-	return function_exists( 'cbcommerce_checkout_url' ) ? cbcommerce_checkout_url( $plan ) : wp_registration_url();
+$payments_live  = function_exists( 'codesblock_payments_live' ) ? codesblock_payments_live() : $payments_ready;
+$notify_url     = is_page_template( 'page-my-learning.php' ) ? home_url( '/#newsletter' ) : '#newsletter';
+$plan_cta       = function ( $plan, $label, $plan_name ) use ( $payments_live, $notify_url ) {
+	$url = function_exists( 'cbcommerce_checkout_url' ) ? cbcommerce_checkout_url( $plan ) : wp_registration_url();
+
+	if ( ! $payments_live ) {
+		printf( '<a class="cbx-plan-cta" href="%1$s" data-member-close>%2$s</a>', esc_url( $notify_url ), esc_html__( 'Notify me at launch', 'codesblock' ) );
+		return;
+	}
+
+	if ( ! is_user_logged_in() ) {
+		/* Sign in first, then continue straight to checkout with this plan. */
+		printf(
+			'<button type="button" class="cbx-plan-cta js-open-member" data-member-view="signin" data-member-kicker="%1$s" data-member-title="%2$s" data-member-redirect="%3$s">%4$s</button>',
+			esc_attr( $plan_name ),
+			esc_attr__( 'Sign in to continue to secure checkout', 'codesblock' ),
+			esc_url( $url ),
+			esc_html( $label )
+		);
+		return;
+	}
+
+	printf( '<a class="cbx-plan-cta" href="%1$s">%2$s</a>', esc_url( $url ), esc_html( $label ) );
 };
 ?>
 <?php if ( $show_auth_modal ) : ?>
@@ -111,7 +132,6 @@ $checkout       = function ( $plan ) {
 							<input id="cb-register-password" name="password" type="password" autocomplete="new-password" minlength="10" required>
 							<button type="button" class="cb-password-toggle" aria-label="<?php esc_attr_e( 'Show password', 'codesblock' ); ?>" data-password-toggle><?php esc_html_e( 'Show', 'codesblock' ); ?></button>
 						</div>
-						<label class="cbx-check"><input type="checkbox" name="marketing_consent" value="1"><span><?php esc_html_e( 'Also send me the weekly build note (optional)', 'codesblock' ); ?></span></label>
 						<input class="cb-honeypot" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
 						<button class="cbx-submit" type="submit"><?php esc_html_e( 'Create free account', 'codesblock' ); ?></button>
 						<p class="cb-form-feedback" role="status" aria-live="polite"></p>
@@ -154,7 +174,7 @@ $checkout       = function ( $plan ) {
 					<li><?php esc_html_e( 'Labs, drills and mock interviews', 'codesblock' ); ?></li>
 					<li><?php esc_html_e( 'Progress saved', 'codesblock' ); ?></li>
 				</ul>
-				<a class="cbx-plan-cta" href="<?php echo esc_url( $checkout( 'pro' ) ); ?>"><?php echo esc_html( $payments_ready ? __( 'Get 30 days', 'codesblock' ) : __( 'Get launch update', 'codesblock' ) ); ?></a>
+				<?php $plan_cta( 'pro', __( 'Get 30 days', 'codesblock' ), __( '30-day pass', 'codesblock' ) ); ?>
 			</article>
 			<article class="cbx-plan is-featured">
 				<span class="cbx-plan-badge"><?php echo esc_html( $annual_saving ? sprintf( __( 'Best value · save %d%%', 'codesblock' ), $annual_saving ) : __( 'Best value', 'codesblock' ) ); ?></span>
@@ -166,7 +186,7 @@ $checkout       = function ( $plan ) {
 					<li><?php esc_html_e( 'Every new course and lesson as it launches', 'codesblock' ); ?></li>
 					<li><?php esc_html_e( 'Labs, drills and mock interviews', 'codesblock' ); ?></li>
 				</ul>
-				<a class="cbx-plan-cta" href="<?php echo esc_url( $checkout( 'pro_annual' ) ); ?>"><?php echo esc_html( $payments_ready ? __( 'Get 1 year', 'codesblock' ) : __( 'Get launch update', 'codesblock' ) ); ?></a>
+				<?php $plan_cta( 'pro_annual', __( 'Get 1 year', 'codesblock' ), __( '1-year pass', 'codesblock' ) ); ?>
 			</article>
 			<article class="cbx-plan">
 				<h3><?php esc_html_e( 'Founding lifetime', 'codesblock' ); ?></h3>
@@ -177,17 +197,22 @@ $checkout       = function ( $plan ) {
 					<li><?php esc_html_e( 'Future courses included', 'codesblock' ); ?></li>
 					<li><?php esc_html_e( 'Founding-member price', 'codesblock' ); ?></li>
 				</ul>
-				<a class="cbx-plan-cta" href="<?php echo esc_url( $checkout( 'lifetime' ) ); ?>"><?php echo esc_html( $payments_ready ? __( 'Get lifetime', 'codesblock' ) : __( 'Notify me', 'codesblock' ) ); ?></a>
+				<?php $plan_cta( 'lifetime', __( 'Get lifetime', 'codesblock' ), __( 'Founding lifetime', 'codesblock' ) ); ?>
 			</article>
 		</div>
 
 		<footer class="cbx-pricing-foot">
 			<div class="cbx-pay">
-				<span><b>UPI</b> GPay · PhonePe · BHIM</span>
-				<span><b><?php esc_html_e( 'Cards', 'codesblock' ); ?></b> Visa · Mastercard · RuPay</span>
-				<span class="cbx-secure"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><?php echo esc_html( $india_ready ? __( 'Secure checkout · instant access', 'codesblock' ) : __( 'Payment methods appear at checkout', 'codesblock' ) ); ?></span>
+				<?php if ( $payments_live ) : ?>
+				<span><b>UPI</b> GPay · PhonePe · Paytm</span>
+				<span><b><?php esc_html_e( 'Cards', 'codesblock' ); ?></b> Visa · Mastercard · RuPay · Amex</span>
+				<span><b><?php esc_html_e( 'International', 'codesblock' ); ?></b> <?php esc_html_e( 'cards accepted', 'codesblock' ); ?></span>
+				<?php endif; ?>
+				<span class="cbx-secure"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><?php echo esc_html( $payments_live ? __( 'Secure checkout · instant access', 'codesblock' ) : __( 'Secure checkout opening soon', 'codesblock' ) ); ?></span>
 			</div>
-			<?php if ( $payments_ready ) : ?>
+			<?php if ( ! $payments_live ) : ?>
+				<p class="cbx-coupon"><?php esc_html_e( 'Paid passes open soon. Free lessons and articles are available now.', 'codesblock' ); ?></p>
+			<?php else : ?>
 				<p class="cbx-coupon"><?php echo wp_kses_post( __( 'New here? Use <b>WELCOME25</b> for 25% off the 30-day pass.', 'codesblock' ) ); ?></p>
 			<?php endif; ?>
 			<?php if ( ! is_user_logged_in() ) : ?>
