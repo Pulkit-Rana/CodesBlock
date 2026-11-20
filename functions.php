@@ -232,6 +232,28 @@ function codesblock_is_social_login_request() {
 }
 
 /**
+ * Never cache the social sign-in routes. They carry a one-time OAuth state,
+ * so a cached redirect makes every visitor reuse a spent state and fail.
+ */
+function codesblock_nocache_social_login() {
+	if ( ! codesblock_is_social_login_request() ) {
+		return;
+	}
+
+	if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+		define( 'DONOTCACHEPAGE', true );
+	}
+	do_action( 'litespeed_control_set_nocache', 'codesblock social sign-in' );
+	if ( ! headers_sent() ) {
+		nocache_headers();
+		header( 'X-LiteSpeed-Cache-Control: no-cache' );
+		header( 'CDN-Cache-Control: no-store' );
+	}
+}
+add_action( 'init', 'codesblock_nocache_social_login', 0 );
+add_action( 'rest_api_init', 'codesblock_nocache_social_login', 0 );
+
+/**
  * Give people who join with Google or GitHub the free Starter plan, like email sign-ups.
  *
  * @param int $user_id New user ID.
