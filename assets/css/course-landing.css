@@ -1019,6 +1019,11 @@ details[open] > summary .cbl-chevron {
 		transform: translateY(0);
 	}
 
+	body:has(.cbl-mobile-bar.is-visible) .ai-tutor-toggle {
+		bottom: calc(84px + env(safe-area-inset-bottom));
+		transition: bottom .25s ease;
+	}
+
 	.cbl-mobile-bar > div {
 		display: flex;
 		flex-direction: column;
