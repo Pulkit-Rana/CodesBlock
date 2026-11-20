@@ -1303,7 +1303,7 @@ details[open] > summary .cbl-chevron {
 .cbl-route li {
 	border-top: 4px solid var(--cbl-phase);
 	display: flex;
-	flex: var(--cbl-span) 1 0;
+	flex: calc(var(--cbl-span) + 3) 1 0;
 	flex-direction: column;
 	gap: 2px;
 	min-width: 0;
