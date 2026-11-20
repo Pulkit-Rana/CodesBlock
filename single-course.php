@@ -363,7 +363,7 @@ $codesblock_render_cta = function ( $extra_class = '', $is_primary = false ) use
 							}
 							?>
 							<li class="cbl-module<?php echo $codesblock_module['is_bonus'] ? ' is-bonus' : ''; ?>">
-								<details<?php echo 0 === $codesblock_index ? ' open' : ''; ?>>
+								<details>
 									<summary>
 										<span class="cbl-module-num" aria-hidden="true"><?php echo esc_html( $codesblock_module['is_bonus'] ? '+' : (string) $codesblock_index ); ?></span>
 										<span class="cbl-module-text">

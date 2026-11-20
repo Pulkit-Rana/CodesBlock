@@ -808,6 +808,19 @@ details[open] > summary .cbl-chevron {
 	grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
 }
 
+.cbl-landing .cbl-split .cbl-diagram svg {
+	min-width: 0;
+}
+
+.cbl-landing .cbl-stack {
+	display: grid;
+	gap: 16px;
+}
+
+.cbl-landing .cbl-stack .cbl-diagram svg {
+	max-width: 580px;
+}
+
 .cbl-landing .cbl-cards {
 	display: grid;
 	gap: 14px;
