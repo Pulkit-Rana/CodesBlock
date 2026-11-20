@@ -1412,3 +1412,12 @@
 		animation: none;
 	}
 }
+
+.cbx-news .cb-form-feedback:empty,
+.cbx-form .cb-form-feedback:empty {
+	display: none;
+}
+
+.cbx-news-band {
+	border: 1px solid rgba(255, 255, 255, .12);
+}

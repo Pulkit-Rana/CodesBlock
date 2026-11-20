@@ -38,7 +38,9 @@ $lifetime_price = $lifetime_level && function_exists( 'pmpro_formatPrice' ) ? pm
 $annual_saving  = $pro_amount > 0 ? max( 0, (int) round( ( 1 - ( $annual_amount / ( $pro_amount * 12 ) ) ) * 100 ) ) : 0;
 $payments_ready = function_exists( 'cbcommerce_payments_ready' ) && cbcommerce_payments_ready();
 $india_ready    = function_exists( 'cbcommerce_india_payments_ready' ) && cbcommerce_india_payments_ready();
-$has_providers  = function_exists( 'codesblock_social_providers' ) && codesblock_social_providers();
+$providers      = function_exists( 'codesblock_social_providers' ) ? codesblock_social_providers() : array();
+$has_providers  = (bool) $providers;
+$provider_names = implode( __( ' or ', 'codesblock' ), wp_list_pluck( $providers, 'label' ) );
 $annual_monthly = $annual_level && function_exists( 'pmpro_formatPrice' ) ? pmpro_formatPrice( round( $annual_amount / 12 ) ) : '₹' . number_format_i18n( round( $annual_amount / 12 ) );
 $checkout       = function ( $plan ) {
 	return function_exists( 'cbcommerce_checkout_url' ) ? cbcommerce_checkout_url( $plan ) : wp_registration_url();
@@ -71,7 +73,7 @@ $checkout       = function ( $plan ) {
 		<div class="cbx-auth-main">
 			<p class="cbx-kicker" data-auth-kicker data-default="<?php esc_attr_e( 'Welcome to CodesBlock', 'codesblock' ); ?>"><?php esc_html_e( 'Welcome to CodesBlock', 'codesblock' ); ?></p>
 			<h2 id="member-title" data-default="<?php esc_attr_e( 'Sign in or create your free account', 'codesblock' ); ?>"><?php esc_html_e( 'Sign in or create your free account', 'codesblock' ); ?></h2>
-			<p id="member-description" class="cbx-lead"><?php echo esc_html( $has_providers ? __( 'One click with Google or GitHub. New here? Your account is created automatically. No password, no card.', 'codesblock' ) : __( 'Use your email to sign in or create a free account. No card needed.', 'codesblock' ) ); ?></p>
+			<p id="member-description" class="cbx-lead"><?php echo esc_html( $has_providers ? sprintf( __( 'One click with %s. New here? Your account is created automatically. No password, no card.', 'codesblock' ), $provider_names ) : __( 'Use your email to sign in or create a free account. No card needed.', 'codesblock' ) ); ?></p>
 
 			<?php get_template_part( 'template-parts/auth-providers', null, array( 'redirect' => $redirect_url ) ); ?>
 
